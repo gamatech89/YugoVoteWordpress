@@ -91,18 +91,18 @@ if (class_exists('YGV_Achievement_Service')) {
     $streak_bonus = min($voting_streak, 10);
 }
 
-// Category icons/emojis
+// Category icons - mapiranje na Lucide icon imena
 $category_icons = [
-    'Sport' => '⚽',
-    'Muzika' => '🎵',
-    'Film' => '🎬',
-    'FIlm' => '🎬',
-    'Film i TV' => '🎬',
-    'Biznis' => '💼',
-    'Culture Club' => '🎭',
-    'Trendy' => '🔥',
-    'Lifestyle' => '🔥',
-    'Trendy/Lifestyle' => '🔥',
+    'Sport' => 'dribbble',
+    'Muzika' => 'music',
+    'Film' => 'film',
+    'FIlm' => 'film',
+    'Film i TV' => 'tv',
+    'Biznis' => 'briefcase',
+    'Culture Club' => 'palette',
+    'Trendy' => 'flame',
+    'Lifestyle' => 'flame',
+    'Trendy/Lifestyle' => 'flame',
 ];
 ?>
 
@@ -161,13 +161,13 @@ $category_icons = [
         <div class="ygv-streak-content">
             <div class="ygv-streak-icon">
                 <?php if ($voting_streak >= 30): ?>
-                    💎
+                    <?php ygv_icon_e('gem', 32); ?>
                 <?php elseif ($voting_streak >= 7): ?>
-                    🔥🔥
+                    <?php ygv_icon_e('flame', 32); ?><?php ygv_icon_e('flame', 32); ?>
                 <?php elseif ($voting_streak >= 1): ?>
-                    🔥
+                    <?php ygv_icon_e('flame', 32); ?>
                 <?php else: ?>
-                    ❄️
+                    <?php ygv_icon_e('snowflake', 32); ?>
                 <?php endif; ?>
             </div>
             <div class="ygv-streak-info">
@@ -217,7 +217,7 @@ $category_icons = [
                     </div>
                     <?php else: ?>
                     <div class="ygv-milestone-text ygv-milestone-complete">
-                        🏆 <?php echo esc_html__('Legendarni streak!', 'hello-elementor-child'); ?>
+                        <?php ygv_icon_e('trophy', 20); ?> <?php echo esc_html__('Legendarni streak!', 'hello-elementor-child'); ?>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -238,7 +238,7 @@ $category_icons = [
                     $cat_level = (int)$cat['level'];
                     $cat_title = ygv_get_title_for_level($cat_level, $level_config);
                     $cat_name = $cat['category_name'] ?: 'Unknown';
-                    $icon = $category_icons[$cat_name] ?? '📁';
+                    $icon_name = $category_icons[$cat_name] ?? 'folder';
                     
                     // Get vote bonus for this level
                     $vote_bonus = 0;
@@ -252,7 +252,7 @@ $category_icons = [
                     }
                 ?>
                 <div class="ygv-category-level-item">
-                    <div class="ygv-cat-icon"><?php echo $icon; ?></div>
+                    <div class="ygv-cat-icon"><?php ygv_icon_e($icon_name, 24); ?></div>
                     <div class="ygv-cat-info">
                         <div class="ygv-cat-name"><?php echo esc_html($cat_name); ?></div>
                         <div class="ygv-cat-level">

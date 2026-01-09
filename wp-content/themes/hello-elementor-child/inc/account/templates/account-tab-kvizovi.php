@@ -85,7 +85,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
     <!-- Token Status Card -->
     <div class="ygv-card ygv-token-card">
         <div class="ygv-token-content">
-            <div class="ygv-token-icon">🎮</div>
+            <div class="ygv-token-icon"><?php ygv_icon_e('gamepad', 32); ?></div>
             <div class="ygv-token-info">
                 <h3 class="ygv-token-title"><?php echo esc_html__('Quiz Tokeni', 'hello-elementor-child'); ?></h3>
                 <div class="ygv-token-count">
@@ -114,26 +114,26 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
 
     <!-- Quiz Stats Overview -->
     <div class="ygv-card ygv-quiz-stats-card">
-        <h3>📊 <?php echo esc_html__('Pregled Kvizova', 'hello-elementor-child'); ?></h3>
+        <h3><?php ygv_icon_e('chart-bar', 20); ?> <?php echo esc_html__('Pregled Kvizova', 'hello-elementor-child'); ?></h3>
         
         <div class="ygv-quiz-stats-grid">
             <div class="ygv-quiz-stat-box">
-                <span class="ygv-quiz-stat-icon">📝</span>
+                <span class="ygv-quiz-stat-icon"><?php ygv_icon_e('clipboard-edit', 24); ?></span>
                 <span class="ygv-quiz-stat-number"><?php echo number_format($total_quizzes); ?></span>
                 <span class="ygv-quiz-stat-label"><?php echo esc_html__('Rešenih Kvizova', 'hello-elementor-child'); ?></span>
             </div>
             <div class="ygv-quiz-stat-box">
-                <span class="ygv-quiz-stat-icon">🔄</span>
+                <span class="ygv-quiz-stat-icon"><?php ygv_icon_e('refresh', 24); ?></span>
                 <span class="ygv-quiz-stat-number"><?php echo number_format($total_attempts); ?></span>
                 <span class="ygv-quiz-stat-label"><?php echo esc_html__('Ukupno Pokušaja', 'hello-elementor-child'); ?></span>
             </div>
             <div class="ygv-quiz-stat-box">
-                <span class="ygv-quiz-stat-icon">⭐</span>
+                <span class="ygv-quiz-stat-icon"><?php ygv_icon_e('star', 24); ?></span>
                 <span class="ygv-quiz-stat-number"><?php echo number_format($total_xp); ?></span>
                 <span class="ygv-quiz-stat-label"><?php echo esc_html__('XP iz Kvizova', 'hello-elementor-child'); ?></span>
             </div>
             <div class="ygv-quiz-stat-box">
-                <span class="ygv-quiz-stat-icon">🏆</span>
+                <span class="ygv-quiz-stat-icon"><?php ygv_icon_e('trophy', 24); ?></span>
                 <span class="ygv-quiz-stat-number"><?php echo number_format($perfect_scores); ?></span>
                 <span class="ygv-quiz-stat-label"><?php echo esc_html__('Savršenih Rezultata', 'hello-elementor-child'); ?></span>
             </div>
@@ -154,7 +154,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
     <!-- Category Progress -->
     <?php if (!empty($category_progress)): ?>
     <div class="ygv-card">
-        <h3>🏅 <?php echo esc_html__('Top Kategorije', 'hello-elementor-child'); ?></h3>
+        <h3><?php ygv_icon_e('medal', 20); ?> <?php echo esc_html__('Top Kategorije', 'hello-elementor-child'); ?></h3>
         <p class="ygv-card-subtitle"><?php echo esc_html__('Tvoj napredak u kategorijama kvizova', 'hello-elementor-child'); ?></p>
         
         <div class="ygv-category-progress-list">
@@ -193,7 +193,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
     <!-- Quiz History -->
     <div class="ygv-card">
         <div class="ygv-card-header">
-            <h3>📚 <?php echo esc_html__('Istorija Kvizova', 'hello-elementor-child'); ?></h3>
+            <h3><?php ygv_icon_e('history', 20); ?> <?php echo esc_html__('Istorija Kvizova', 'hello-elementor-child'); ?></h3>
             <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary ygv-btn-small">
                 <?php echo esc_html__('Istraži Kvizove', 'hello-elementor-child'); ?>
             </a>
@@ -201,7 +201,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
         
         <?php if (empty($quiz_progress)): ?>
             <div class="ygv-empty-state">
-                <span class="ygv-empty-icon">🧠</span>
+                <span class="ygv-empty-icon"><?php ygv_icon_e('brain', 48); ?></span>
                 <h4><?php echo esc_html__('Još nisi rešio/la nijedan kviz', 'hello-elementor-child'); ?></h4>
                 <p><?php echo esc_html__('Rešavaj kvizove da zaradiš XP i napreduj u kategorijama!', 'hello-elementor-child'); ?></p>
                 <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary">
@@ -238,7 +238,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                     <div class="ygv-quiz-history-score <?php echo esc_attr($score_class); ?>">
                         <span class="ygv-quiz-score-percent"><?php echo $best_percent; ?>%</span>
                         <?php if ($best_percent >= 100): ?>
-                            <span class="ygv-quiz-perfect">🏆</span>
+                            <span class="ygv-quiz-perfect"><?php ygv_icon_e('trophy', 16); ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="ygv-quiz-history-content">
@@ -255,19 +255,19 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                                 <?php echo esc_html($difficulty_label); ?>
                             </span>
                             <span class="ygv-quiz-meta-attempts" title="<?php echo esc_attr__('Broj pokušaja', 'hello-elementor-child'); ?>">
-                                🔄 <?php echo $attempts; ?>x
+                                <?php ygv_icon_e('refresh', 14); ?> <?php echo $attempts; ?>x
                             </span>
                             <span class="ygv-quiz-meta-xp" title="<?php echo esc_attr__('Zarađen XP', 'hello-elementor-child'); ?>">
-                                ⭐ <?php echo number_format($awarded_xp); ?> XP
+                                <?php ygv_icon_e('star', 14); ?> <?php echo number_format($awarded_xp); ?> XP
                             </span>
                             <span class="ygv-quiz-meta-time"><?php echo esc_html($time_ago); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
                         </div>
                     </div>
                     <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>" class="ygv-quiz-history-action" title="<?php echo esc_attr__('Ponovo reši', 'hello-elementor-child'); ?>">
                         <?php if ($best_percent < 100): ?>
-                            🔄
+                            <?php ygv_icon_e('refresh', 20); ?>
                         <?php else: ?>
-                            ✓
+                            <?php ygv_icon_e('check-circle', 20); ?>
                         <?php endif; ?>
                     </a>
                 </div>

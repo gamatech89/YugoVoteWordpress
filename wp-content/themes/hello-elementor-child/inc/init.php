@@ -8,6 +8,9 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
+// --- LOADING ICONS SYSTEM ---
+require_once get_stylesheet_directory() . '/inc/icons.php';
+
 // --- LOADING QUIZZES FEATURE ---
 require_once get_stylesheet_directory() . '/inc/quizzes/quizzes-init.php'; 
 

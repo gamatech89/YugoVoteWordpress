@@ -68,9 +68,7 @@ function ygv_user_stats_bar_shortcode($atts) {
             <!-- XP Progress -->
             <div class="ygv-stats-item ygv-stats-xp" title="<?php echo esc_attr($progress_data['xp'] . ' / ' . $progress_data['next_xp'] . ' XP do sledećeg nivoa'); ?>">
                 <div class="ygv-stats-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
-                    </svg>
+                    <?php ygv_icon_e('star', 18); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">XP</div>
@@ -84,10 +82,7 @@ function ygv_user_stats_bar_shortcode($atts) {
             <!-- Quiz Tokens -->
             <div class="ygv-stats-item ygv-stats-tokens" title="<?php echo esc_attr('Kviz Tokeni: ' . $token_data['tokens'] . '/' . $token_data['max_tokens']); ?>">
                 <div class="ygv-stats-icon ygv-stats-icon-token">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <path d="M12 6V18M8 10H16M8 14H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                    <?php ygv_icon_e('coins', 18); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">Tokeni</div>
@@ -98,7 +93,7 @@ function ygv_user_stats_bar_shortcode($atts) {
                 </div>
                 <?php if ($token_data['tokens'] < $token_data['max_tokens'] && $token_data['next_token_in'] > 0): ?>
                     <div class="ygv-stats-timer" data-next-token="<?php echo esc_attr($token_data['next_token_in']); ?>">
-                        <span class="ygv-timer-icon">⏱</span>
+                        <span class="ygv-timer-icon"><?php ygv_icon_e('timer', 14); ?></span>
                         <span class="ygv-timer-value"><?php echo esc_html(ygv_format_time_short($token_data['next_token_in'])); ?></span>
                     </div>
                 <?php endif; ?>
@@ -107,10 +102,7 @@ function ygv_user_stats_bar_shortcode($atts) {
             <!-- YugoCoins -->
             <div class="ygv-stats-item ygv-stats-coins" title="YugoCoins">
                 <div class="ygv-stats-icon ygv-stats-icon-coin">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
-                        <text x="12" y="16" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Y</text>
-                    </svg>
+                    <?php ygv_icon_e('circle-dollar', 18); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">Coins</div>
@@ -121,9 +113,7 @@ function ygv_user_stats_bar_shortcode($atts) {
             <!-- Notifications Bell -->
             <a href="<?php echo esc_url(home_url('/moj-nalog/?tab=obavestenja')); ?>" class="ygv-stats-item ygv-stats-notifications" title="Obaveštenja">
                 <div class="ygv-stats-icon ygv-stats-icon-bell">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <?php ygv_icon_e('bell', 20); ?>
                     <?php if ($notifications_count > 0): ?>
                         <span class="ygv-notification-badge"><?php echo $notifications_count > 9 ? '9+' : $notifications_count; ?></span>
                     <?php endif; ?>

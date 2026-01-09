@@ -2285,7 +2285,12 @@ select.ygv-input {
 
 /* Token Card - Enhanced */
 .ygv-token-card {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #4f46e5 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #8b5cf6 0%,
+    #6366f1 50%,
+    #4f46e5 100%
+  ) !important;
   border: none !important;
   color: white !important;
   padding: 24px !important;
@@ -2356,7 +2361,7 @@ select.ygv-input {
 
 .ygv-token-timer {
   font-weight: 700 !important;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 8px;
   border-radius: 4px;
@@ -2394,7 +2399,12 @@ select.ygv-input {
 
 /* Quiz Stats Card - Enhanced */
 .ygv-quiz-stats-card {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #fef3c7 0%,
+    #fde68a 50%,
+    #fbbf24 100%
+  ) !important;
   border: none !important;
   padding: 24px !important;
   border-radius: 16px !important;
@@ -2692,12 +2702,12 @@ select.ygv-input {
   .ygv-quiz-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-  
+
   .ygv-token-content {
     flex-direction: column !important;
     text-align: center !important;
   }
-  
+
   .ygv-token-bar-wrapper {
     max-width: none !important;
     width: 100% !important;
@@ -2709,14 +2719,14 @@ select.ygv-input {
     flex-direction: column !important;
     align-items: flex-start !important;
   }
-  
+
   .ygv-quiz-history-score {
     width: 100% !important;
     height: 50px !important;
     flex-direction: row !important;
     gap: 10px;
   }
-  
+
   .ygv-quiz-history-meta {
     flex-direction: column !important;
     gap: 6px !important;

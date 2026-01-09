@@ -28,7 +28,7 @@ function yugo_create_list_shortcode() {
     if (!$can_create['can_create']) {
         return '<div class="ygv-card">
             <div class="ygv-info-box">
-                <span class="ygv-info-icon">🔒</span>
+                <span class="ygv-info-icon">' . ygv_icon('lock', 24) . '</span>
                 <div class="ygv-info-content">
                     <strong>' . esc_html__('Kreiranje lista je zaključano', 'hello-elementor-child') . '</strong>
                     <p>' . esc_html($can_create['reason']) . '</p>
@@ -179,7 +179,7 @@ function yugo_create_list_shortcode() {
                         <label for="list_category"><?php echo esc_html__('Kategorija Liste', 'hello-elementor-child'); ?> <span class="required">*</span></label>
                         <?php if (empty($available_categories)): ?>
                             <div class="ygv-info-box" style="margin: 0;">
-                                <span class="ygv-info-icon">🔒</span>
+                                <span class="ygv-info-icon"><?php ygv_icon_e('lock', 20); ?></span>
                                 <div class="ygv-info-content">
                                     <strong><?php echo esc_html__('Nemaš otključane kategorije', 'hello-elementor-child'); ?></strong>
                                     <p><?php printf(esc_html__('Potreban je nivo %d u kategoriji da bi kreirao liste.', 'hello-elementor-child'), $required_level); ?></p>
@@ -308,9 +308,9 @@ function yugo_create_list_shortcode() {
                 html += `
                     <div class="ygv-item-card ${isSelected ? 'ygv-item-selected' : ''} ${disabled ? 'ygv-item-disabled' : ''}" 
                          data-id="${item.id}" data-title="${item.title}">
-                        ${item.thumbnail ? `<img src="${item.thumbnail}" alt="">` : '<div class="ygv-item-no-thumb">📷</div>'}
+                        ${item.thumbnail ? `<img src="${item.thumbnail}" alt="">` : '<div class="ygv-item-no-thumb"><?php echo esc_js(ygv_icon('image', 24)); ?></div>'}
                         <span class="ygv-item-title">${item.title}</span>
-                        ${isSelected ? '<span class="ygv-item-check">✓</span>' : ''}
+                        ${isSelected ? '<span class="ygv-item-check"><?php echo esc_js(ygv_icon('check', 16)); ?></span>' : ''}
                     </div>
                 `;
             });
@@ -396,7 +396,7 @@ function yugo_create_list_shortcode() {
                 
                 if (selected.length < 10) {
                     messageDiv.className = 'ygv-message ygv-error-banner';
-                    messageDiv.innerHTML = '<span>⚠️</span><strong><?php echo esc_js(__('Moraš izabrati tačno 10 stavki.', 'hello-elementor-child')); ?></strong>';
+                    messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong><?php echo esc_js(__('Moraš izabrati tačno 10 stavki.', 'hello-elementor-child')); ?></strong>';
                     messageDiv.style.display = 'flex';
                     return;
                 }
@@ -416,7 +416,7 @@ function yugo_create_list_shortcode() {
                 .then(data => {
                     if (data.success) {
                         messageDiv.className = 'ygv-message ygv-success-banner';
-                        messageDiv.innerHTML = '<span>✅</span><strong>' + data.data.message + '</strong>';
+                        messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('check-circle', 20)); ?></span><strong>' + data.data.message + '</strong>';
                         messageDiv.style.display = 'flex';
                         
                         setTimeout(() => {
@@ -424,7 +424,7 @@ function yugo_create_list_shortcode() {
                         }, 2000);
                     } else {
                         messageDiv.className = 'ygv-message ygv-error-banner';
-                        messageDiv.innerHTML = '<span>⚠️</span><strong>' + data.data + '</strong>';
+                        messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong>' + data.data + '</strong>';
                         messageDiv.style.display = 'flex';
                         submitBtn.disabled = false;
                         submitBtn.textContent = '<?php echo esc_js(__('Kreiraj Listu', 'hello-elementor-child')); ?>';
@@ -432,7 +432,7 @@ function yugo_create_list_shortcode() {
                 })
                 .catch(error => {
                     messageDiv.className = 'ygv-message ygv-error-banner';
-                    messageDiv.innerHTML = '<span>⚠️</span><strong><?php echo esc_js(__('Greška pri komunikaciji sa serverom.', 'hello-elementor-child')); ?></strong>';
+                    messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong><?php echo esc_js(__('Greška pri komunikaciji sa serverom.', 'hello-elementor-child')); ?></strong>';
                     messageDiv.style.display = 'flex';
                     submitBtn.disabled = false;
                     submitBtn.textContent = '<?php echo esc_js(__('Kreiraj Listu', 'hello-elementor-child')); ?>';

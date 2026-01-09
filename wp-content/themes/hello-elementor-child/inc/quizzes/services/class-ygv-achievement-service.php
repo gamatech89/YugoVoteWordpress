@@ -56,7 +56,7 @@ class YGV_Achievement_Service {
             'first_vote' => [
                 'name' => __('Prvi Glas', 'hello-elementor-child'),
                 'description' => __('Glasaj na svojoj prvoj listi', 'hello-elementor-child'),
-                'icon' => '🗳️',
+                'icon' => 'vote',
                 'xp_reward' => 10,
                 'category' => 'voting',
                 'check_type' => 'vote_count',
@@ -65,7 +65,7 @@ class YGV_Achievement_Service {
             'vote_10' => [
                 'name' => __('Glasač', 'hello-elementor-child'),
                 'description' => __('Glasaj 10 puta', 'hello-elementor-child'),
-                'icon' => '🗳️',
+                'icon' => 'vote',
                 'xp_reward' => 25,
                 'category' => 'voting',
                 'check_type' => 'vote_count',
@@ -74,7 +74,7 @@ class YGV_Achievement_Service {
             'vote_50' => [
                 'name' => __('Aktivni Glasač', 'hello-elementor-child'),
                 'description' => __('Glasaj 50 puta', 'hello-elementor-child'),
-                'icon' => '🎯',
+                'icon' => 'target',
                 'xp_reward' => 50,
                 'category' => 'voting',
                 'check_type' => 'vote_count',
@@ -83,7 +83,7 @@ class YGV_Achievement_Service {
             'vote_100' => [
                 'name' => __('Profesionalni Glasač', 'hello-elementor-child'),
                 'description' => __('Glasaj 100 puta', 'hello-elementor-child'),
-                'icon' => '🏅',
+                'icon' => 'medal',
                 'xp_reward' => 100,
                 'category' => 'voting',
                 'check_type' => 'vote_count',
@@ -92,7 +92,7 @@ class YGV_Achievement_Service {
             'vote_500' => [
                 'name' => __('Glasački Veteran', 'hello-elementor-child'),
                 'description' => __('Glasaj 500 puta', 'hello-elementor-child'),
-                'icon' => '🎖️',
+                'icon' => 'award',
                 'xp_reward' => 250,
                 'category' => 'voting',
                 'check_type' => 'vote_count',
@@ -103,7 +103,7 @@ class YGV_Achievement_Service {
             'first_quiz' => [
                 'name' => __('Kviz Početnik', 'hello-elementor-child'),
                 'description' => __('Završi svoj prvi kviz', 'hello-elementor-child'),
-                'icon' => '🧠',
+                'icon' => 'brain',
                 'xp_reward' => 15,
                 'category' => 'quiz',
                 'check_type' => 'quiz_count',
@@ -112,7 +112,7 @@ class YGV_Achievement_Service {
             'quiz_10' => [
                 'name' => __('Kviz Entuzijasta', 'hello-elementor-child'),
                 'description' => __('Završi 10 kvizova', 'hello-elementor-child'),
-                'icon' => '📚',
+                'icon' => 'book-open',
                 'xp_reward' => 50,
                 'category' => 'quiz',
                 'check_type' => 'quiz_count',
@@ -121,7 +121,7 @@ class YGV_Achievement_Service {
             'quiz_perfect' => [
                 'name' => __('Perfektan Rezultat', 'hello-elementor-child'),
                 'description' => __('Završi kviz sa 100% tačnih odgovora', 'hello-elementor-child'),
-                'icon' => '💯',
+                'icon' => 'percent',
                 'xp_reward' => 30,
                 'category' => 'quiz',
                 'check_type' => 'quiz_perfect',
@@ -132,7 +132,7 @@ class YGV_Achievement_Service {
             'first_list' => [
                 'name' => __('Kreator', 'hello-elementor-child'),
                 'description' => __('Kreiraj svoju prvu listu', 'hello-elementor-child'),
-                'icon' => '📝',
+                'icon' => 'clipboard-edit',
                 'xp_reward' => 50,
                 'category' => 'creation',
                 'check_type' => 'list_count',
@@ -141,7 +141,7 @@ class YGV_Achievement_Service {
             'list_5' => [
                 'name' => __('Aktivni Kreator', 'hello-elementor-child'),
                 'description' => __('Kreiraj 5 listi', 'hello-elementor-child'),
-                'icon' => '✍️',
+                'icon' => 'edit',
                 'xp_reward' => 100,
                 'category' => 'creation',
                 'check_type' => 'list_count',
@@ -152,7 +152,7 @@ class YGV_Achievement_Service {
             'level_5' => [
                 'name' => __('Učenik', 'hello-elementor-child'),
                 'description' => __('Dostani globalni nivo 5', 'hello-elementor-child'),
-                'icon' => '⭐',
+                'icon' => 'star',
                 'xp_reward' => 25,
                 'category' => 'level',
                 'check_type' => 'overall_level',
@@ -161,7 +161,7 @@ class YGV_Achievement_Service {
             'level_10' => [
                 'name' => __('Znalac', 'hello-elementor-child'),
                 'description' => __('Dostani globalni nivo 10', 'hello-elementor-child'),
-                'icon' => '🌟',
+                'icon' => 'sparkles',
                 'xp_reward' => 50,
                 'category' => 'level',
                 'check_type' => 'overall_level',
@@ -170,7 +170,7 @@ class YGV_Achievement_Service {
             'level_25' => [
                 'name' => __('Ekspert', 'hello-elementor-child'),
                 'description' => __('Dostani globalni nivo 25', 'hello-elementor-child'),
-                'icon' => '💫',
+                'icon' => 'zap',
                 'xp_reward' => 150,
                 'category' => 'level',
                 'check_type' => 'overall_level',
@@ -179,7 +179,7 @@ class YGV_Achievement_Service {
             'level_50' => [
                 'name' => __('Legenda', 'hello-elementor-child'),
                 'description' => __('Dostani globalni nivo 50', 'hello-elementor-child'),
-                'icon' => '🏆',
+                'icon' => 'trophy',
                 'xp_reward' => 500,
                 'category' => 'level',
                 'check_type' => 'overall_level',
@@ -190,7 +190,7 @@ class YGV_Achievement_Service {
             'category_level_10' => [
                 'name' => __('Specijalista', 'hello-elementor-child'),
                 'description' => __('Dostani nivo 10 u bilo kojoj kategoriji', 'hello-elementor-child'),
-                'icon' => '🎓',
+                'icon' => 'badge',
                 'xp_reward' => 75,
                 'category' => 'level',
                 'check_type' => 'any_category_level',
@@ -199,7 +199,7 @@ class YGV_Achievement_Service {
             'category_level_25' => [
                 'name' => __('Master', 'hello-elementor-child'),
                 'description' => __('Dostani nivo 25 u bilo kojoj kategoriji', 'hello-elementor-child'),
-                'icon' => '🧙',
+                'icon' => 'crown',
                 'xp_reward' => 200,
                 'category' => 'level',
                 'check_type' => 'any_category_level',
@@ -210,7 +210,7 @@ class YGV_Achievement_Service {
             'streak_3' => [
                 'name' => __('Početak Serije', 'hello-elementor-child'),
                 'description' => __('Glasaj 3 dana zaredom', 'hello-elementor-child'),
-                'icon' => '🔥',
+                'icon' => 'fire',
                 'xp_reward' => 20,
                 'category' => 'streak',
                 'check_type' => 'voting_streak',
@@ -219,7 +219,7 @@ class YGV_Achievement_Service {
             'streak_7' => [
                 'name' => __('Nedeljna Serija', 'hello-elementor-child'),
                 'description' => __('Glasaj 7 dana zaredom', 'hello-elementor-child'),
-                'icon' => '🔥',
+                'icon' => 'flame',
                 'xp_reward' => 50,
                 'category' => 'streak',
                 'check_type' => 'voting_streak',
@@ -228,7 +228,7 @@ class YGV_Achievement_Service {
             'streak_30' => [
                 'name' => __('Mesečna Serija', 'hello-elementor-child'),
                 'description' => __('Glasaj 30 dana zaredom', 'hello-elementor-child'),
-                'icon' => '💎',
+                'icon' => 'gem',
                 'xp_reward' => 200,
                 'category' => 'streak',
                 'check_type' => 'voting_streak',

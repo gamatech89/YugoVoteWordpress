@@ -15,11 +15,11 @@ $stats = $achievement_service->get_stats($user_id);
 
 // Group achievements by category
 $categories = [
-    'voting' => ['name' => __('Glasanje', 'hello-elementor-child'), 'icon' => '🗳️', 'achievements' => []],
-    'quiz' => ['name' => __('Kvizovi', 'hello-elementor-child'), 'icon' => '🧠', 'achievements' => []],
-    'creation' => ['name' => __('Kreiranje', 'hello-elementor-child'), 'icon' => '📝', 'achievements' => []],
-    'level' => ['name' => __('Nivoi', 'hello-elementor-child'), 'icon' => '⭐', 'achievements' => []],
-    'streak' => ['name' => __('Serije', 'hello-elementor-child'), 'icon' => '🔥', 'achievements' => []],
+    'voting' => ['name' => __('Glasanje', 'hello-elementor-child'), 'icon' => 'vote', 'achievements' => []],
+    'quiz' => ['name' => __('Kvizovi', 'hello-elementor-child'), 'icon' => 'brain', 'achievements' => []],
+    'creation' => ['name' => __('Kreiranje', 'hello-elementor-child'), 'icon' => 'clipboard-edit', 'achievements' => []],
+    'level' => ['name' => __('Nivoi', 'hello-elementor-child'), 'icon' => 'star', 'achievements' => []],
+    'streak' => ['name' => __('Serije', 'hello-elementor-child'), 'icon' => 'flame', 'achievements' => []],
 ];
 
 foreach ($achievements as $achievement) {
@@ -49,7 +49,7 @@ foreach ($achievements as $achievement) {
             <div class="ygv-achievements-meta">
                 <h3><?php echo esc_html__('Dostignuća', 'hello-elementor-child'); ?></h3>
                 <p class="ygv-xp-earned">
-                    <span class="ygv-xp-icon">✨</span>
+                    <span class="ygv-xp-icon"><?php ygv_icon_e('sparkles', 18); ?></span>
                     <?php printf(
                         esc_html__('%d XP zarađeno od dostignuća', 'hello-elementor-child'),
                         $stats['xp_earned']
@@ -63,13 +63,13 @@ foreach ($achievements as $achievement) {
     <!-- Newly Unlocked Banner -->
     <div class="ygv-card ygv-newly-unlocked">
         <div class="ygv-unlocked-banner">
-            <span class="ygv-banner-icon">🎉</span>
+            <span class="ygv-banner-icon"><?php ygv_icon_e('party-popper', 32); ?></span>
             <div class="ygv-banner-content">
                 <strong><?php echo esc_html__('Nova dostignuća otključana!', 'hello-elementor-child'); ?></strong>
                 <div class="ygv-new-achievements-list">
                     <?php foreach ($newly_unlocked as $new): ?>
                     <span class="ygv-new-achievement">
-                        <?php echo $new['icon']; ?> <?php echo esc_html($new['name']); ?>
+                        <?php ygv_icon_e($new['icon'], 16); ?> <?php echo esc_html($new['name']); ?>
                         <span class="ygv-xp-badge">+<?php echo $new['xp_reward']; ?> XP</span>
                     </span>
                     <?php endforeach; ?>
@@ -88,7 +88,7 @@ foreach ($achievements as $achievement) {
     <div class="ygv-card ygv-achievement-category">
         <div class="ygv-card-header">
             <h3>
-                <span class="ygv-cat-icon"><?php echo $category['icon']; ?></span>
+                <span class="ygv-cat-icon"><?php ygv_icon_e($category['icon'], 20); ?></span>
                 <?php echo esc_html($category['name']); ?>
             </h3>
             <span class="ygv-achievement-count"><?php echo $unlocked_in_cat; ?>/<?php echo $total_in_cat; ?></span>
@@ -102,9 +102,9 @@ foreach ($achievements as $achievement) {
             ?>
             <div class="ygv-achievement-card <?php echo $is_unlocked ? 'ygv-unlocked' : 'ygv-locked'; ?>">
                 <div class="ygv-achievement-icon <?php echo $is_unlocked ? '' : 'ygv-grayscale'; ?>">
-                    <?php echo $achievement['icon']; ?>
+                    <?php ygv_icon_e($achievement['icon'], 32); ?>
                     <?php if ($is_unlocked): ?>
-                    <span class="ygv-unlocked-check">✓</span>
+                    <span class="ygv-unlocked-check"><?php ygv_icon_e('check', 14); ?></span>
                     <?php endif; ?>
                 </div>
                 <div class="ygv-achievement-info">
@@ -123,7 +123,7 @@ foreach ($achievements as $achievement) {
                     <div class="ygv-achievement-reward">
                         <?php if ($is_unlocked): ?>
                             <span class="ygv-reward-earned">
-                                ✅ <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
+                                <?php ygv_icon_e('check-circle', 16); ?> <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
                             </span>
                             <?php if ($achievement['unlocked_at']): ?>
                             <span class="ygv-unlocked-date">

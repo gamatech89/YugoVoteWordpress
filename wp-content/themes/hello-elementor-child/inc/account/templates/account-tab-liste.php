@@ -98,7 +98,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
         
         <?php if (!$can_create['can_create']): ?>
             <div class="ygv-info-box">
-                <span class="ygv-info-icon">🔒</span>
+                <span class="ygv-info-icon"><?php ygv_icon_e('lock', 24); ?></span>
                 <div class="ygv-info-content">
                     <strong><?php echo esc_html__('Kreiranje lista je zaključano', 'hello-elementor-child'); ?></strong>
                     <p><?php echo esc_html($can_create['reason']); ?></p>
@@ -109,7 +109,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
         
         <?php if (empty($user_lists)): ?>
             <div class="ygv-empty-state">
-                <span class="ygv-empty-icon">📋</span>
+                <span class="ygv-empty-icon"><?php ygv_icon_e('clipboard-list', 48); ?></span>
                 <h4><?php echo esc_html__('Još nemaš nijednu listu', 'hello-elementor-child'); ?></h4>
                 <p><?php echo esc_html__('Kada dostigneš potreban nivo, moći ćeš da kreiraš svoje Top 10 liste.', 'hello-elementor-child'); ?></p>
             </div>
@@ -152,13 +152,13 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                             <span class="ygv-list-category"><?php echo esc_html($category_name); ?></span>
                         <?php endif; ?>
                         <div class="ygv-list-meta">
-                            <span class="ygv-list-votes">🗳️ <?php echo number_format($vote_count); ?> <?php echo esc_html__('glasova', 'hello-elementor-child'); ?></span>
+                            <span class="ygv-list-votes"><?php ygv_icon_e('vote', 14); ?> <?php echo number_format($vote_count); ?> <?php echo esc_html__('glasova', 'hello-elementor-child'); ?></span>
                             <span class="ygv-list-date"><?php echo esc_html(human_time_diff(strtotime($list->post_date), current_time('timestamp'))); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
                         </div>
                     </div>
                     <div class="ygv-list-actions">
-                        <a href="<?php echo esc_url(get_edit_post_link($list->ID)); ?>" class="ygv-btn-small" title="<?php echo esc_attr__('Uredi', 'hello-elementor-child'); ?>">✏️</a>
-                        <a href="<?php echo esc_url(get_permalink($list->ID)); ?>" class="ygv-btn-small" title="<?php echo esc_attr__('Pogledaj', 'hello-elementor-child'); ?>">👁️</a>
+                        <a href="<?php echo esc_url(get_edit_post_link($list->ID)); ?>" class="ygv-btn-small" title="<?php echo esc_attr__('Uredi', 'hello-elementor-child'); ?>"><?php ygv_icon_e('edit', 16); ?></a>
+                        <a href="<?php echo esc_url(get_permalink($list->ID)); ?>" class="ygv-btn-small" title="<?php echo esc_attr__('Pogledaj', 'hello-elementor-child'); ?>"><?php ygv_icon_e('eye', 16); ?></a>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -177,7 +177,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
     
     <!-- Voting Statistics -->
     <div class="ygv-card ygv-voting-stats-card">
-        <h3>📊 <?php echo esc_html__('Statistika Glasanja', 'hello-elementor-child'); ?></h3>
+        <h3><?php ygv_icon_e('chart-bar', 20); ?> <?php echo esc_html__('Statistika Glasanja', 'hello-elementor-child'); ?></h3>
         
         <div class="ygv-voting-stats-grid">
             <div class="ygv-stat-box">
@@ -216,12 +216,12 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
     
     <!-- Voting History -->
     <div class="ygv-card">
-        <h3>🗳️ <?php echo esc_html__('Istorija Glasanja', 'hello-elementor-child'); ?></h3>
+        <h3><?php ygv_icon_e('history', 20); ?> <?php echo esc_html__('Istorija Glasanja', 'hello-elementor-child'); ?></h3>
         <p class="ygv-card-subtitle"><?php echo esc_html__('Liste na kojima si glasao/la', 'hello-elementor-child'); ?></p>
         
         <?php if (empty($voted_lists)): ?>
             <div class="ygv-empty-state">
-                <span class="ygv-empty-icon">🗳️</span>
+                <span class="ygv-empty-icon"><?php ygv_icon_e('vote', 48); ?></span>
                 <h4><?php echo esc_html__('Još nisi glasao/la', 'hello-elementor-child'); ?></h4>
                 <p><?php echo esc_html__('Kada glasaš na listama, tvoja istorija će se prikazati ovde.', 'hello-elementor-child'); ?></p>
                 <a href="<?php echo esc_url(home_url('/liste/')); ?>" class="ygv-btn ygv-btn-primary">
@@ -258,13 +258,13 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                         <?php endif; ?>
                         <div class="ygv-history-meta">
                             <span class="ygv-history-votes" title="<?php echo esc_attr__('Tvoji glasovi na ovoj listi', 'hello-elementor-child'); ?>">
-                                ✓ <?php echo $user_votes; ?> <?php echo $user_votes === 1 ? esc_html__('glas', 'hello-elementor-child') : esc_html__('glasova', 'hello-elementor-child'); ?>
+                                <?php ygv_icon_e('check', 14); ?> <?php echo $user_votes; ?> <?php echo $user_votes === 1 ? esc_html__('glas', 'hello-elementor-child') : esc_html__('glasova', 'hello-elementor-child'); ?>
                             </span>
                             <span class="ygv-history-date"><?php echo esc_html($time_ago); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
                         </div>
                     </div>
                     <a href="<?php echo esc_url(get_permalink($list->ID)); ?>" class="ygv-history-action" title="<?php echo esc_attr__('Pogledaj listu', 'hello-elementor-child'); ?>">
-                        →
+                        <?php ygv_icon_e('arrow-right', 18); ?>
                     </a>
                 </div>
                 <?php endforeach; ?>
@@ -303,9 +303,9 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 <span class="ygv-cat-create-name"><?php echo esc_html($category->name); ?></span>
                 <span class="ygv-cat-create-level">
                     <?php if ($can_create_in_cat): ?>
-                        ✅ <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
+                        <?php ygv_icon_e('check-circle', 16); ?> <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
                     <?php else: ?>
-                        🔒 <?php printf(esc_html__('Nivo %d/%d', 'hello-elementor-child'), $user_cat_level, $required_level); ?>
+                        <?php ygv_icon_e('lock', 16); ?> <?php printf(esc_html__('Nivo %d/%d', 'hello-elementor-child'), $user_cat_level, $required_level); ?>
                     <?php endif; ?>
                 </span>
             </div>

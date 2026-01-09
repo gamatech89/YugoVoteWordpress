@@ -35,16 +35,16 @@ function ygv_leaderboard_shortcode($atts) {
         <!-- Leaderboard Type Tabs -->
         <div class="ygv-lb-tabs">
             <button class="ygv-lb-tab <?php echo $type === 'overall' ? 'active' : ''; ?>" data-type="overall">
-                🏆 <?php echo esc_html__('Ukupno', 'hello-elementor-child'); ?>
+                <?php ygv_icon_e('trophy', 16); ?> <?php echo esc_html__('Ukupno', 'hello-elementor-child'); ?>
             </button>
             <button class="ygv-lb-tab <?php echo $type === 'votes' ? 'active' : ''; ?>" data-type="votes">
-                🗳️ <?php echo esc_html__('Glasači', 'hello-elementor-child'); ?>
+                <?php ygv_icon_e('vote', 16); ?> <?php echo esc_html__('Glasači', 'hello-elementor-child'); ?>
             </button>
             <button class="ygv-lb-tab <?php echo $type === 'streak' ? 'active' : ''; ?>" data-type="streak">
-                🔥 <?php echo esc_html__('Streak', 'hello-elementor-child'); ?>
+                <?php ygv_icon_e('flame', 16); ?> <?php echo esc_html__('Streak', 'hello-elementor-child'); ?>
             </button>
             <button class="ygv-lb-tab <?php echo $type === 'achievements' ? 'active' : ''; ?>" data-type="achievements">
-                ⭐ <?php echo esc_html__('Dostignuća', 'hello-elementor-child'); ?>
+                <?php ygv_icon_e('star', 16); ?> <?php echo esc_html__('Dostignuća', 'hello-elementor-child'); ?>
             </button>
         </div>
         
@@ -326,7 +326,7 @@ function ygv_render_achievements_leaderboard($limit, $current_user_id) {
 function ygv_render_leaderboard_list($leaders, $current_user_id, $current_user_rank, $current_user_data, $type) {
     if (empty($leaders)) {
         return '<div class="ygv-lb-empty">' . 
-            '<span class="ygv-lb-empty-icon">🏆</span>' .
+            '<span class="ygv-lb-empty-icon">' . ygv_icon('trophy', 48) . '</span>' .
             '<p>' . esc_html__('Još nema podataka za ovu rang listu.', 'hello-elementor-child') . '</p>' .
         '</div>';
     }
@@ -375,16 +375,16 @@ function ygv_render_leaderboard_row($rank, $data, $current_user_id, $type) {
             break;
         case 'votes':
             $votes = number_format((int)($data['vote_count'] ?? 0));
-            $value_html = '<span class="ygv-lb-votes">🗳️ ' . $votes . ' glasova</span>';
+            $value_html = '<span class="ygv-lb-votes">' . ygv_icon('vote', 14) . ' ' . $votes . ' glasova</span>';
             break;
         case 'streak':
             $streak = (int)($data['streak_days'] ?? 0);
-            $icon = $streak >= 30 ? '💎' : ($streak >= 7 ? '🔥🔥' : '🔥');
+            $icon = $streak >= 30 ? ygv_icon('gem', 16) : ($streak >= 7 ? ygv_icon('flame', 16) : ygv_icon('fire', 16));
             $value_html = '<span class="ygv-lb-streak">' . $icon . ' ' . $streak . ' dana</span>';
             break;
         case 'achievements':
             $count = (int)($data['achievement_count'] ?? 0);
-            $value_html = '<span class="ygv-lb-achievements">⭐ ' . $count . ' dostignuća</span>';
+            $value_html = '<span class="ygv-lb-achievements">' . ygv_icon('star', 14) . ' ' . $count . ' dostignuća</span>';
             break;
     }
     
