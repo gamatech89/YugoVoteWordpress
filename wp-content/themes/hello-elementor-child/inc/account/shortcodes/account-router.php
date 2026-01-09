@@ -15,6 +15,8 @@ function ygv_account_nav_items(): array {
     $items = [
         'kvizovi'     => [__('Kvizovi', 'hello-elementor-child'), 'kvizovi'],
         'profil'      => [__('Profil', 'hello-elementor-child'), 'profil'],
+        'liste'       => [__('Moje Liste', 'hello-elementor-child'), 'liste'],
+        'dostignuca'  => [__('Dostignuća', 'hello-elementor-child'), 'dostignuca'],
         'podesavanja' => [__('Podešavanja', 'hello-elementor-child'), 'podesavanja'],
         'sigurnost'   => [__('Sigurnost', 'hello-elementor-child'), 'sigurnost'],
     ];
