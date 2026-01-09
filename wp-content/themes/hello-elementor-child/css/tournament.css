@@ -1,0 +1,639 @@
+/**
+ * Tournament Duel Arena - Clean & Functional UI
+ * Created: 2025-12-28
+ */
+
+/* ==========================================================================
+   ARENA WRAPPER
+   ========================================================================== */
+
+.yuv-arena-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.yuv-arena-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  background: rgba(67, 85, 164, 0.15);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid rgba(254, 101, 85, 0.3);
+}
+
+.yuv-stage-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #4355a4 0%, #5568c4 100%);
+  color: #ffd700;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  border-radius: 24px;
+  border: 1px solid rgba(67, 85, 164, 0.8);
+  box-shadow: 0 4px 12px rgba(67, 85, 164, 0.3);
+}
+
+.yuv-tournament-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+}
+
+.yuv-match-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 16px 0;
+}
+
+.yuv-timer-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(254, 101, 85, 0.15);
+  border: 2px solid rgba(254, 101, 85, 0.3);
+  border-radius: 30px;
+  color: #fe6555;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.yuv-timer-display > span:first-child {
+  display: inline-flex;
+  align-items: center;
+}
+
+.yuv-timer-display .yuv-timer-value {
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Fix timer emoji */
+.yuv-timer-display img.emoji {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* ==========================================================================
+   DUEL ARENA (SPLIT SCREEN)
+   ========================================================================== */
+
+.yuv-duel-arena {
+  display: flex;
+  position: relative;
+  min-height: 500px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+/* Large VS Watermark */
+.yuv-duel-arena::before {
+  content: "VS";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 280px;
+  font-weight: 900;
+  color: rgba(254, 101, 85, 0.08);
+  z-index: 0;
+  pointer-events: none;
+  text-shadow: 0 0 100px rgba(254, 101, 85, 0.15);
+  letter-spacing: 20px;
+}
+
+/* Contender Cards */
+.yuv-contender {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.yuv-contender::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Contender Background Image */
+.yuv-contender-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.yuv-contender-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.6) 60%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  z-index: 1;
+}
+
+/* Content Container - No blur, just flex container */
+.yuv-contender-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+/* Info Panel - Blurred glass-morphism at bottom */
+.yuv-contender-info-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.75) 20%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: auto;
+}
+
+.yuv-contender-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  line-height: 1.2;
+}
+
+.yuv-contender-bio {
+  display: none;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 14px 0;
+  line-height: 1.4;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Vote Button */
+.yuv-vote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 36px;
+  background: linear-gradient(
+    135deg,
+    rgba(254, 101, 85, 0.9) 0%,
+    rgba(255, 122, 109, 0.9) 100%
+  );
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(254, 101, 85, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  margin: 16px auto 12px auto;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.yuv-vote-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 28px rgba(254, 101, 85, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 122, 109, 1) 0%,
+    rgba(254, 101, 85, 1) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.yuv-vote-btn:active {
+  transform: translateY(-1px) scale(1);
+}
+
+.yuv-vote-icon {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Fix for WordPress emoji conversion */
+.yuv-vote-icon img.emoji {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* VS Badge (Center) */
+.yuv-vs-badge {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 999 !important;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #fe6555 0%, #ff4d3c 100%);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 8px rgba(254, 101, 85, 0.12),
+    0 0 0 16px rgba(254, 101, 85, 0.06), 0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(254, 101, 85, 0.4);
+  backdrop-filter: blur(20px);
+  animation: vsPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.yuv-vs-badge::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  border: 2px solid rgba(254, 101, 85, 0.3);
+  border-radius: 50%;
+  animation: vsRipple 2.5s ease-out infinite;
+}
+
+.yuv-vs-badge span {
+  font-size: 48px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(254, 101, 85, 0.8), 0 2px 8px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+}
+
+@keyframes vsPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes vsRipple {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   VOTE COUNTS & RESULTS - ALWAYS VISIBLE, SIMPLE LAYOUT
+   ========================================================================== */
+
+/* Vote Count Display - Only Visible After Voting */
+.yuv-vote-count-display {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 0 0 0;
+  margin: 0;
+}
+
+/* Show vote counts after voting */
+.yuv-show-results .yuv-vote-count-display {
+  display: flex;
+}
+
+.yuv-vote-percent {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.yuv-vote-number {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Result Bar Container - Shows at Top When Voted */
+.yuv-result-bar-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.yuv-result-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4355a4 0%, #fe6555 100%);
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 20px rgba(254, 101, 85, 0.6);
+}
+
+/* Winner Styling - Subtle Blue Glow */
+.yuv-show-results .yuv-contender.is-winner {
+  box-shadow: inset 0 0 0 2px rgba(67, 85, 164, 0.6),
+    0 0 40px rgba(67, 85, 164, 0.2);
+}
+
+.yuv-show-results .yuv-contender.is-winner::before {
+  border-color: rgba(67, 85, 164, 0.4);
+  box-shadow: inset 0 0 80px rgba(67, 85, 164, 0.1);
+}
+
+.yuv-show-results .yuv-contender.is-winner .yuv-vote-percent {
+  color: #6b8aed;
+  text-shadow: 0 0 30px rgba(107, 138, 237, 0.6), 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.yuv-show-results .yuv-contender.is-winner .yuv-result-bar {
+  background: linear-gradient(90deg, #4355a4 0%, #6b8aed 100%);
+  box-shadow: 0 0 40px rgba(67, 85, 164, 0.5);
+}
+
+/* Hide vote button after voting */
+.yuv-show-results .yuv-vote-btn {
+  display: none !important;
+}
+
+/* OLD OVERLAY STYLES - REMOVE */
+.yuv-result-overlay {
+  display: none !important;
+}
+
+/* ==========================================================================
+   NAVIGATION STRIP
+   ========================================================================== */
+
+/* ==========================================================================
+   NAVIGATION STRIP (Thumbnails)
+   ========================================================================== */
+
+.yuv-nav-strip {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, 0.95) 0%,
+    rgba(15, 23, 42, 0.95) 100%
+  );
+  border-top: 2px solid rgba(67, 85, 164, 0.3);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #4355a4 rgba(67, 85, 164, 0.2);
+}
+
+.yuv-nav-strip::-webkit-scrollbar {
+  height: 8px;
+}
+
+.yuv-nav-strip::-webkit-scrollbar-track {
+  background: rgba(67, 85, 164, 0.1);
+  border-radius: 4px;
+}
+
+.yuv-nav-strip::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #4355a4 0%, #5568c4 100%);
+  border-radius: 4px;
+}
+
+/* Navigation Item */
+.yuv-nav-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 140px;
+  background: linear-gradient(
+    135deg,
+    rgba(67, 85, 164, 0.15) 0%,
+    rgba(67, 85, 164, 0.08) 100%
+  );
+  border: 2px solid rgba(67, 85, 164, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.yuv-nav-item:hover {
+  transform: translateY(-6px) scale(1.04);
+  border-color: rgba(67, 85, 164, 0.7);
+  box-shadow: 0 12px 32px rgba(67, 85, 164, 0.4);
+}
+
+.yuv-nav-item.current {
+  border-color: #4355a4;
+  border-width: 3px;
+  background: linear-gradient(
+    135deg,
+    rgba(67, 85, 164, 0.35) 0%,
+    rgba(67, 85, 164, 0.25) 100%
+  );
+  box-shadow: 0 0 24px rgba(67, 85, 164, 0.6);
+}
+
+.yuv-nav-item.current::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background: #4355a4;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(67, 85, 164, 0.8);
+  z-index: 5;
+}
+
+.yuv-nav-item.voted {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.2) 0%,
+    rgba(5, 150, 105, 0.15) 100%
+  );
+  border-color: #10b981;
+}
+
+.yuv-nav-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  z-index: 5;
+}
+
+.yuv-nav-check::before {
+  content: "✓";
+}
+
+/* Thumbnail Images */
+.yuv-nav-thumbs {
+  display: flex;
+  gap: 4px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+}
+
+.yuv-nav-img {
+  width: 50px !important;
+  height: 50px !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
+  object-fit: cover !important;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: block !important;
+}
+
+.yuv-nav-vs {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .yuv-duel-arena {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .yuv-contender {
+    min-height: 400px;
+  }
+
+  .yuv-contender-content {
+    min-height: 400px;
+    padding: 32px 20px;
+  }
+
+  .yuv-contender-name {
+    font-size: 24px;
+  }
+
+  .yuv-contender-bio {
+    font-size: 14px;
+  }
+
+  .yuv-vote-btn {
+    padding: 14px 40px;
+    font-size: 14px;
+  }
+
+  .yuv-vs-badge {
+    width: 90px;
+    height: 90px;
+  }
+
+  .yuv-vs-badge span {
+    font-size: 40px;
+  }
+
+  .yuv-result-percent {
+    font-size: 72px;
+  }
+
+  .yuv-tournament-title {
+    font-size: 20px;
+  }
+
+  .yuv-nav-item {
+    width: 120px;
+  }
+
+  .yuv-nav-img {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}

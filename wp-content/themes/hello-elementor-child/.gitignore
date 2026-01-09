@@ -1,0 +1,65 @@
+# Documentation files (generated/temporary)
+*_COMPLETE.md
+*_REPORT.md
+*_CHECKLIST.md
+*_INDEX.md
+*_GUIDE.md
+*_SUMMARY.md
+*_CHANGES.md
+*_REFACTOR*.md
+README_REFACTORING.md
+DOCUMENTATION_INDEX.md
+MIGRATION_REPORT.md
+MODULE_STRUCTURE_GUIDE.md
+POST_REFACTORING_CHECKLIST.md
+QUIZ_REFACTORING_COMPLETE.md
+REFACTORING_COMPLETE.md
+REFACTORING_VISUAL_SUMMARY.md
+TOURNAMENT_DATABASE_REFACTOR.md
+TOURNAMENT_UI_OVERHAUL.md
+GIT_CHANGES.md
+
+# Keep only:
+# - DEVELOPMENT_REFERENCE.md (main reference)
+# - .github/copilot-instructions.md (AI guide)
+
+# Backup files
+*.bak
+*.bkp
+*-old.*
+*-backup.*
+*.backup
+*.-bkpphp
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Node modules (if using npm/yarn)
+node_modules/
+package-lock.json
+yarn.lock
+
+# WordPress
+wp-config-local.php
+wp-content/uploads/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
