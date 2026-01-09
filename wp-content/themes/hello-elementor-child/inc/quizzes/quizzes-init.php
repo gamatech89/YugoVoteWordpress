@@ -33,9 +33,7 @@ if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuizCategoryMeta')) {
     HelloElementorChild\Quizzes\Meta\QuizCategoryMeta::register();
 }
 
-// --- Services ---
-require_once $quizzes_inc_path . 'services/class-ygv-token-service.php';
-require_once $quizzes_inc_path . 'services/class-ygv-progress-service.php';
+// --- Services (autoloaded via PSR-4) ---
 
 // --- Shortcodes ---
 $levels_sc = $quizzes_inc_path . 'shortcodes/levels-per-category.php';
@@ -51,13 +49,13 @@ if (file_exists($quiz_ajax_grid)) require_once $quiz_ajax_grid;
 
 // Accessors
 if (!function_exists('ygv_tokens')) {
-    function ygv_tokens(): YGV_Token_Service {
-        static $s = null; return $s ?: $s = new YGV_Token_Service();
+    function ygv_tokens(): HelloElementorChild\Quizzes\Services\TokenService {
+        static $s = null; return $s ?: $s = new HelloElementorChild\Quizzes\Services\TokenService();
     }
 }
 if (!function_exists('ygv_progress')) {
-    function ygv_progress(): YGV_Progress_Service {
-        static $s = null; return $s ?: $s = new YGV_Progress_Service();
+    function ygv_progress(): HelloElementorChild\Quizzes\Services\ProgressService {
+        static $s = null; return $s ?: $s = new HelloElementorChild\Quizzes\Services\ProgressService();
     }
 }
 
