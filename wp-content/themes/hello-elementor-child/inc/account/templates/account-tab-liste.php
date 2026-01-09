@@ -1,6 +1,7 @@
 <?php if (!defined('ABSPATH')) exit;
 
 $user_id = get_current_user_id();
+global $wpdb;
 
 // Get lists created by this user
 $user_lists = get_posts([
@@ -24,6 +25,63 @@ $parent_categories = get_terms([
     'parent' => 0,
     'hide_empty' => false,
 ]);
+
+// Get voting history - lists where user has voted
+$voted_lists_query = $wpdb->prepare(
+    "SELECT DISTINCT v.voting_list_id, MAX(v.created_at) as last_vote_date, COUNT(*) as vote_count
+     FROM {$wpdb->prefix}voting_list_votes v
+     WHERE v.user_id = %d
+     GROUP BY v.voting_list_id
+     ORDER BY last_vote_date DESC
+     LIMIT 50",
+    $user_id
+);
+$voted_list_data = $wpdb->get_results($voted_lists_query, ARRAY_A);
+
+// Get the list post objects
+$voted_lists = [];
+if (!empty($voted_list_data)) {
+    $list_ids = wp_list_pluck($voted_list_data, 'voting_list_id');
+    $voted_list_map = array_column($voted_list_data, null, 'voting_list_id');
+    
+    $list_posts = get_posts([
+        'post_type' => 'voting_list',
+        'post__in' => $list_ids,
+        'posts_per_page' => -1,
+        'post_status' => 'publish',
+        'orderby' => 'post__in',
+    ]);
+    
+    foreach ($list_posts as $list) {
+        $voted_lists[] = [
+            'post' => $list,
+            'vote_count' => $voted_list_map[$list->ID]['vote_count'] ?? 0,
+            'last_vote' => $voted_list_map[$list->ID]['last_vote_date'] ?? '',
+        ];
+    }
+}
+
+// Calculate voting stats
+$total_votes = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT COUNT(*) FROM {$wpdb->prefix}voting_list_votes WHERE user_id = %d",
+    $user_id
+));
+
+$total_lists_voted = count($voted_list_data);
+
+// Get votes by category
+$votes_by_category = $wpdb->get_results($wpdb->prepare(
+    "SELECT t.name as category_name, COUNT(v.id) as vote_count
+     FROM {$wpdb->prefix}voting_list_votes v
+     JOIN {$wpdb->prefix}posts p ON v.voting_list_id = p.ID
+     JOIN {$wpdb->prefix}term_relationships tr ON p.ID = tr.object_id
+     JOIN {$wpdb->prefix}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+     JOIN {$wpdb->prefix}terms t ON tt.term_id = t.term_id
+     WHERE v.user_id = %d AND tt.taxonomy = 'voting_list_category' AND tt.parent = 0
+     GROUP BY t.term_id
+     ORDER BY vote_count DESC",
+    $user_id
+), ARRAY_A);
 ?>
 
 <div class="ygv-my-lists">
@@ -114,6 +172,107 @@ $parent_categories = get_terms([
                     ); ?>
                 </p>
             </div>
+        <?php endif; ?>
+    </div>
+    
+    <!-- Voting Statistics -->
+    <div class="ygv-card ygv-voting-stats-card">
+        <h3>📊 <?php echo esc_html__('Statistika Glasanja', 'hello-elementor-child'); ?></h3>
+        
+        <div class="ygv-voting-stats-grid">
+            <div class="ygv-stat-box">
+                <span class="ygv-stat-number"><?php echo number_format($total_votes); ?></span>
+                <span class="ygv-stat-label"><?php echo esc_html__('Ukupno Glasova', 'hello-elementor-child'); ?></span>
+            </div>
+            <div class="ygv-stat-box">
+                <span class="ygv-stat-number"><?php echo number_format($total_lists_voted); ?></span>
+                <span class="ygv-stat-label"><?php echo esc_html__('Lista Glasano', 'hello-elementor-child'); ?></span>
+            </div>
+        </div>
+        
+        <?php if (!empty($votes_by_category)): ?>
+        <div class="ygv-votes-by-category">
+            <h4><?php echo esc_html__('Glasovi po Kategoriji', 'hello-elementor-child'); ?></h4>
+            <div class="ygv-category-vote-bars">
+                <?php 
+                $max_votes = max(array_column($votes_by_category, 'vote_count'));
+                foreach ($votes_by_category as $cat): 
+                    $percent = $max_votes > 0 ? ($cat['vote_count'] / $max_votes) * 100 : 0;
+                ?>
+                <div class="ygv-category-vote-item">
+                    <div class="ygv-cat-vote-header">
+                        <span class="ygv-cat-vote-name"><?php echo esc_html($cat['category_name']); ?></span>
+                        <span class="ygv-cat-vote-count"><?php echo number_format($cat['vote_count']); ?></span>
+                    </div>
+                    <div class="ygv-cat-vote-bar">
+                        <div class="ygv-cat-vote-bar-fill" style="width: <?php echo $percent; ?>%"></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    
+    <!-- Voting History -->
+    <div class="ygv-card">
+        <h3>🗳️ <?php echo esc_html__('Istorija Glasanja', 'hello-elementor-child'); ?></h3>
+        <p class="ygv-card-subtitle"><?php echo esc_html__('Liste na kojima si glasao/la', 'hello-elementor-child'); ?></p>
+        
+        <?php if (empty($voted_lists)): ?>
+            <div class="ygv-empty-state">
+                <span class="ygv-empty-icon">🗳️</span>
+                <h4><?php echo esc_html__('Još nisi glasao/la', 'hello-elementor-child'); ?></h4>
+                <p><?php echo esc_html__('Kada glasaš na listama, tvoja istorija će se prikazati ovde.', 'hello-elementor-child'); ?></p>
+                <a href="<?php echo esc_url(home_url('/liste/')); ?>" class="ygv-btn ygv-btn-primary">
+                    <?php echo esc_html__('Istraži Liste', 'hello-elementor-child'); ?>
+                </a>
+            </div>
+        <?php else: ?>
+            <div class="ygv-voting-history-list">
+                <?php foreach ($voted_lists as $item): 
+                    $list = $item['post'];
+                    $user_votes = $item['vote_count'];
+                    $last_vote = $item['last_vote'];
+                    
+                    $categories = wp_get_object_terms($list->ID, 'voting_list_category', ['fields' => 'names']);
+                    $category_name = !empty($categories) ? $categories[0] : '';
+                    
+                    // Get thumbnail
+                    $thumbnail = get_the_post_thumbnail_url($list->ID, 'thumbnail');
+                    if (!$thumbnail) {
+                        $thumbnail = get_stylesheet_directory_uri() . '/assets/images/list-placeholder.jpg';
+                    }
+                    
+                    // Calculate time ago
+                    $time_ago = human_time_diff(strtotime($last_vote), current_time('timestamp'));
+                ?>
+                <div class="ygv-history-item">
+                    <div class="ygv-history-thumb" style="background-image: url('<?php echo esc_url($thumbnail); ?>')"></div>
+                    <div class="ygv-history-content">
+                        <h4 class="ygv-history-title">
+                            <a href="<?php echo esc_url(get_permalink($list->ID)); ?>"><?php echo esc_html($list->post_title); ?></a>
+                        </h4>
+                        <?php if ($category_name): ?>
+                            <span class="ygv-history-category"><?php echo esc_html($category_name); ?></span>
+                        <?php endif; ?>
+                        <div class="ygv-history-meta">
+                            <span class="ygv-history-votes" title="<?php echo esc_attr__('Tvoji glasovi na ovoj listi', 'hello-elementor-child'); ?>">
+                                ✓ <?php echo $user_votes; ?> <?php echo $user_votes === 1 ? esc_html__('glas', 'hello-elementor-child') : esc_html__('glasova', 'hello-elementor-child'); ?>
+                            </span>
+                            <span class="ygv-history-date"><?php echo esc_html($time_ago); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
+                        </div>
+                    </div>
+                    <a href="<?php echo esc_url(get_permalink($list->ID)); ?>" class="ygv-history-action" title="<?php echo esc_attr__('Pogledaj listu', 'hello-elementor-child'); ?>">
+                        →
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <?php if (count($voted_lists) >= 50): ?>
+            <p class="ygv-show-more-hint"><?php echo esc_html__('Prikazano poslednjih 50 lista', 'hello-elementor-child'); ?></p>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
     
