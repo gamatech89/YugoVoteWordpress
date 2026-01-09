@@ -1,2 +1,303 @@
-<?php if (!defined('ABSPATH')) exit; ?>
-<?php echo do_shortcode('[yugo_account_panel]'); ?>
+<?php if (!defined('ABSPATH')) exit;
+
+$user_id = get_current_user_id();
+global $wpdb;
+
+// Get quiz progress table
+$t_quiz = $wpdb->prefix . 'ygv_user_quiz_progress';
+$t_cat = $wpdb->prefix . 'ygv_user_category_progress';
+
+// Get user's quiz history (all quizzes they've attempted)
+$quiz_progress = $wpdb->get_results($wpdb->prepare(
+    "SELECT qp.*, p.post_title as quiz_title, 
+            GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') as category_names
+     FROM {$t_quiz} qp
+     LEFT JOIN {$wpdb->posts} p ON qp.quiz_id = p.ID
+     LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+     LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+     LEFT JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+     WHERE qp.user_id = %d 
+       AND p.post_status = 'publish'
+       AND (tt.taxonomy = 'quiz_category' OR tt.taxonomy IS NULL)
+     GROUP BY qp.quiz_id
+     ORDER BY qp.last_attempt_at DESC",
+    $user_id
+), ARRAY_A);
+
+// Calculate stats
+$total_quizzes = count($quiz_progress);
+$total_attempts = array_sum(array_column($quiz_progress, 'attempts'));
+$total_xp = array_sum(array_column($quiz_progress, 'awarded_xp'));
+$perfect_scores = count(array_filter($quiz_progress, fn($q) => (int)$q['best_percent'] >= 100));
+
+// Get top categories (by XP)
+$category_progress = $wpdb->get_results($wpdb->prepare(
+    "SELECT cp.*, t.name as category_name
+     FROM {$t_cat} cp
+     LEFT JOIN {$wpdb->terms} t ON cp.category_term_id = t.term_id
+     WHERE cp.user_id = %d
+     ORDER BY cp.xp DESC
+     LIMIT 5",
+    $user_id
+), ARRAY_A);
+
+// Get available quizzes count
+$available_quizzes = $wpdb->get_var(
+    "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'quiz' AND post_status = 'publish'"
+);
+
+// Token info
+$max_tokens = 20;
+$refill_rate = 60 * 60 * 4; // 4 hours in seconds
+$token_bucket = get_user_meta($user_id, 'quiz_token_bucket', true);
+$current_tokens = $max_tokens;
+$next_refill = 0;
+
+if (is_array($token_bucket) && isset($token_bucket['tokens'])) {
+    $current_tokens = (int)$token_bucket['tokens'];
+    $last_refill = (int)($token_bucket['last_refill'] ?? 0);
+    $now = time();
+    $time_passed = $now - $last_refill;
+    
+    // Calculate tokens gained since last refill
+    $tokens_gained = floor($time_passed / $refill_rate);
+    $current_tokens = min($max_tokens, $current_tokens + $tokens_gained);
+    
+    // Time until next token
+    if ($current_tokens < $max_tokens) {
+        $next_refill = $refill_rate - ($time_passed % $refill_rate);
+    }
+}
+
+// Level config for titles
+$level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
+?>
+
+<div class="ygv-quizzes-dashboard">
+
+    <!-- Token Status Card -->
+    <div class="ygv-card ygv-token-card">
+        <div class="ygv-token-content">
+            <div class="ygv-token-icon">🎮</div>
+            <div class="ygv-token-info">
+                <h3 class="ygv-token-title"><?php echo esc_html__('Quiz Tokeni', 'hello-elementor-child'); ?></h3>
+                <div class="ygv-token-count">
+                    <span class="ygv-token-current"><?php echo $current_tokens; ?></span>
+                    <span class="ygv-token-divider">/</span>
+                    <span class="ygv-token-max"><?php echo $max_tokens; ?></span>
+                </div>
+                <?php if ($current_tokens < $max_tokens && $next_refill > 0): ?>
+                <div class="ygv-token-refill">
+                    <?php echo esc_html__('Sledeći token za', 'hello-elementor-child'); ?>: 
+                    <span class="ygv-token-timer" data-seconds="<?php echo $next_refill; ?>">
+                        <?php echo gmdate('H:i:s', $next_refill); ?>
+                    </span>
+                </div>
+                <?php elseif ($current_tokens >= $max_tokens): ?>
+                <div class="ygv-token-full"><?php echo esc_html__('Tokeni su puni!', 'hello-elementor-child'); ?></div>
+                <?php endif; ?>
+            </div>
+            <div class="ygv-token-bar-wrapper">
+                <div class="ygv-token-bar">
+                    <div class="ygv-token-bar-fill" style="width: <?php echo ($current_tokens / $max_tokens) * 100; ?>%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Stats Overview -->
+    <div class="ygv-card ygv-quiz-stats-card">
+        <h3>📊 <?php echo esc_html__('Pregled Kvizova', 'hello-elementor-child'); ?></h3>
+        
+        <div class="ygv-quiz-stats-grid">
+            <div class="ygv-quiz-stat-box">
+                <span class="ygv-quiz-stat-icon">📝</span>
+                <span class="ygv-quiz-stat-number"><?php echo number_format($total_quizzes); ?></span>
+                <span class="ygv-quiz-stat-label"><?php echo esc_html__('Rešenih Kvizova', 'hello-elementor-child'); ?></span>
+            </div>
+            <div class="ygv-quiz-stat-box">
+                <span class="ygv-quiz-stat-icon">🔄</span>
+                <span class="ygv-quiz-stat-number"><?php echo number_format($total_attempts); ?></span>
+                <span class="ygv-quiz-stat-label"><?php echo esc_html__('Ukupno Pokušaja', 'hello-elementor-child'); ?></span>
+            </div>
+            <div class="ygv-quiz-stat-box">
+                <span class="ygv-quiz-stat-icon">⭐</span>
+                <span class="ygv-quiz-stat-number"><?php echo number_format($total_xp); ?></span>
+                <span class="ygv-quiz-stat-label"><?php echo esc_html__('XP iz Kvizova', 'hello-elementor-child'); ?></span>
+            </div>
+            <div class="ygv-quiz-stat-box">
+                <span class="ygv-quiz-stat-icon">🏆</span>
+                <span class="ygv-quiz-stat-number"><?php echo number_format($perfect_scores); ?></span>
+                <span class="ygv-quiz-stat-label"><?php echo esc_html__('Savršenih Rezultata', 'hello-elementor-child'); ?></span>
+            </div>
+        </div>
+        
+        <div class="ygv-quiz-progress-overview">
+            <div class="ygv-quiz-progress-text">
+                <?php echo esc_html__('Napredak:', 'hello-elementor-child'); ?> 
+                <strong><?php echo $total_quizzes; ?></strong> / <strong><?php echo $available_quizzes; ?></strong> 
+                <?php echo esc_html__('kvizova rešeno', 'hello-elementor-child'); ?>
+            </div>
+            <div class="ygv-quiz-progress-bar">
+                <div class="ygv-quiz-progress-fill" style="width: <?php echo $available_quizzes > 0 ? ($total_quizzes / $available_quizzes) * 100 : 0; ?>%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Progress -->
+    <?php if (!empty($category_progress)): ?>
+    <div class="ygv-card">
+        <h3>🏅 <?php echo esc_html__('Top Kategorije', 'hello-elementor-child'); ?></h3>
+        <p class="ygv-card-subtitle"><?php echo esc_html__('Tvoj napredak u kategorijama kvizova', 'hello-elementor-child'); ?></p>
+        
+        <div class="ygv-category-progress-list">
+            <?php foreach ($category_progress as $cat): 
+                $cat_level = (int)$cat['level'];
+                $cat_xp = (int)$cat['xp'];
+                
+                // Get title for level
+                $cat_title = 'Rookie';
+                if ($level_config) {
+                    foreach ($level_config['tiers'] as $tier) {
+                        if ($cat_level >= $tier['min_level'] && $cat_level <= $tier['max_level']) {
+                            $cat_title = $tier['title'];
+                            break;
+                        }
+                    }
+                }
+            ?>
+            <div class="ygv-cat-progress-item">
+                <div class="ygv-cat-progress-level">
+                    <span class="ygv-cat-level-number"><?php echo $cat_level; ?></span>
+                </div>
+                <div class="ygv-cat-progress-info">
+                    <div class="ygv-cat-progress-name"><?php echo esc_html($cat['category_name'] ?? 'Unknown'); ?></div>
+                    <div class="ygv-cat-progress-title"><?php echo esc_html($cat_title); ?></div>
+                </div>
+                <div class="ygv-cat-progress-xp">
+                    <?php echo number_format($cat_xp); ?> XP
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Quiz History -->
+    <div class="ygv-card">
+        <div class="ygv-card-header">
+            <h3>📚 <?php echo esc_html__('Istorija Kvizova', 'hello-elementor-child'); ?></h3>
+            <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary ygv-btn-small">
+                <?php echo esc_html__('Istraži Kvizove', 'hello-elementor-child'); ?>
+            </a>
+        </div>
+        
+        <?php if (empty($quiz_progress)): ?>
+            <div class="ygv-empty-state">
+                <span class="ygv-empty-icon">🧠</span>
+                <h4><?php echo esc_html__('Još nisi rešio/la nijedan kviz', 'hello-elementor-child'); ?></h4>
+                <p><?php echo esc_html__('Rešavaj kvizove da zaradiš XP i napreduj u kategorijama!', 'hello-elementor-child'); ?></p>
+                <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary">
+                    <?php echo esc_html__('Počni sa Kvizovima', 'hello-elementor-child'); ?>
+                </a>
+            </div>
+        <?php else: ?>
+            <div class="ygv-quiz-history-list">
+                <?php foreach ($quiz_progress as $quiz): 
+                    $quiz_id = (int)$quiz['quiz_id'];
+                    $best_percent = (int)$quiz['best_percent'];
+                    $attempts = (int)$quiz['attempts'];
+                    $awarded_xp = (int)$quiz['awarded_xp'];
+                    $last_attempt = $quiz['last_attempt_at'];
+                    
+                    // Get difficulty
+                    $difficulty = get_post_meta($quiz_id, '_quiz_difficulty', true) ?: 'medium';
+                    $difficulty_labels = [
+                        'easy' => __('Lako', 'hello-elementor-child'),
+                        'medium' => __('Srednje', 'hello-elementor-child'),
+                        'hard' => __('Teško', 'hello-elementor-child'),
+                    ];
+                    $difficulty_label = $difficulty_labels[$difficulty] ?? $difficulty;
+                    
+                    // Time ago
+                    $time_ago = human_time_diff(strtotime($last_attempt), current_time('timestamp'));
+                    
+                    // Score color class
+                    $score_class = 'ygv-score-low';
+                    if ($best_percent >= 80) $score_class = 'ygv-score-high';
+                    elseif ($best_percent >= 50) $score_class = 'ygv-score-medium';
+                ?>
+                <div class="ygv-quiz-history-item">
+                    <div class="ygv-quiz-history-score <?php echo esc_attr($score_class); ?>">
+                        <span class="ygv-quiz-score-percent"><?php echo $best_percent; ?>%</span>
+                        <?php if ($best_percent >= 100): ?>
+                            <span class="ygv-quiz-perfect">🏆</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="ygv-quiz-history-content">
+                        <h4 class="ygv-quiz-history-title">
+                            <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>">
+                                <?php echo esc_html($quiz['quiz_title'] ?? 'Quiz #'.$quiz_id); ?>
+                            </a>
+                        </h4>
+                        <?php if (!empty($quiz['category_names'])): ?>
+                            <span class="ygv-quiz-history-category"><?php echo esc_html($quiz['category_names']); ?></span>
+                        <?php endif; ?>
+                        <div class="ygv-quiz-history-meta">
+                            <span class="ygv-quiz-meta-difficulty ygv-difficulty-<?php echo esc_attr($difficulty); ?>">
+                                <?php echo esc_html($difficulty_label); ?>
+                            </span>
+                            <span class="ygv-quiz-meta-attempts" title="<?php echo esc_attr__('Broj pokušaja', 'hello-elementor-child'); ?>">
+                                🔄 <?php echo $attempts; ?>x
+                            </span>
+                            <span class="ygv-quiz-meta-xp" title="<?php echo esc_attr__('Zarađen XP', 'hello-elementor-child'); ?>">
+                                ⭐ <?php echo number_format($awarded_xp); ?> XP
+                            </span>
+                            <span class="ygv-quiz-meta-time"><?php echo esc_html($time_ago); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
+                        </div>
+                    </div>
+                    <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>" class="ygv-quiz-history-action" title="<?php echo esc_attr__('Ponovo reši', 'hello-elementor-child'); ?>">
+                        <?php if ($best_percent < 100): ?>
+                            🔄
+                        <?php else: ?>
+                            ✓
+                        <?php endif; ?>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+</div>
+
+<script>
+// Token timer countdown
+document.addEventListener('DOMContentLoaded', function() {
+    const timer = document.querySelector('.ygv-token-timer');
+    if (!timer) return;
+    
+    let seconds = parseInt(timer.dataset.seconds, 10);
+    if (isNaN(seconds) || seconds <= 0) return;
+    
+    const updateTimer = () => {
+        if (seconds <= 0) {
+            location.reload();
+            return;
+        }
+        
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        
+        timer.textContent = 
+            String(h).padStart(2, '0') + ':' +
+            String(m).padStart(2, '0') + ':' +
+            String(s).padStart(2, '0');
+        
+        seconds--;
+    };
+    
+    setInterval(updateTimer, 1000);
+});
+</script>
