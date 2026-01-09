@@ -22,6 +22,7 @@ function get_quiz_data(WP_REST_Request $request) {
     $selected_questions  = get_post_meta($quiz_id, '_quiz_questions', true) ?: [];
     $selected_categories = get_post_meta($quiz_id, '_quiz_question_categories', true) ?: [];
     $featured_image      = get_the_post_thumbnail_url($quiz_id, 'full') ?: '';
+    $allow_guest_play    = get_post_meta($quiz_id, '_allow_guest_play', true);
 
     // Fetch Quiz Difficulty Title
     $quiz_difficulty = "";
@@ -125,6 +126,9 @@ function get_quiz_data(WP_REST_Request $request) {
         'quiz_mode'         => $quiz_mode,
         'quiz_type'         => $quiz_type,
         'categories'        => $category_names,
+        'category_color'    => function_exists('ygv_get_quiz_category_color') ? ygv_get_quiz_category_color($quiz_id) : '#6A0DAD',
+        'category_name'     => function_exists('ygv_get_quiz_category_name') ? ygv_get_quiz_category_name($quiz_id) : 'General',
+        'allow_guest_play'  => $allow_guest_play === '1',
         'questions'         => $response_questions
     ]);
 }

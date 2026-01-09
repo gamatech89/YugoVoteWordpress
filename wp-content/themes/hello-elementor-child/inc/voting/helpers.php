@@ -55,8 +55,17 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
     $featured = get_posts([
         'post_type' => 'voting_list',
         'posts_per_page' => $limit,
-        'meta_key' => '_is_featured',
-        'meta_value' => '1',
+        'meta_query' => [
+            'relation' => 'AND',
+            [
+                'key' => '_is_featured',
+                'value' => '1',
+            ],
+            [
+                'key' => '_is_tournament_match',
+                'compare' => 'NOT EXISTS',
+            ],
+        ],
         'tax_query' => [[
             'taxonomy' => 'voting_list_category',
             'field'    => 'term_id',
@@ -73,6 +82,12 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
             'post_type' => 'voting_list',
             'posts_per_page' => $needed,
             'post__not_in' => $exclude_ids,
+            'meta_query' => [
+                [
+                    'key' => '_is_tournament_match',
+                    'compare' => 'NOT EXISTS',
+                ],
+            ],
             'tax_query' => [[
                 'taxonomy' => 'voting_list_category',
                 'field'    => 'term_id',
@@ -141,8 +156,17 @@ function get_featured_posts_for_term($term_id, $count = 1) {
     return get_posts([
         'post_type'      => 'voting_list',
         'posts_per_page' => $count,
-        'meta_key'       => '_is_featured',
-        'meta_value'     => '1',
+        'meta_query' => [
+            'relation' => 'AND',
+            [
+                'key' => '_is_featured',
+                'value' => '1',
+            ],
+            [
+                'key' => '_is_tournament_match',
+                'compare' => 'NOT EXISTS',
+            ],
+        ],
         'tax_query'      => [[
             'taxonomy' => 'voting_list_category',
             'field'    => 'term_id',
@@ -169,6 +193,12 @@ function get_latest_posts_for_term($term_id, $exclude_ids = [], $count = 3) {
         'post__not_in'   => $exclude_ids,
         'orderby'        => 'date',
         'order'          => 'DESC',
+        'meta_query' => [
+            [
+                'key' => '_is_tournament_match',
+                'compare' => 'NOT EXISTS',
+            ],
+        ],
         'tax_query'      => [[
             'taxonomy' => 'voting_list_category',
             'field'    => 'term_id',

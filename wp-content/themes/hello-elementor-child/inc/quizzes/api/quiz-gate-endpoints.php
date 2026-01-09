@@ -18,7 +18,7 @@ add_action('rest_api_init', function () {
     // POST /yugovote/v1/quiz/{id}/start
 register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/start', [
     'methods'  => 'POST',
-    'permission_callback' => function(){ return is_user_logged_in(); },
+    'permission_callback' => '__return_true',
     'callback' => function (WP_REST_Request $req) {
         $user_id = get_current_user_id();
         $quiz_id = (int)$req['id'];
@@ -28,7 +28,15 @@ register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/start', [
             return new WP_Error('quiz_not_found', __('Kviz nije pronađen.', 'hello-elementor-child'), ['status'=>404]);
         }
 
-        if (function_exists('ygv_tokens')) {
+        // Check guest permission
+        $allow_guest = get_post_meta($quiz_id, '_allow_guest_play', true) === '1';
+        
+        if ($user_id === 0 && !$allow_guest) {
+            return new WP_Error('login_required', __('Morate biti prijavljeni da biste igrali ovaj kviz.', 'hello-elementor-child'), ['status'=>401]);
+        }
+
+        // Only charge tokens if user is logged in
+        if ($user_id > 0 && function_exists('ygv_tokens')) {
             $cost = (int) get_post_meta($quiz_id, '_quiz_token_cost', true);
             if ($cost <= 0) $cost = 8;
 
@@ -47,6 +55,7 @@ register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/start', [
             'success'    => true,
             'attempt_id' => $attempt_id,
             'quiz_id'    => $quiz_id,
+            'is_guest'   => $user_id === 0,
             'message'    => __('Pokušaj kreiran. Srećno!', 'hello-elementor-child'),
         ]);
     },
@@ -55,7 +64,7 @@ register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/start', [
 // POST /yugovote/v1/quiz/{id}/submit
 register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/submit', [
     'methods'  => 'POST',
-    'permission_callback' => function(){ return is_user_logged_in(); },
+    'permission_callback' => '__return_true',
     'callback' => function (WP_REST_Request $req) {
         $user_id    = get_current_user_id();
         $quiz_id    = (int)$req['id'];
@@ -70,17 +79,22 @@ register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/submit', [
 
         $score_percent = (int) round(($correct / $total) * 100);
 
-        // Get the quiz's category (first quiz_category term)
-        $term_ids = wp_get_object_terms($quiz_id, 'quiz_category', ['fields'=>'ids']);
-        $cat_id   = (!is_wp_error($term_ids) && !empty($term_ids)) ? (int)$term_ids[0] : 0;
+        // Only save progress if logged in
+        $result = ['awarded_xp' => 0, 'category' => null, 'overall' => null];
+        
+        if ($user_id > 0 && function_exists('ygv_progress')) {
+            // Get the quiz's category (first quiz_category term)
+            $term_ids = wp_get_object_terms($quiz_id, 'quiz_category', ['fields'=>'ids']);
+            $cat_id   = (!is_wp_error($term_ids) && !empty($term_ids)) ? (int)$term_ids[0] : 0;
 
-        // Award XP using delta model
-        $result = function_exists('ygv_progress') ? ygv_progress()->record_attempt($user_id, [
-            'quiz_id'  => $quiz_id,
-            'category' => $cat_id,
-            'correct'  => $correct,
-            'total'    => $total,
-        ]) : ['awarded_xp'=>0];
+            // Award XP using delta model
+            $result = ygv_progress()->record_attempt($user_id, [
+                'quiz_id'  => $quiz_id,
+                'category' => $cat_id,
+                'correct'  => $correct,
+                'total'    => $total,
+            ]);
+        }
 
         return rest_ensure_response([
             'success'       => true,
@@ -89,10 +103,13 @@ register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/submit', [
             'correct'       => $correct,
             'total'         => $total,
             'score_percent' => $score_percent,
+            'is_guest'      => $user_id === 0,
             'awarded_xp'    => (int)($result['awarded_xp'] ?? 0),
             'category'      => $result['category'] ?? null,
             'overall'       => $result['overall'] ?? null,
-            'message'       => __('Rezultat zabeležen.', 'hello-elementor-child'),
+            'message'       => $user_id === 0 
+                ? __('Rezultat izračunat. Prijavite se da sačuvate napredak!', 'hello-elementor-child')
+                : __('Rezultat zabeležen.', 'hello-elementor-child'),
         ]);
     },
 ]);

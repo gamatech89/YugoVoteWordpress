@@ -23,17 +23,11 @@ require_once get_stylesheet_directory() . '/inc/account/account-init.php';
 // --- LOADING POLLS FEATURE ---
 require_once get_stylesheet_directory() . '/inc/polls/polls-init.php';
 
-//LOADING MIGRATION FILES
+// --- LOADING DATABASE MIGRATIONS ---
+require_once get_stylesheet_directory() . '/inc/migrations/migrations-init.php';
 
-require_once get_stylesheet_directory() . '/inc/migrations/run-migrations.php';
-
-
-
-//Hellpers Load
-
-require_once get_stylesheet_directory() . '/inc/helpers/icons.php';
-require_once get_stylesheet_directory() . '/inc/helpers/category-color-generator.php';
-require_once get_stylesheet_directory() . '/inc/helpers/utilities.php';
+// --- LOADING GLOBAL HELPERS ---
+require_once get_stylesheet_directory() . '/inc/helpers/helpers-init.php';
 
 
 

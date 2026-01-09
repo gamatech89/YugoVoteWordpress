@@ -31,11 +31,6 @@ if (file_exists($admin_inc_path . 'admin-menu.php')) {
     require_once $admin_inc_path . 'admin-menu.php';
 }
 
-// Load Admin-specific Filters
-if (file_exists($admin_inc_path . 'admin-filters.php')) {
-    require_once $admin_inc_path . 'admin-filters.php';
-}
-
 // Load Custom Admin Tools (like your recalculate vote cache tool)
 if (file_exists($admin_inc_path . 'tools-recalculate-vote-cache.php')) {
     require_once $admin_inc_path . 'tools-recalculate-vote-cache.php';

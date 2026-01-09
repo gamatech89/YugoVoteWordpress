@@ -29,6 +29,7 @@ function ygv_render_quiz_meta_box(WP_Post $post) {
     $selected_categories= (array) get_post_meta($post->ID, '_quiz_question_categories', true) ?: [];
     $quiz_token_cost    = (int) get_post_meta($post->ID, '_quiz_token_cost', true) ?: 8;
     $quiz_xp_value      = (int) get_post_meta($post->ID, '_quiz_xp_value', true) ?: 20;
+    $allow_guest_play   = get_post_meta($post->ID, '_allow_guest_play', true);
 
     $categories = get_terms([
         'taxonomy'   => 'question_category',
@@ -57,6 +58,10 @@ function ygv_render_quiz_meta_box(WP_Post $post) {
 
     echo '<label><strong>'.esc_html__('Base XP (per quiz)', 'hello-elementor-child').':</strong></label>';
     echo '<input type="number" name="quiz_xp_value" value="' . esc_attr($quiz_xp_value) . '" min="1" style="width:100%;"><br><br>';
+
+    echo '<label><input type="checkbox" name="allow_guest_play" value="1" ' . checked($allow_guest_play, '1', false) . '> ';
+    echo '<strong>' . esc_html__('Allow Guest Play', 'hello-elementor-child') . '</strong></label>';
+    echo '<p class="description">' . esc_html__('Allow non-logged-in users to play this quiz (scores will not be saved).', 'hello-elementor-child') . '</p><br><br>';
 
     echo '<label><strong>'.esc_html__('Quiz Difficulty', 'hello-elementor-child').':</strong></label>';
     echo '<select name="quiz_difficulty" style="width:100%;">';
@@ -167,6 +172,13 @@ function ygv_save_quiz_meta($post_id) {
             $arr = array_map('intval', $arr);
             update_post_meta($post_id, '_quiz_questions', wp_json_encode(array_values($arr)));
         }
+    }
+
+    // guest play checkbox
+    if (isset($_POST['allow_guest_play'])) {
+        update_post_meta($post_id, '_allow_guest_play', '1');
+    } else {
+        delete_post_meta($post_id, '_allow_guest_play');
     }
 }
 add_action('save_post_quiz', 'ygv_save_quiz_meta');

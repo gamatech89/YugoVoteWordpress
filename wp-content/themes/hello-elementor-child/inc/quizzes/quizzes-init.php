@@ -23,13 +23,23 @@ require_once $quizzes_inc_path . 'cpts/taxonomy-quiz-category.php';
 require_once $quizzes_inc_path . 'meta/quiz-meta.php';
 require_once $quizzes_inc_path . 'meta/quiz-level-meta.php';
 require_once $quizzes_inc_path . 'meta/question-meta.php';
+require_once $quizzes_inc_path . 'meta/quiz-category-meta.php';
 
 // --- Services ---
 require_once $quizzes_inc_path . 'services/class-ygv-token-service.php';
 require_once $quizzes_inc_path . 'services/class-ygv-progress-service.php';
 
+// --- Shortcodes ---
 $levels_sc = $quizzes_inc_path . 'shortcodes/levels-per-category.php';
 if (file_exists($levels_sc)) require_once $levels_sc;
+
+// ✅ NEW: Quiz Grid Shortcode
+$quiz_grid_sc = $quizzes_inc_path . 'shortcodes/quiz-grid-shortcode.php';
+if (file_exists($quiz_grid_sc)) require_once $quiz_grid_sc;
+
+// ✅ NEW: Quiz Grid AJAX Handler
+$quiz_ajax_grid = $quizzes_inc_path . 'api/quiz-ajax-grid.php';
+if (file_exists($quiz_ajax_grid)) require_once $quiz_ajax_grid;
 
 // Accessors
 if (!function_exists('ygv_tokens')) {
@@ -56,6 +66,11 @@ if (file_exists($quizzes_inc_path . 'api/quiz-gate-endpoints.php')) {
     require_once $quizzes_inc_path . 'api/quiz-gate-endpoints.php';
 } elseif (defined('WP_DEBUG') && WP_DEBUG) {
     error_log('YGV Quizzes: api/quiz-gate-endpoints.php not found');
+}
+
+// --- Admin (columns, filters) ---
+if (file_exists($quizzes_inc_path . 'admin/question-columns.php')) {
+    require_once $quizzes_inc_path . 'admin/question-columns.php';
 }
 
 // --- Helpers ---

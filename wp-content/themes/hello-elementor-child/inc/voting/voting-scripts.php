@@ -30,7 +30,8 @@ function enqueue_voting_list_scripts() {
             'lists_with_this_item',
             'related_lists_carousel',
             'homepage_categories_slider', // Added: Homepage Slider
-            'voting_category_hero'        // Added: Category Hero
+            'voting_category_hero',       // Added: Category Hero
+            'voting_top_categories'       // Added: Top Categories Carousel
         ];
 
         foreach ($required_shortcodes as $shortcode) {
@@ -119,6 +120,15 @@ function enqueue_voting_list_scripts() {
             'cs-carousel-init',
             get_stylesheet_directory_uri() . '/js/voting/voting-carousel.js',
             ['swiper-js'],
+            HELLO_ELEMENTOR_CHILD_VERSION,
+            true
+        );
+
+        // Top Categories Carousel
+        wp_enqueue_script(
+            'yuv-top-categories-carousel',
+            get_stylesheet_directory_uri() . '/js/voting/top-categories-carousel.js',
+            ['jquery'],
             HELLO_ELEMENTOR_CHILD_VERSION,
             true
         );

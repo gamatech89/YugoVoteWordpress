@@ -59,3 +59,21 @@ function ygv_get_random_questions_for_quiz(int $quiz_id, int $count, array $ques
 
     return $q->posts ?? [];
 }
+
+/** Get quiz category color (returns hex code or default) */
+function ygv_get_quiz_category_color(int $quiz_id, string $default = '#6A0DAD'): string {
+    $terms = wp_get_object_terms($quiz_id, 'quiz_category', ['fields' => 'ids']);
+    
+    if (is_wp_error($terms) || empty($terms)) {
+        return $default;
+    }
+    
+    $color = get_term_meta($terms[0], 'quiz_category_color', true);
+    return $color ?: $default;
+}
+
+/** Get quiz category name */
+function ygv_get_quiz_category_name(int $quiz_id): string {
+    $terms = wp_get_object_terms($quiz_id, 'quiz_category', ['fields' => 'names']);
+    return (!is_wp_error($terms) && !empty($terms)) ? $terms[0] : __('General', 'hello-elementor-child');
+}

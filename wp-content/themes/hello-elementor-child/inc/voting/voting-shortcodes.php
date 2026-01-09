@@ -87,11 +87,16 @@ function lists_for_current_item_shortcode($atts) {
         'posts_per_page' => -1,
         'post_status'    => 'publish',
         'meta_query'     => [
+            'relation' => 'AND',
             [
                 'key'     => '_voting_items',
                 'value'   => '"' . $current_item_id . '"',
                 'compare' => 'LIKE'
-            ]
+            ],
+            [
+                'key'     => '_is_tournament_match',
+                'compare' => 'NOT EXISTS',
+            ],
         ]
     ];
 
@@ -447,6 +452,12 @@ if (!function_exists('cs_voting_trending_shortcode')) {
             'post_status'    => 'publish',
             'posts_per_page' => -1, // Uzmi sve da bismo našli stvarne pobednike
             'fields'         => 'ids', // Trebaju nam samo ID-evi radi brzine
+            'meta_query'     => [
+                [
+                    'key'     => '_is_tournament_match',
+                    'compare' => 'NOT EXISTS',
+                ],
+            ],
         ];
 
         $all_list_ids = get_posts($all_lists_args);
@@ -503,4 +514,27 @@ if (!function_exists('cs_voting_trending_shortcode')) {
         return ob_get_clean();
     }
     add_shortcode('voting_trending', 'cs_voting_trending_shortcode');
+}
+/**
+ * Shortcode: Display Top Categories with Zigzag Layout
+ * Usage: [voting_top_categories]
+ * 
+ * Shows all top-level categories with:
+ * - Large circular mascot/logo
+ * - Top voting list per category
+ * - Alternating left/right layout
+ */
+if (!function_exists('cs_voting_top_categories_shortcode')) {
+    function cs_voting_top_categories_shortcode() {
+        ob_start();
+        
+        $template_path = get_stylesheet_directory() . '/inc/voting/templates/partials/archive-top-categories.php';
+        
+        if (file_exists($template_path)) {
+            include $template_path;
+        }
+        
+        return ob_get_clean();
+    }
+    add_shortcode('voting_top_categories', 'cs_voting_top_categories_shortcode');
 }

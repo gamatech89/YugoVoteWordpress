@@ -51,4 +51,48 @@ if (!function_exists('cs_add_search_popup_to_footer')) {
     add_action('wp_footer', 'cs_add_search_popup_to_footer');
 }
 
+/**
+ * Redirect tournament matches if accessed directly
+ * Tournament matches should only be viewed through the duel arena shortcode
+ */
+if (!function_exists('yuv_redirect_tournament_matches')) {
+    function yuv_redirect_tournament_matches() {
+        if (is_singular('voting_list')) {
+            global $post;
+            $is_tournament = get_post_meta($post->ID, '_is_tournament_match', true);
+            
+            if ($is_tournament == '1') {
+                // Redirect to home page or tournament archive
+                wp_redirect(home_url('/'));
+                exit;
+            }
+        }
+    }
+    add_action('template_redirect', 'yuv_redirect_tournament_matches');
+}
+
+/**
+ * Exclude tournament matches from main voting_list queries
+ */
+if (!function_exists('yuv_exclude_tournament_from_queries')) {
+    function yuv_exclude_tournament_from_queries($query) {
+        // Only on frontend, main query, for voting_list post type
+        if (is_admin() || !$query->is_main_query()) {
+            return;
+        }
+        
+        if ($query->get('post_type') === 'voting_list') {
+            $meta_query = $query->get('meta_query') ?: [];
+            
+            $meta_query[] = [
+                'key' => '_is_tournament_match',
+                'compare' => 'NOT EXISTS',
+            ];
+            
+            $query->set('meta_query', $meta_query);
+        }
+    }
+    add_action('pre_get_posts', 'yuv_exclude_tournament_from_queries');
+}
+
 ?>

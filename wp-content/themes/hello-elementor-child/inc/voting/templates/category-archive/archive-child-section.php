@@ -11,6 +11,12 @@ $posts = get_posts([
   'posts_per_page' => -1,
   'orderby' => 'date',
   'order' => 'DESC',
+  'meta_query' => [
+    [
+      'key' => '_is_tournament_match',
+      'compare' => 'NOT EXISTS',
+    ],
+  ],
   'tax_query' => [[
     'taxonomy' => 'voting_list_category',
     'field' => 'term_id',
