@@ -65,15 +65,26 @@ function save_question_meta($post_id) {
         return;
     }
 
+    if (get_post_type($post_id) !== 'question') {
+        return;
+    }
+
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
 
-    update_post_meta($post_id, '_question_text', sanitize_textarea_field($_POST['question_text']));
-    update_post_meta($post_id, '_question_difficulty', intval($_POST['question_difficulty']));
-    update_post_meta($post_id, '_num_answers', intval($_POST['num_answers']));
-    update_post_meta($post_id, '_quiz_answers', array_map('sanitize_text_field', $_POST['quiz_answers']));
-    update_post_meta($post_id, '_correct_answer', intval($_POST['correct_answer']));
+    $question_text     = isset($_POST['question_text']) ? sanitize_textarea_field(wp_unslash($_POST['question_text'])) : '';
+    $difficulty_level  = isset($_POST['question_difficulty']) ? (int) $_POST['question_difficulty'] : 0;
+    $num_answers       = isset($_POST['num_answers']) ? max(2, min(6, (int) $_POST['num_answers'])) : 4;
+    $answers_raw       = isset($_POST['quiz_answers']) && is_array($_POST['quiz_answers']) ? $_POST['quiz_answers'] : [];
+    $answers_sanitized = array_map('sanitize_text_field', array_slice($answers_raw, 0, $num_answers));
+    $correct_answer    = isset($_POST['correct_answer']) ? (int) $_POST['correct_answer'] : -1;
+
+    update_post_meta($post_id, '_question_text', $question_text);
+    update_post_meta($post_id, '_question_difficulty', $difficulty_level);
+    update_post_meta($post_id, '_num_answers', $num_answers);
+    update_post_meta($post_id, '_quiz_answers', $answers_sanitized);
+    update_post_meta($post_id, '_correct_answer', $correct_answer);
 }
-add_action('save_post', 'save_question_meta');
+add_action('save_post_question', 'save_question_meta');
 
