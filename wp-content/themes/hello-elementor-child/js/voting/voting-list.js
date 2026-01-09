@@ -227,6 +227,50 @@
             });
         }
 
+        // --- Toast Notification Methods ---
+        _showToast(message, type = 'success', duration = 3000) {
+            // Remove any existing toast
+            $('.ygv-vote-toast').remove();
+            
+            const $toast = $(`
+                <div class="ygv-vote-toast ygv-vote-toast--${type}">
+                    <span class="ygv-vote-toast__message">${message}</span>
+                </div>
+            `);
+            
+            $('body').append($toast);
+            
+            // Trigger animation
+            setTimeout(() => $toast.addClass('ygv-vote-toast--visible'), 10);
+            
+            // Auto-hide
+            setTimeout(() => {
+                $toast.removeClass('ygv-vote-toast--visible');
+                setTimeout(() => $toast.remove(), 300);
+            }, duration);
+        }
+        
+        _buildVoteFeedbackMessage(data) {
+            let parts = [];
+            
+            // Show vote value with bonus if applicable
+            if (data.expert_bonus && data.expert_bonus > 0) {
+                parts.push(`Tvoj glas: ${data.base_vote} (+${data.expert_bonus} bonus)`);
+            }
+            
+            // Show XP earned
+            if (data.xp_awarded && data.xp_awarded > 0) {
+                parts.push(`+${data.xp_awarded} XP`);
+            }
+            
+            // Show daily limit warning if reached
+            if (data.xp_limit_reached) {
+                parts.push('Dnevni limit XP dostignut');
+            }
+            
+            return parts.join(' • ');
+        }
+
         // --- AJAX Methods ---
         sendVoteUpdateRequest(actionType, dataPayload) {
             this._showLoader(); // Show loader for any vote update
@@ -237,7 +281,13 @@
                         // Re-fetch user votes to revert UI to last known correct server state
                         this.loadUserVotes().always(() => this.loadItemScoresAndReorder());
                     } else {
-                         // On success, scores will be reloaded by .always() below
+                        // Show feedback toast for successful vote submission
+                        if (actionType === 'submit_vote' && response.data) {
+                            const feedbackMsg = this._buildVoteFeedbackMessage(response.data);
+                            if (feedbackMsg) {
+                                this._showToast(feedbackMsg, 'success', 3500);
+                            }
+                        }
                     }
                 })
                 .fail((jqXHR, textStatus, errorThrown) => {

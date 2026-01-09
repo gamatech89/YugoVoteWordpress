@@ -95,6 +95,10 @@ function ygv_get_default_level_config(): array {
         // List creation requirements
         'list_creation_category_level' => 10, // Category level required to create lists in that category
         'list_creation_global_level' => 5,    // Global level required to create any list
+        // XP rewards
+        'xp_per_vote' => 2,              // XP earned per vote cast
+        'daily_vote_limit' => 50,        // Maximum votes per day that earn XP
+        'xp_for_list_creation' => 50,    // XP earned when creating a list
     ];
 }
 

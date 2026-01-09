@@ -292,4 +292,89 @@ class YGV_Progress_Service {
         }
         return $result;
     }
+    
+    /**
+     * Award XP for voting on a list
+     * 
+     * Rules:
+     * - 2 XP per vote (configurable)
+     * - Maximum 50 votes per day = 100 XP max/day from voting
+     * - XP goes to the parent category of the voting list
+     * 
+     * @param int $user_id
+     * @param int $voting_list_id
+     * @return array ['awarded_xp' => int, 'votes_today' => int, 'limit_reached' => bool]
+     */
+    public function award_voting_xp(int $user_id, int $voting_list_id): array {
+        global $wpdb;
+        
+        // Get config
+        $config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : [];
+        $xp_per_vote = (int)($config['xp_per_vote'] ?? 2);
+        $daily_vote_limit = (int)($config['daily_vote_limit'] ?? 50);
+        
+        // Count votes today by this user
+        $votes_table = $wpdb->prefix . 'voting_list_votes';
+        $today_start = gmdate('Y-m-d 00:00:00');
+        
+        $votes_today = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$votes_table} 
+             WHERE user_id = %d AND created_at >= %s",
+            $user_id,
+            $today_start
+        ));
+        
+        // Check if limit reached (subtract 1 since we just added a vote)
+        $votes_before_this = max(0, $votes_today - 1);
+        $limit_reached = $votes_before_this >= $daily_vote_limit;
+        
+        $result = [
+            'awarded_xp' => 0,
+            'votes_today' => $votes_today,
+            'daily_limit' => $daily_vote_limit,
+            'limit_reached' => $limit_reached,
+        ];
+        
+        // If limit reached, no XP
+        if ($limit_reached) {
+            return $result;
+        }
+        
+        // Get parent category for this voting list
+        $category_term_id = 0;
+        if (function_exists('ygv_get_list_parent_category')) {
+            $category_term_id = ygv_get_list_parent_category($voting_list_id);
+        }
+        
+        // Award XP
+        if ($category_term_id > 0) {
+            $xp_result = $this->add_xp($user_id, $category_term_id, $xp_per_vote);
+            $result['awarded_xp'] = $xp_per_vote;
+            $result['category'] = $xp_result['category'] ?? null;
+            $result['overall'] = $xp_result['overall'] ?? null;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Award XP for creating a voting list
+     * 
+     * Rules:
+     * - 50 XP per list created (configurable)
+     * - XP goes to the category the list was created in
+     * 
+     * @param int $user_id
+     * @param int $category_term_id
+     * @return array
+     */
+    public function award_list_creation_xp(int $user_id, int $category_term_id): array {
+        $config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : [];
+        $xp_for_list = (int)($config['xp_for_list_creation'] ?? 50);
+        
+        $result = $this->add_xp($user_id, $category_term_id, $xp_for_list);
+        $result['awarded_xp'] = $xp_for_list;
+        
+        return $result;
+    }
 }

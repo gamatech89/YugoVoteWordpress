@@ -579,13 +579,20 @@ function ygv_ajax_create_list() {
     update_post_meta($post_id, '_voting_items', $voting_items);
     update_post_meta($post_id, '_voting_scale', $voting_scale);
     
-    // Award XP for creating a list (if we implement this later)
-    // do_action('ygv_list_created', $post_id, $user_id, $category_id);
+    // Award XP for creating a list
+    $xp_awarded = 0;
+    if (!class_exists('YGV_Progress_Service')) {
+        require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-progress-service.php';
+    }
+    $progress_service = new YGV_Progress_Service();
+    $xp_result = $progress_service->award_list_creation_xp($user_id, $category_id);
+    $xp_awarded = $xp_result['awarded_xp'] ?? 0;
     
     wp_send_json_success([
-        'message' => __('Lista je kreirana i čeka odobrenje!', 'hello-elementor-child'),
+        'message' => sprintf(__('Lista je kreirana i čeka odobrenje! +%d XP', 'hello-elementor-child'), $xp_awarded),
         'redirect' => ygv_account_page_url(['tab' => 'liste']),
         'post_id' => $post_id,
+        'xp_awarded' => $xp_awarded,
     ]);
 }
 add_action('wp_ajax_ygv_create_list', 'ygv_ajax_create_list');

@@ -998,4 +998,64 @@
     width: 240px;
   }
 }
+
+/* ========================================
+   Vote Toast Notifications
+   ======================================== */
+.ygv-vote-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 10000;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: var(--light-color);
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  font-family: var(--secondary-font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-out;
+  max-width: 90%;
+  text-align: center;
+}
+
+.ygv-vote-toast--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.ygv-vote-toast--success {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.ygv-vote-toast--warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.ygv-vote-toast--error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.ygv-vote-toast__message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* XP indicator in toast */
+.ygv-vote-toast__xp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+}
+
 /* Deploy test: Fri Jan  9 11:23:39 CET 2026 */

@@ -264,6 +264,25 @@ function submit_vote() {
     if (function_exists('update_vote_score_cache')) {
         update_vote_score_cache($voting_item_id);
     }
+    
+    // Award XP for voting (logged-in users only)
+    $xp_awarded = 0;
+    $votes_today = 0;
+    $limit_reached = false;
+    
+    if ($user_id > 0) {
+        // Get or create progress service instance
+        if (!class_exists('YGV_Progress_Service')) {
+            require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-progress-service.php';
+        }
+        
+        $progress_service = new YGV_Progress_Service();
+        $xp_result = $progress_service->award_voting_xp($user_id, $voting_list_id);
+        
+        $xp_awarded = $xp_result['awarded_xp'] ?? 0;
+        $votes_today = $xp_result['votes_today'] ?? 0;
+        $limit_reached = $xp_result['limit_reached'] ?? false;
+    }
 
     // Return success with bonus info for UI feedback
     $response = [
@@ -276,6 +295,13 @@ function submit_vote() {
         $response['expert_bonus'] = $expert_bonus;
         $response['expert_title'] = $expert_title;
         $response['category_level'] = $user_category_level;
+    }
+    
+    // Add XP info to response
+    if ($user_id > 0) {
+        $response['xp_awarded'] = $xp_awarded;
+        $response['votes_today'] = $votes_today;
+        $response['xp_limit_reached'] = $limit_reached;
     }
     
     wp_send_json_success($response);
