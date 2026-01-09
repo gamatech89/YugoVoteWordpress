@@ -1,4 +1,26 @@
-/**ADMIN PANEL STYLES**/
+.ygv-quiz-meta .widefat th,
+.ygv-quiz-meta .widefat td {
+    vertical-align: middle;
+}
+
+.ygv-quiz-meta .description {
+    margin: 4px 0 0;
+}
+
+.ygv-quiz-meta .ygv-meta-inline-label {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.ygv-quiz-meta .button {
+    margin-top: 4px;
+}
+
+.ygv-quiz-meta select,
+.ygv-quiz-meta textarea,
+.ygv-quiz-meta input[type="number"] {
+    max-width: 480px;
+}/**ADMIN PANEL STYLES**/
 
     .cs-quiz-answer-container { 
 		display: flex; 
