@@ -129,6 +129,27 @@
   border: 1px solid #e6e7eb;
   cursor: pointer;
   text-decoration: none;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ygv-btn-small:hover {
+  border-color: #6db24a;
+  color: #6db24a;
+}
+/* Primary small button - needs higher specificity */
+.ygv-btn.ygv-btn-primary.ygv-btn-small,
+.ygv-btn-primary.ygv-btn-small {
+  background: #6db24a;
+  color: #fff;
+  border-color: #6db24a;
+}
+.ygv-btn.ygv-btn-primary.ygv-btn-small:hover,
+.ygv-btn-primary.ygv-btn-small:hover {
+  background: #5a9940;
+  color: #fff;
+  border-color: #5a9940;
 }
 
 /* ============================================
