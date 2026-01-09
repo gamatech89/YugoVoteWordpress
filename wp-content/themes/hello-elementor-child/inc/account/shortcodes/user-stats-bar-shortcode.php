@@ -272,24 +272,23 @@ function ygv_format_time_short($seconds) {
 
 /**
  * Enqueue stats bar assets
+ * Always load for logged-in users since Elementor widgets don't use has_shortcode properly
  */
 add_action('wp_enqueue_scripts', function() {
-    global $post;
-    
-    // Check if shortcode is used on this page
-    if (isset($post) && $post instanceof WP_Post && has_shortcode($post->post_content, 'ygv_user_stats_bar')) {
+    // Always load for logged in users - Elementor widgets bypass has_shortcode check
+    if (is_user_logged_in()) {
         wp_enqueue_style(
             'ygv-user-stats-bar-css',
             get_stylesheet_directory_uri() . '/css/user-stats-bar.css',
             [],
-            defined('HELLO_ELEMENTOR_CHILD_VERSION') ? HELLO_ELEMENTOR_CHILD_VERSION : '1.0.0'
+            filemtime(get_stylesheet_directory() . '/css/user-stats-bar.css')
         );
         
         wp_enqueue_script(
             'ygv-user-stats-bar-js',
             get_stylesheet_directory_uri() . '/js/account/user-stats-bar.js',
             [],
-            defined('HELLO_ELEMENTOR_CHILD_VERSION') ? HELLO_ELEMENTOR_CHILD_VERSION : '1.0.0',
+            filemtime(get_stylesheet_directory() . '/js/account/user-stats-bar.js'),
             true
         );
     }
