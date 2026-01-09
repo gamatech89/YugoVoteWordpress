@@ -4,10 +4,14 @@
  */
 
 /* ============================================
-   ELEMENTOR OVERRIDE RESET
+   STATS BAR CONTAINER - Target specific wrapper
    ============================================ */
-.elementor-widget-shortcode .ygv-user-stats-bar,
-.elementor-shortcode .ygv-user-stats-bar,
+.cs-player-stats-container .elementor-widget-container,
+.cs-player-stats-container .elementor-shortcode {
+  display: inline-block !important;
+  width: auto !important;
+}
+
 .ygv-user-stats-bar {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -22,8 +26,6 @@
   max-width: 100%;
 }
 
-.elementor-widget-shortcode .ygv-stats-bar-inner,
-.elementor-shortcode .ygv-stats-bar-inner,
 .ygv-stats-bar-inner {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -33,17 +35,9 @@
   width: auto !important;
 }
 
-/* Reset any Elementor column/flex behavior */
-.elementor-widget-shortcode .elementor-widget-container,
-.elementor-widget-shortcode .elementor-shortcode {
-  display: inline-block !important;
-  width: auto !important;
-}
-
 /* ============================================
    USER AVATAR & NAME
    ============================================ */
-.elementor-shortcode .ygv-stats-user,
 .ygv-stats-user {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -108,7 +102,6 @@
 /* ============================================
    STATS ITEMS (XP, Tokens, Coins)
    ============================================ */
-.elementor-shortcode .ygv-stats-item,
 .ygv-stats-item {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -174,7 +167,6 @@
   color: #fff;
 }
 
-.elementor-shortcode .ygv-stats-content,
 .ygv-stats-content {
   display: inline-flex !important;
   flex-direction: column !important;
@@ -239,7 +231,6 @@
 /* ============================================
    TOKEN TIMER
    ============================================ */
-.elementor-shortcode .ygv-stats-timer,
 .ygv-stats-timer {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -265,7 +256,6 @@
 /* ============================================
    NOTIFICATION BELL
    ============================================ */
-.elementor-shortcode .ygv-stats-notifications,
 .ygv-stats-notifications {
   display: inline-flex !important;
   flex-direction: row !important;
