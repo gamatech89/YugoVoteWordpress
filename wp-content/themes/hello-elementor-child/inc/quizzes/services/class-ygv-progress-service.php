@@ -343,10 +343,11 @@ class YGV_Progress_Service {
      * - 2 XP per vote (configurable)
      * - Maximum 50 votes per day = 100 XP max/day from voting
      * - XP goes to the parent category of the voting list
+     * - Streak bonus: +1 XP per streak day (max +10)
      * 
      * @param int $user_id
      * @param int $voting_list_id
-     * @return array ['awarded_xp' => int, 'votes_today' => int, 'limit_reached' => bool]
+     * @return array ['awarded_xp' => int, 'votes_today' => int, 'limit_reached' => bool, 'streak' => array]
      */
     public function award_voting_xp(int $user_id, int $voting_list_id): array {
         global $wpdb;
@@ -371,11 +372,15 @@ class YGV_Progress_Service {
         $votes_before_this = max(0, $votes_today - 1);
         $limit_reached = $votes_before_this >= $daily_vote_limit;
         
+        // Calculate voting streak
+        $streak_info = $this->calculate_voting_streak($user_id);
+        
         $result = [
             'awarded_xp' => 0,
             'votes_today' => $votes_today,
             'daily_limit' => $daily_vote_limit,
             'limit_reached' => $limit_reached,
+            'streak' => $streak_info,
         ];
         
         // If limit reached, no XP
@@ -389,15 +394,136 @@ class YGV_Progress_Service {
             $category_term_id = ygv_get_list_parent_category($voting_list_id);
         }
         
+        // Calculate streak bonus XP (capped at +10)
+        $streak_bonus = min($streak_info['days'], 10);
+        $total_xp = $xp_per_vote + $streak_bonus;
+        
         // Award XP
         if ($category_term_id > 0) {
-            $xp_result = $this->add_xp($user_id, $category_term_id, $xp_per_vote);
-            $result['awarded_xp'] = $xp_per_vote;
+            $xp_result = $this->add_xp($user_id, $category_term_id, $total_xp);
+            $result['awarded_xp'] = $total_xp;
+            $result['base_xp'] = $xp_per_vote;
+            $result['streak_bonus_xp'] = $streak_bonus;
             $result['category'] = $xp_result['category'] ?? null;
             $result['overall'] = $xp_result['overall'] ?? null;
+            
+            // Copy level_ups if any
+            if (!empty($xp_result['level_ups'])) {
+                $result['level_ups'] = $xp_result['level_ups'];
+            }
         }
         
         return $result;
+    }
+    
+    /**
+     * Calculate user's voting streak
+     * 
+     * A streak is consecutive days of voting activity.
+     * Returns the current streak length and bonus info.
+     * 
+     * @param int $user_id
+     * @return array ['days' => int, 'is_new_day' => bool, 'milestone' => array|null]
+     */
+    public function calculate_voting_streak(int $user_id): array {
+        global $wpdb;
+        $votes_table = $wpdb->prefix . 'voting_list_votes';
+        
+        $today = gmdate('Y-m-d');
+        $yesterday = gmdate('Y-m-d', strtotime('-1 day'));
+        
+        // Get distinct dates user voted (last 60 days), most recent first
+        $dates = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT DATE(created_at) as vote_date 
+             FROM {$votes_table} 
+             WHERE user_id = %d AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY)
+             ORDER BY vote_date DESC",
+            $user_id
+        ));
+        
+        if (empty($dates)) {
+            return [
+                'days' => 1, // First vote counts as day 1
+                'is_new_day' => true,
+                'milestone' => $this->get_streak_milestone(1),
+            ];
+        }
+        
+        // Check if this is the first vote of today
+        $is_new_day = ($dates[0] !== $today);
+        
+        // If streak is broken (didn't vote today or yesterday)
+        if ($dates[0] !== $today && $dates[0] !== $yesterday) {
+            return [
+                'days' => 1, // Starting fresh
+                'is_new_day' => true,
+                'milestone' => $this->get_streak_milestone(1),
+            ];
+        }
+        
+        // Count consecutive days
+        $streak = 0;
+        $expected_date = $is_new_day ? $today : $dates[0];
+        
+        // If this is a new day, we need to check from today backwards
+        if ($is_new_day) {
+            // First check if yesterday was in the list
+            if ($dates[0] === $yesterday) {
+                $streak = 1; // Today counts as day 1
+                $expected_date = $yesterday;
+                
+                foreach ($dates as $date) {
+                    if ($date === $expected_date) {
+                        $streak++;
+                        $expected_date = gmdate('Y-m-d', strtotime($expected_date . ' -1 day'));
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                $streak = 1; // Just today, streak broken before
+            }
+        } else {
+            // Already voted today, count from today backwards
+            foreach ($dates as $date) {
+                if ($date === $expected_date) {
+                    $streak++;
+                    $expected_date = gmdate('Y-m-d', strtotime($expected_date . ' -1 day'));
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        return [
+            'days' => $streak,
+            'is_new_day' => $is_new_day,
+            'milestone' => $this->get_streak_milestone($streak),
+        ];
+    }
+    
+    /**
+     * Get milestone info for a streak
+     * 
+     * @param int $streak_days
+     * @return array|null
+     */
+    protected function get_streak_milestone(int $streak_days): ?array {
+        $milestones = [
+            3 => ['icon' => '🔥', 'title' => '3-dnevni Streak!', 'message' => 'Glasaš 3 dana zaredom!'],
+            7 => ['icon' => '🔥🔥', 'title' => '7-dnevni Streak!', 'message' => 'Tjedan dana aktivnosti!'],
+            14 => ['icon' => '🔥🔥🔥', 'title' => '2 tjedna Streak!', 'message' => 'Nevjerojatna predanost!'],
+            30 => ['icon' => '💎', 'title' => 'Mjesečni Streak!', 'message' => 'Cijeli mjesec glasanja!'],
+            60 => ['icon' => '💎💎', 'title' => '60-dnevni Streak!', 'message' => 'Legendarni glasač!'],
+            100 => ['icon' => '🏆', 'title' => '100-dnevni Streak!', 'message' => 'Stostruki prvak!'],
+        ];
+        
+        // Return milestone if streak exactly matches
+        if (isset($milestones[$streak_days])) {
+            return $milestones[$streak_days];
+        }
+        
+        return null;
     }
     
     /**

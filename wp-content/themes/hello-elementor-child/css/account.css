@@ -288,6 +288,141 @@
   color: #9ca3af;
 }
 
+/* ============================================
+   STREAK CARD STYLES
+   ============================================ */
+   
+.ygv-streak-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.ygv-streak-card.ygv-streak-active {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1px solid #fed7aa;
+}
+
+.ygv-streak-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ygv-streak-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-streak-icon {
+  animation: flameGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes flameGlow {
+  0% { filter: brightness(1); transform: scale(1); }
+  100% { filter: brightness(1.1); transform: scale(1.05); }
+}
+
+.ygv-streak-info {
+  flex: 1;
+  min-width: 150px;
+}
+
+.ygv-streak-title {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 4px 0;
+  font-weight: 500;
+}
+
+.ygv-streak-days {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ygv-streak-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+  font-family: var(--secondary-font), sans-serif;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-streak-number {
+  color: #ea580c;
+}
+
+.ygv-streak-label {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.ygv-streak-bonus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ygv-streak-bonus-badge {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.ygv-streak-bonus-text {
+  font-size: 12px;
+  color: #78716c;
+}
+
+.ygv-streak-hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.ygv-streak-progress {
+  min-width: 160px;
+}
+
+.ygv-milestone-progress {
+  text-align: center;
+}
+
+.ygv-milestone-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-milestone-bar {
+  background: #fde68a;
+}
+
+.ygv-milestone-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #ea580c);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.ygv-milestone-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ygv-milestone-complete {
+  color: #ea580c;
+  font-weight: 600;
+}
+
 /* Profile Info */
 .ygv-profile-info p {
   margin: 8px 0;

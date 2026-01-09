@@ -424,9 +424,18 @@
         );
       }
 
-      // Show XP earned
+      // Show XP earned with streak bonus breakdown
       if (data.xp_awarded && data.xp_awarded > 0) {
-        parts.push(`+${data.xp_awarded} XP`);
+        if (data.streak_bonus_xp && data.streak_bonus_xp > 0) {
+          parts.push(`+${data.xp_awarded} XP (${data.base_xp} + ${data.streak_bonus_xp} streak)`);
+        } else {
+          parts.push(`+${data.xp_awarded} XP`);
+        }
+      }
+
+      // Show streak info
+      if (data.streak && data.streak.days > 1) {
+        parts.push(`🔥 ${data.streak.days} dana streak`);
       }
 
       // Show daily limit warning if reached
@@ -435,6 +444,52 @@
       }
 
       return parts.join(" • ");
+    }
+
+    // --- Streak Milestone Notification ---
+    _showStreakMilestonePopup(milestone, streakDays) {
+      // Remove any existing popup
+      $(".ygv-streak-popup").remove();
+
+      const $popup = $(`
+        <div class="ygv-streak-popup">
+          <div class="ygv-streak-popup-overlay"></div>
+          <div class="ygv-streak-popup-content">
+            <button class="ygv-streak-popup-close">&times;</button>
+            <div class="ygv-streak-popup__icon">${milestone.icon}</div>
+            <div class="ygv-streak-popup__flames">
+              <span class="flame flame-1">🔥</span>
+              <span class="flame flame-2">🔥</span>
+              <span class="flame flame-3">🔥</span>
+            </div>
+            <h2 class="ygv-streak-popup__title">${milestone.title}</h2>
+            <div class="ygv-streak-popup__days">${streakDays} dana zaredom!</div>
+            <p class="ygv-streak-popup__message">${milestone.message}</p>
+            <div class="ygv-streak-popup__bonus">+${Math.min(streakDays, 10)} XP streak bonus po glasu</div>
+            <button class="ygv-streak-popup__cta">Nastavi! 💪</button>
+          </div>
+        </div>
+      `);
+
+      $("body").append($popup);
+      setTimeout(() => $popup.addClass("ygv-streak-popup--visible"), 10);
+
+      $popup
+        .find(
+          ".ygv-streak-popup-close, .ygv-streak-popup-overlay, .ygv-streak-popup__cta"
+        )
+        .on("click", () => {
+          $popup.removeClass("ygv-streak-popup--visible");
+          setTimeout(() => $popup.remove(), 300);
+        });
+    }
+
+    _handleStreakMilestone(streakData) {
+      if (!streakData || !streakData.milestone || !streakData.is_new_day) return;
+      
+      // Only show milestone popup on new day when milestone is reached
+      const milestone = streakData.milestone;
+      this._showStreakMilestonePopup(milestone, streakData.days);
     }
 
     // --- AJAX Methods ---
@@ -482,6 +537,22 @@
                 setTimeout(
                   () => this._handleAchievements(response.data.achievements),
                   levelUpDelay
+                );
+              }
+
+              // Handle streak milestones (show after achievements)
+              if (response.data.streak && response.data.streak.milestone && response.data.streak.is_new_day) {
+                const achievementDelay =
+                  response.data.achievements && response.data.achievements.length > 0
+                    ? response.data.achievements.length * 4500 + 2000
+                    : 0;
+                const levelUpDelay =
+                  response.data.level_ups && response.data.level_ups.length > 0
+                    ? response.data.level_ups.length * 4000 + 1500
+                    : 1500;
+                setTimeout(
+                  () => this._handleStreakMilestone(response.data.streak),
+                  levelUpDelay + achievementDelay
                 );
               }
             }

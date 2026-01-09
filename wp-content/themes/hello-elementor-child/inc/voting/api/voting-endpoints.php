@@ -269,6 +269,7 @@ function submit_vote() {
     $xp_awarded = 0;
     $votes_today = 0;
     $limit_reached = false;
+    $streak_info = null;
     
     if ($user_id > 0) {
         // Get or create progress service instance
@@ -282,6 +283,7 @@ function submit_vote() {
         $xp_awarded = $xp_result['awarded_xp'] ?? 0;
         $votes_today = $xp_result['votes_today'] ?? 0;
         $limit_reached = $xp_result['limit_reached'] ?? false;
+        $streak_info = $xp_result['streak'] ?? null;
     }
 
     // Return success with bonus info for UI feedback
@@ -302,6 +304,16 @@ function submit_vote() {
         $response['xp_awarded'] = $xp_awarded;
         $response['votes_today'] = $votes_today;
         $response['xp_limit_reached'] = $limit_reached;
+        
+        // Add streak info
+        if ($streak_info) {
+            $response['streak'] = $streak_info;
+            // Include breakdown if streak bonus was applied
+            if (isset($xp_result['streak_bonus_xp']) && $xp_result['streak_bonus_xp'] > 0) {
+                $response['base_xp'] = $xp_result['base_xp'] ?? 2;
+                $response['streak_bonus_xp'] = $xp_result['streak_bonus_xp'];
+            }
+        }
         
         // Add level-up info if any
         if (!empty($xp_result['level_ups'])) {

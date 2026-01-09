@@ -74,6 +74,23 @@ function ygv_get_next_level_xp($current_level, $config) {
 $global_title = ygv_get_title_for_level((int)$overall['overall_level'], $level_config);
 $global_next_xp = ygv_get_next_level_xp((int)$overall['overall_level'], $level_config);
 
+// Get voting streak info
+$voting_streak = 0;
+$streak_bonus = 0;
+if (class_exists('YGV_Achievement_Service')) {
+    $achievement_service = new YGV_Achievement_Service();
+    $user_stats = $achievement_service->get_user_stats($user_id);
+    $voting_streak = $user_stats['voting_streak'] ?? 0;
+    $streak_bonus = min($voting_streak, 10);
+} else {
+    // Fallback: calculate directly
+    require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-achievement-service.php';
+    $achievement_service = new YGV_Achievement_Service();
+    $user_stats = $achievement_service->get_user_stats($user_id);
+    $voting_streak = $user_stats['voting_streak'] ?? 0;
+    $streak_bonus = min($voting_streak, 10);
+}
+
 // Category icons/emojis
 $category_icons = [
     'Sport' => '⚽',
@@ -134,6 +151,75 @@ $category_icons = [
                         <span><?php echo esc_html__('Max nivo!', 'hello-elementor-child'); ?></span>
                         <?php endif; ?>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Voting Streak Card -->
+    <div class="ygv-card ygv-streak-card <?php echo $voting_streak >= 3 ? 'ygv-streak-active' : ''; ?>">
+        <div class="ygv-streak-content">
+            <div class="ygv-streak-icon">
+                <?php if ($voting_streak >= 30): ?>
+                    💎
+                <?php elseif ($voting_streak >= 7): ?>
+                    🔥🔥
+                <?php elseif ($voting_streak >= 1): ?>
+                    🔥
+                <?php else: ?>
+                    ❄️
+                <?php endif; ?>
+            </div>
+            <div class="ygv-streak-info">
+                <h3 class="ygv-streak-title"><?php echo esc_html__('Glasački Streak', 'hello-elementor-child'); ?></h3>
+                <div class="ygv-streak-days">
+                    <span class="ygv-streak-number"><?php echo $voting_streak; ?></span>
+                    <span class="ygv-streak-label"><?php echo $voting_streak === 1 ? esc_html__('dan', 'hello-elementor-child') : esc_html__('dana', 'hello-elementor-child'); ?> <?php echo esc_html__('zaredom', 'hello-elementor-child'); ?></span>
+                </div>
+                <?php if ($streak_bonus > 0): ?>
+                <div class="ygv-streak-bonus">
+                    <span class="ygv-streak-bonus-badge">+<?php echo $streak_bonus; ?> XP</span>
+                    <span class="ygv-streak-bonus-text"><?php echo esc_html__('bonus po glasu', 'hello-elementor-child'); ?></span>
+                </div>
+                <?php else: ?>
+                <div class="ygv-streak-hint">
+                    <?php echo esc_html__('Glasaj svaki dan za streak bonus!', 'hello-elementor-child'); ?>
+                </div>
+                <?php endif; ?>
+            </div>
+            <div class="ygv-streak-progress">
+                <?php 
+                // Show progress to next milestone
+                $next_milestone = 3;
+                if ($voting_streak >= 3) $next_milestone = 7;
+                if ($voting_streak >= 7) $next_milestone = 14;
+                if ($voting_streak >= 14) $next_milestone = 30;
+                if ($voting_streak >= 30) $next_milestone = 60;
+                if ($voting_streak >= 60) $next_milestone = 100;
+                
+                $milestone_start = 0;
+                if ($next_milestone == 7) $milestone_start = 3;
+                if ($next_milestone == 14) $milestone_start = 7;
+                if ($next_milestone == 30) $milestone_start = 14;
+                if ($next_milestone == 60) $milestone_start = 30;
+                if ($next_milestone == 100) $milestone_start = 60;
+                
+                $progress = min(100, (($voting_streak - $milestone_start) / ($next_milestone - $milestone_start)) * 100);
+                if ($voting_streak >= 100) $progress = 100;
+                ?>
+                <div class="ygv-milestone-progress">
+                    <div class="ygv-milestone-bar">
+                        <div class="ygv-milestone-bar-fill" style="width: <?php echo $progress; ?>%"></div>
+                    </div>
+                    <?php if ($voting_streak < 100): ?>
+                    <div class="ygv-milestone-text">
+                        <?php echo $voting_streak; ?> / <?php echo $next_milestone; ?> <?php echo esc_html__('dana', 'hello-elementor-child'); ?>
+                    </div>
+                    <?php else: ?>
+                    <div class="ygv-milestone-text ygv-milestone-complete">
+                        🏆 <?php echo esc_html__('Legendarni streak!', 'hello-elementor-child'); ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
