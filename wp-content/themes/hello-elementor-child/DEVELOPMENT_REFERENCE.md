@@ -1,7 +1,7 @@
 # YugoVote Development Reference
 
 **WordPress Child Theme for Hello Elementor**  
-**Last Updated:** December 27, 2025
+**Last Updated:** January 9, 2026
 
 ---
 
@@ -9,7 +9,8 @@
 
 - **AI Instructions**: [.github/copilot-instructions.md](.github/copilot-instructions.md)
 - **Module Pattern**: See "Module Structure" section below
-- **Tournament System**: See "Tournament Architecture" section below
+- **Shortcodes**: See "Shortcode Reference" section below
+- **API Endpoints**: See "API Reference" section below
 
 ---
 
@@ -19,16 +20,19 @@ YugoVote is a modular WordPress voting & quiz platform built as a child theme fo
 
 ### Core Features
 
-- **Voting System**: Lists, items, categories, and tournament brackets
-- **Quiz System**: Multi-level quizzes with token-based progression
-- **Polls**: Standalone voting polls
-- **Account System**: Custom authentication and user profiles
+| Module | Description |
+|--------|-------------|
+| **Voting** | Lists, items, categories, user voting |
+| **Tournament** | Bracket-style competitions with timed matches |
+| **Quizzes** | Multi-level quizzes with token-based progression |
+| **Polls** | Standalone voting polls |
+| **Account** | Custom authentication and user profiles |
 
 ### Technology Stack
 
-- **Backend**: PHP 8.0+, WordPress 6.0+, MySQL custom tables
-- **Frontend**: jQuery, AJAX (no REST API), Shortcode-based delivery
-- **Styling**: Custom CSS with gradient-heavy design system
+- **Backend**: PHP 8.2+, WordPress 6.0+, MySQL custom tables
+- **Frontend**: Vanilla JS + jQuery, AJAX, Shortcode-based delivery
+- **Styling**: Custom CSS with CSS variables
 - **Parent Theme**: Hello Elementor
 
 ---
@@ -270,6 +274,14 @@ tail -f wp-content/debug.log
 
 ## 📝 Recent Major Changes
 
+### Deployment Setup (Jan 9, 2026)
+
+- ✅ Git deployment workflow via rsync
+- ✅ Removed backup/old files from repo
+- ✅ Consolidated taxonomies to `cpts/` folder
+- ✅ Moved SQL files to `inc/migrations/sql/`
+- ✅ Updated .gitignore for backup patterns
+
 ### Tournament UI Refactor (Dec 27, 2025)
 
 - ✅ Removed all pulsing animations
@@ -278,19 +290,170 @@ tail -f wp-content/debug.log
 - ✅ Static VS badge with subtle lightning animation only
 - ✅ Database-driven progress tracking
 
-**Files Modified**:
+---
 
-- `css/tournament.css` - Complete UI overhaul
-- `js/tournament.js` - AJAX navigation rewrite
-- `inc/voting/tournament/api/tournament-ajax.php` - New endpoint
-- `inc/voting/tournament/shortcodes/bracket-shortcode.php` - Extracted rendering
+## 🎯 Shortcode Reference
 
-### Module Structure Refactor (Dec 26, 2025)
+### Voting Module
 
-- ✅ Moved taxonomies to `cpts/` folders
-- ✅ Created module-specific `admin/` folders
-- ✅ Extracted admin filters from global admin file
-- ✅ Added proper init loaders for helpers & migrations
+| Shortcode | Usage | Description |
+|-----------|-------|-------------|
+| `[voting_list id="123"]` | Specific list | Display voting list by ID |
+| `[voting_list_single]` | On single post | Display current post as voting list |
+| `[voting_list_total_score id="123"]` | Anywhere | Show total score for a list |
+| `[lists_with_this_item]` | On voting_items single | Show lists containing current item |
+| `[voting_category_hero]` | Category archive | Hero section with featured lists |
+| `[homepage_categories_slider]` | Homepage | Category carousel slider |
+| `[voting_top_categories]` | Homepage | Top categories with rankings |
+| `[voting_trending]` | Anywhere | Trending/popular lists |
+
+### Quiz Module
+
+| Shortcode | Usage | Description |
+|-----------|-------|-------------|
+| `[yuv_quiz_grid]` | Archive page | Grid of quiz cards with filters |
+| `[ygv_levels_per_category]` | Profile | User levels by category |
+
+### Tournament Module
+
+| Shortcode | Usage | Description |
+|-----------|-------|-------------|
+| `[yuv_active_duel]` | Tournament page | Active bracket/arena view |
+
+### Polls Module
+
+| Shortcode | Usage | Description |
+|-----------|-------|-------------|
+| `[yuv_poll id="123"]` | Anywhere | Display poll by ID |
+
+### Account Module
+
+| Shortcode | Usage | Description |
+|-----------|-------|-------------|
+| `[ygv_account_panel]` | Profile page | User account dashboard |
+| `[ygv_token_display]` | Header/sidebar | Token balance display |
+
+---
+
+## 🔌 API Reference
+
+### REST Endpoints (Quiz Module)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/wp-json/yugovote/v1/quiz/{id}` | GET | Get quiz data with questions |
+| `/wp-json/yugovote/v1/quiz/{id}/start` | POST | Start quiz attempt (charges tokens) |
+| `/wp-json/yugovote/v1/quiz/{id}/submit` | POST | Submit quiz results |
+
+### AJAX Endpoints
+
+**Voting Module:**
+| Action | Description |
+|--------|-------------|
+| `cs_cast_vote` | Cast vote on voting list item |
+| `cs_get_votes` | Get current vote counts |
+
+**Tournament Module:**
+| Action | Description |
+|--------|-------------|
+| `yuv_cast_tournament_vote` | Vote in tournament match |
+| `yuv_load_tournament_match_html` | Load next match HTML |
+
+**Quiz Module:**
+| Action | Description |
+|--------|-------------|
+| `yuv_quiz_grid_filter` | Filter quiz grid by category |
+
+**Account Module:**
+| Action | Description |
+|--------|-------------|
+| `ygv_update_profile` | Update user profile |
+
+---
+
+## 📁 Folder Structure
+
+```
+hello-elementor-child/
+├── functions.php              # Entry point
+├── style.css                  # Theme header + global styles
+├── inc/
+│   ├── init.php               # Bootstraps all modules
+│   ├── config.php             # Configuration constants
+│   ├── quizzes/
+│   │   ├── quizzes-init.php
+│   │   ├── quizzes-scripts.php
+│   │   ├── cpts/              # quiz, question, quiz-level CPTs
+│   │   ├── meta/              # Meta boxes
+│   │   ├── api/               # REST + AJAX endpoints
+│   │   ├── services/          # Token & Progress services
+│   │   ├── shortcodes/
+│   │   ├── helpers/
+│   │   └── templates/
+│   ├── voting/
+│   │   ├── voting-init.php
+│   │   ├── voting-scripts.php
+│   │   ├── voting-shortcodes.php
+│   │   ├── voting-hooks.php
+│   │   ├── cpts/              # voting_list, voting_items, taxonomies
+│   │   ├── meta/
+│   │   ├── api/
+│   │   ├── admin/
+│   │   ├── templates/
+│   │   └── tournament/        # Tournament sub-module
+│   │       ├── tournament-init.php
+│   │       ├── cpts/
+│   │       ├── meta/
+│   │       ├── api/
+│   │       ├── shortcodes/
+│   │       └── classes/
+│   ├── account/
+│   │   ├── account-init.php
+│   │   ├── api/
+│   │   ├── shortcodes/
+│   │   └── templates/
+│   ├── polls/
+│   │   ├── polls-init.php
+│   │   ├── cpts/
+│   │   ├── meta/
+│   │   └── templates/
+│   ├── admin/                 # Global admin customizations
+│   ├── helpers/               # Global utility functions
+│   └── migrations/            # Database migrations
+│       ├── sql/               # Raw SQL scripts
+│       └── *.php              # Migration files
+├── css/                       # Feature-specific CSS
+├── js/                        # Feature-specific JS
+├── assets/                    # Images, sounds, etc.
+└── template-parts/            # Reusable template partials
+```
+
+---
+
+## 🚀 Deployment Workflow
+
+### Local Development
+
+1. Edit files in `wp-content/themes/hello-elementor-child/`
+2. Test locally via Docker (`docker-compose up`)
+3. Commit and push:
+   ```bash
+   git add -f wp-content/themes/hello-elementor-child/
+   git commit -m "Your message"
+   git push
+   ```
+
+### Server Deployment
+
+SSH into server and run:
+```bash
+~/yugovote-theme/deploy-theme.sh
+```
+
+This will:
+1. `git pull` latest changes
+2. `rsync` child theme to production
+3. Display "Deploy complete."
 
 ---
 
@@ -302,4 +465,4 @@ tail -f wp-content/debug.log
 
 ---
 
-**For detailed API documentation and implementation examples, see the inline comments in source files.**
+**For detailed implementation examples, see inline comments in source files.**

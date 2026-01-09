@@ -27,9 +27,13 @@ GIT_CHANGES.md
 *.bak
 *.bkp
 *-old.*
+*-old-*
 *-backup.*
 *.backup
+*.backup-*
 *.-bkpphp
+*-broken.*
+*-broken-*
 
 # OS files
 .DS_Store
