@@ -4,31 +4,49 @@
  */
 
 /* ============================================
-   STATS BAR CONTAINER - INLINE HORIZONTAL
+   ELEMENTOR OVERRIDE RESET
    ============================================ */
+.elementor-widget-shortcode .ygv-user-stats-bar,
+.elementor-shortcode .ygv-user-stats-bar,
 .ygv-user-stats-bar {
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   padding: 6px 12px;
   border-radius: 50px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  flex-wrap: nowrap !important;
+  width: auto !important;
+  max-width: 100%;
 }
 
+.elementor-widget-shortcode .ygv-stats-bar-inner,
+.elementor-shortcode .ygv-stats-bar-inner,
 .ygv-stats-bar-inner {
   display: inline-flex !important;
   flex-direction: row !important;
   align-items: center !important;
   gap: 8px;
   flex-wrap: nowrap !important;
+  width: auto !important;
+}
+
+/* Reset any Elementor column/flex behavior */
+.elementor-widget-shortcode .elementor-widget-container,
+.elementor-widget-shortcode .elementor-shortcode {
+  display: inline-block !important;
+  width: auto !important;
 }
 
 /* ============================================
    USER AVATAR & NAME
    ============================================ */
+.elementor-shortcode .ygv-stats-user,
 .ygv-stats-user {
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   gap: 8px;
   text-decoration: none !important;
@@ -90,8 +108,10 @@
 /* ============================================
    STATS ITEMS (XP, Tokens, Coins)
    ============================================ */
+.elementor-shortcode .ygv-stats-item,
 .ygv-stats-item {
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   gap: 6px;
   padding: 5px 10px;
@@ -109,15 +129,18 @@
   width: 24px;
   height: 24px;
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 6px;
   flex-shrink: 0;
 }
 
-.ygv-stats-icon svg {
-  width: 14px;
-  height: 14px;
+.ygv-stats-icon svg,
+.ygv-stats-icon .ygv-icon {
+  width: 14px !important;
+  height: 14px !important;
+  display: inline-block !important;
 }
 
 /* XP Icon - Gold Star */
@@ -151,9 +174,11 @@
   color: #fff;
 }
 
+.elementor-shortcode .ygv-stats-content,
 .ygv-stats-content {
   display: inline-flex !important;
   flex-direction: column !important;
+  align-items: flex-start !important;
   gap: 0;
   line-height: 1.1;
 }
@@ -214,8 +239,10 @@
 /* ============================================
    TOKEN TIMER
    ============================================ */
+.elementor-shortcode .ygv-stats-timer,
 .ygv-stats-timer {
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   gap: 3px;
   padding: 2px 5px;
@@ -238,8 +265,10 @@
 /* ============================================
    NOTIFICATION BELL
    ============================================ */
+.elementor-shortcode .ygv-stats-notifications,
 .ygv-stats-notifications {
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 6px;
