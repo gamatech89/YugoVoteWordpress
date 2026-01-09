@@ -1,5 +1,10 @@
 <?php if (!defined('ABSPATH')) exit;
 
+// Ensure icons are loaded
+if (!function_exists('ygv_icon_e')) {
+    require_once get_stylesheet_directory() . '/inc/icons.php';
+}
+
 $user = wp_get_current_user();
 $user_id = $user->ID;
 

@@ -53,7 +53,7 @@ function ygv_user_stats_bar_shortcode($atts) {
     
     ob_start();
     ?>
-    <div class="ygv-user-stats-bar">
+    <div class="ygv-user-stats-bar ygv-stats-bar-light">
         <div class="ygv-stats-bar-inner">
             
             <!-- User Avatar & Name -->
