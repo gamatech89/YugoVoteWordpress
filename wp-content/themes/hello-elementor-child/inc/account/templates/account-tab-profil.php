@@ -48,32 +48,36 @@ $cat_progress = $wpdb->get_results($wpdb->prepare(
 $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
 
 // Helper to get title from level
-function ygv_get_title_for_level($level, $config) {
-    if (!$config) return 'Rookie';
-    foreach ($config['tiers'] as $tier) {
-        if ($level >= $tier['min_level'] && $level <= $tier['max_level']) {
-            return $tier['title'];
+if (!function_exists('ygv_get_title_for_level')) {
+    function ygv_get_title_for_level($level, $config) {
+        if (!$config) return 'Rookie';
+        foreach ($config['tiers'] as $tier) {
+            if ($level >= $tier['min_level'] && $level <= $tier['max_level']) {
+                return $tier['title'];
+            }
         }
+        return 'Legend';
     }
-    return 'Legend';
 }
 
 // Helper to get XP needed for next level
-function ygv_get_next_level_xp($current_level, $config) {
-    if (!$config) return null;
-    $thresholds = $config['xp_thresholds'] ?? [];
-    $xp_per_level = $config['xp_per_level_after_10'] ?? 300;
-    
-    $next_level = $current_level + 1;
-    if ($next_level > ($config['max_level'] ?? 100)) return null;
-    
-    if (isset($thresholds[$next_level])) {
-        return $thresholds[$next_level];
+if (!function_exists('ygv_get_next_level_xp')) {
+    function ygv_get_next_level_xp($current_level, $config) {
+        if (!$config) return null;
+        $thresholds = $config['xp_thresholds'] ?? [];
+        $xp_per_level = $config['xp_per_level_after_10'] ?? 300;
+        
+        $next_level = $current_level + 1;
+        if ($next_level > ($config['max_level'] ?? 100)) return null;
+        
+        if (isset($thresholds[$next_level])) {
+            return $thresholds[$next_level];
+        }
+        
+        // Calculate for levels > 10
+        $base = $thresholds[10] ?? 1250;
+        return $base + (($next_level - 10) * $xp_per_level);
     }
-    
-    // Calculate for levels > 10
-    $base = $thresholds[10] ?? 1250;
-    return $base + (($next_level - 10) * $xp_per_level);
 }
 
 $global_title = ygv_get_title_for_level((int)$overall['overall_level'], $level_config);
