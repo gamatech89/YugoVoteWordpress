@@ -58,20 +58,109 @@ class YGV_Progress_Service {
 
     /** ---------------- LEVELS / THRESHOLDS ---------------- */
     public function get_thresholds($scope = 'category'): array {
-        // You can make scopes different later; for now share thresholds.
-        // L1=0, L2=50, L3=120, L4=210, L5=320 ...
+        // Load from configurable settings if available
+        if (function_exists('ygv_get_level_config')) {
+            $config = ygv_get_level_config();
+            $thresholds = $config['xp_thresholds'] ?? [];
+            $xp_per_level = $config['xp_per_level_after_10'] ?? 300;
+            $max_level = $config['max_level'] ?? 100;
+            
+            // Build thresholds for levels 11+
+            $last_threshold = $thresholds[10] ?? 1250;
+            for ($lvl = 11; $lvl <= $max_level; $lvl++) {
+                $last_threshold += $xp_per_level;
+                $thresholds[$lvl] = $last_threshold;
+            }
+            
+            return $thresholds;
+        }
+        
+        // Fallback default: L1=0, L2=50, L3=120, L4=210, L5=320 ...
         return [1=>0, 2=>50, 3=>120, 4=>210, 5=>320, 6=>450, 7=>620, 8=>830, 9=>1080, 10=>1370];
     }
 
     /** returns ['level'=>X, 'next_xp'=>N | null] based on xp */
     public function xp_to_level(int $xp, string $scope = 'category'): array {
         $thr = $this->get_thresholds($scope);
-        $lvl = 1; $next_xp = null;
+        $max_level = function_exists('ygv_get_level_config') 
+            ? (ygv_get_level_config()['max_level'] ?? 100) 
+            : 100;
+        
+        $lvl = 1; 
+        $next_xp = null;
+        
         foreach ($thr as $L => $need) {
-            if ($xp >= $need) { $lvl = $L; }
-            else { $next_xp = $need; break; }
+            if ($L > $max_level) break;
+            if ($xp >= $need) { 
+                $lvl = $L; 
+            } else { 
+                $next_xp = $need; 
+                break; 
+            }
         }
+        
         return ['level'=>$lvl, 'next_xp'=>$next_xp];
+    }
+    
+    /**
+     * Get vote bonus info for a user in a specific category
+     * 
+     * @param int $user_id
+     * @param int $category_term_id Parent category term ID
+     * @return array ['bonus' => int, 'title' => string, 'level' => int, 'xp' => int]
+     */
+    public function get_vote_bonus(int $user_id, int $category_term_id): array {
+        global $wpdb;
+        
+        // Get user's XP and level in this category
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT xp, level FROM {$this->t_cat} WHERE user_id = %d AND category_term_id = %d",
+            $user_id,
+            $category_term_id
+        ), ARRAY_A);
+        
+        $xp = (int)($row['xp'] ?? 0);
+        $level = (int)($row['level'] ?? 1);
+        
+        // Get bonus from config
+        $bonus = 0;
+        $title = 'Rookie';
+        
+        if (function_exists('ygv_get_level_config')) {
+            $config = ygv_get_level_config();
+            foreach ($config['tiers'] as $tier) {
+                if ($level >= $tier['min_level'] && $level <= $tier['max_level']) {
+                    $bonus = (int)$tier['vote_bonus'];
+                    $title = $tier['title'];
+                    break;
+                }
+            }
+        }
+        
+        return [
+            'bonus' => $bonus,
+            'title' => $title,
+            'level' => $level,
+            'xp' => $xp
+        ];
+    }
+    
+    /**
+     * Get user's level title for a category
+     * 
+     * @param int $level
+     * @return string
+     */
+    public function get_level_title(int $level): string {
+        if (function_exists('ygv_get_level_config')) {
+            $config = ygv_get_level_config();
+            foreach ($config['tiers'] as $tier) {
+                if ($level >= $tier['min_level'] && $level <= $tier['max_level']) {
+                    return $tier['title'];
+                }
+            }
+        }
+        return 'Rookie';
     }
 
     /** ---------------- CATEGORY & OVERALL ---------------- */

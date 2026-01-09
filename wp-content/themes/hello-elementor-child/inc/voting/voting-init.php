@@ -16,7 +16,8 @@ if (!defined('ABSPATH')) {
 $voting_inc_path = get_stylesheet_directory() . '/inc/voting/';
 
 // Load Custom Post Types
-require_once $voting_inc_path . 'cpts/cpt-user-level.php';
+// Note: Old user_levels CPT removed - replaced by configurable Level Settings in admin
+// require_once $voting_inc_path . 'cpts/cpt-user-level.php';
 require_once $voting_inc_path . 'cpts/cpt-voting-list.php';
 require_once $voting_inc_path . 'cpts/cpt-voting-list-items.php';
 
@@ -25,7 +26,8 @@ require_once $voting_inc_path . 'cpts/taxonomy-voting-list-category.php';
 require_once $voting_inc_path . 'cpts/taxonomy-voting-item-category.php';
 
 // Load Meta Boxes
-require_once $voting_inc_path . 'meta/user-level-meta.php';
+// Note: Old user_level_meta removed - replaced by configurable Level Settings in admin  
+// require_once $voting_inc_path . 'meta/user-level-meta.php';
 require_once $voting_inc_path . 'meta/voting-list-meta.php';
 require_once $voting_inc_path . 'meta/voting-list-items-meta.php';
 require_once $voting_inc_path . 'meta/voting-list-taxonomy-meta.php';

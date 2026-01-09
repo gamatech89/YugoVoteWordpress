@@ -172,12 +172,15 @@ add_action("wp_ajax_get_voting_item_details", "get_voting_item_details");
  * Ensures that a specific vote value (e.g., "5 points") can only be assigned
  * to one item by a user within a given list. It also ensures a user has only
  * one active vote value per item on that list.
+ * 
+ * Expert Vote Bonus: Logged-in users get bonus points added based on their
+ * category level (e.g., Level 25 in Sport = +2 bonus on Sport lists).
  *
  * Expected $_POST parameters:
  * - '_ajax_nonce' (string) Nonce for security.
  * - 'voting_list_id' (int) ID of the voting list.
  * - 'voting_item_id' (int) ID of the item being voted for.
- * - 'vote_value' (int) The point value being assigned.
+ * - 'vote_value' (int) The point value being assigned (1-10).
  *
  * @action wp_ajax_submit_vote
  * @action wp_ajax_nopriv_submit_vote (for guest users)
@@ -190,22 +193,42 @@ function submit_vote() {
     $user_id = get_current_user_id(); // 0 if guest
     $voting_list_id = isset($_POST['voting_list_id']) ? intval($_POST['voting_list_id']) : 0;
     $voting_item_id = isset($_POST['voting_item_id']) ? intval($_POST['voting_item_id']) : 0;
-    $vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0;
+    $base_vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0;
     $ip_address = $_SERVER['REMOTE_ADDR'];
 
-    if (!$voting_list_id || !$voting_item_id || !$vote_value) {
+    if (!$voting_list_id || !$voting_item_id || !$base_vote_value) {
         wp_send_json_error("Invalid vote data provided.");
         return;
     }
+    
+    // Calculate expert bonus for logged-in users
+    $expert_bonus = 0;
+    $expert_title = null;
+    $user_category_level = null;
+    
+    if ($user_id > 0 && function_exists('ygv_get_list_parent_category') && function_exists('ygv_get_user_vote_bonus')) {
+        $parent_category_id = ygv_get_list_parent_category($voting_list_id);
+        
+        if ($parent_category_id) {
+            $bonus_info = ygv_get_user_vote_bonus($user_id, $parent_category_id);
+            $expert_bonus = (int) $bonus_info['bonus'];
+            $expert_title = $bonus_info['title'];
+            $user_category_level = $bonus_info['level'];
+        }
+    }
+    
+    // Final vote value = base vote + expert bonus
+    $vote_value = $base_vote_value + $expert_bonus;
 
     $table = $wpdb->prefix . "voting_list_votes";
     $where_user_or_ip = ($user_id > 0) ? ['user_id' => $user_id] : ['ip_address' => $ip_address];
 
-    // Step A: Remove any previous assignment of this specific $vote_value 
+    // Step A: Remove any previous assignment of this specific base vote value 
     // by this user/IP on this $voting_list_id, regardless of the item it was on.
+    // Note: We match on base_vote_value since that's what the user selected (1-10)
     $wpdb->delete($table, array_merge($where_user_or_ip, [
-        'voting_list_id' => $voting_list_id,
-        'vote_value'     => $vote_value 
+        'voting_list_id'  => $voting_list_id,
+        'base_vote_value' => $base_vote_value 
     ]));
 
     // Step B: Remove any other vote values this user/IP might have 
@@ -217,21 +240,23 @@ function submit_vote() {
 
     // Step C: Insert the new vote
     $insert_data = array_merge($where_user_or_ip, [
-        'voting_list_id' => $voting_list_id,
-        'voting_item_id' => $voting_item_id,
-        'vote_value'     => $vote_value,
-        'created_at'     => current_time('mysql', 1) // GMT time
+        'voting_list_id'  => $voting_list_id,
+        'voting_item_id'  => $voting_item_id,
+        'base_vote_value' => $base_vote_value,  // What user selected (1-10)
+        'vote_value'      => $vote_value,       // Final value with bonus
+        'expert_bonus'    => $expert_bonus,     // Bonus applied (0-4+)
+        'created_at'      => current_time('mysql', 1) // GMT time
     ]);
+    
     // If it's a guest, user_id will not be in $where_user_or_ip, so add explicitly if it's 0 for the column
     if ($user_id === 0) {
         $insert_data['user_id'] = null; // Or 0, depending on your DB column definition for guest (NULL is better)
     }
 
-
     $inserted = $wpdb->insert($table, $insert_data);
 
     if ($inserted === false) {
-        wp_send_json_error("Database error: Could not record vote.");
+        wp_send_json_error("Database error: Could not record vote. " . $wpdb->last_error);
         return;
     }
     
@@ -240,7 +265,20 @@ function submit_vote() {
         update_vote_score_cache($voting_item_id);
     }
 
-    wp_send_json_success("Vote submitted.");
+    // Return success with bonus info for UI feedback
+    $response = [
+        'message' => 'Vote submitted.',
+        'base_vote' => $base_vote_value,
+        'final_vote' => $vote_value,
+    ];
+    
+    if ($expert_bonus > 0) {
+        $response['expert_bonus'] = $expert_bonus;
+        $response['expert_title'] = $expert_title;
+        $response['category_level'] = $user_category_level;
+    }
+    
+    wp_send_json_success($response);
 }
 add_action("wp_ajax_submit_vote", "submit_vote");
 add_action("wp_ajax_nopriv_submit_vote", "submit_vote");
@@ -254,7 +292,7 @@ add_action("wp_ajax_nopriv_submit_vote", "submit_vote");
  * - '_ajax_nonce' (string) Nonce for security.
  * - 'voting_list_id' (int) ID of the voting list.
  * - 'voting_item_id' (int) ID of the item whose vote is to be removed.
- * - 'vote_value' (int) The specific point value of the vote to remove.
+ * - 'vote_value' (int) The base point value of the vote to remove (1-10, before bonus).
  *
  * @action wp_ajax_remove_vote
  * @action wp_ajax_nopriv_remove_vote (for guest users)
@@ -267,18 +305,20 @@ function remove_vote() {
     $user_id = get_current_user_id();
     $voting_list_id = isset($_POST['voting_list_id']) ? intval($_POST['voting_list_id']) : 0;
     $voting_item_id = isset($_POST['voting_item_id']) ? intval($_POST['voting_item_id']) : 0;
-    $vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0; // The specific vote to remove
+    $base_vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0; // The base vote to remove (1-10)
 
-    if (!$voting_list_id || !$voting_item_id || !$vote_value) {
+    if (!$voting_list_id || !$voting_item_id || !$base_vote_value) {
         wp_send_json_error("Invalid vote data for removal.");
         return;
     }
 
     $table = $wpdb->prefix . "voting_list_votes";
+    
+    // Use base_vote_value for matching (what user selected, not the bonus-adjusted value)
     $where_conditions = [
-        'voting_list_id' => $voting_list_id,
-        'voting_item_id' => $voting_item_id,
-        'vote_value'     => $vote_value
+        'voting_list_id'  => $voting_list_id,
+        'voting_item_id'  => $voting_item_id,
+        'base_vote_value' => $base_vote_value
     ];
 
     if ($user_id > 0) {
@@ -350,7 +390,7 @@ function get_user_votes() {
         $params[] = $ip_address;
     }
 
-    $query = "SELECT voting_item_id, vote_value FROM {$table} WHERE voting_list_id = %d {$sql_where_user}";
+    $query = "SELECT voting_item_id, vote_value, base_vote_value, expert_bonus FROM {$table} WHERE voting_list_id = %d {$sql_where_user}";
     
     $votes = $wpdb->get_results($wpdb->prepare($query, ...$params));
 

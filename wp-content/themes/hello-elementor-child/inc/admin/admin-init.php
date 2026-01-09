@@ -45,6 +45,9 @@ if (file_exists($admin_inc_path . 'elementor-tags.php')) {
     require_once $admin_inc_path . 'elementor-tags.php';
 }
 
-
+// Load Level & XP Settings
+if (file_exists($admin_inc_path . 'level-settings.php')) {
+    require_once $admin_inc_path . 'level-settings.php';
+}
 
 ?>
