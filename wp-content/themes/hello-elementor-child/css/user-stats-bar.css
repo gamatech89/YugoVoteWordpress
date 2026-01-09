@@ -1,0 +1,420 @@
+/**
+ * User Stats Bar CSS
+ * A compact header bar showing user stats: Level, XP, Tokens, Coins, Notifications
+ */
+
+/* ============================================
+   STATS BAR CONTAINER
+   ============================================ */
+.ygv-user-stats-bar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ygv-stats-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ygv-stats-bar-inner::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================
+   USER AVATAR & NAME
+   ============================================ */
+.ygv-stats-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    padding: 4px 12px 4px 4px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ygv-stats-user:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.ygv-stats-avatar {
+    position: relative;
+    width: 36px;
+    height: 36px;
+}
+
+.ygv-stats-avatar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6366f1;
+}
+
+.ygv-stats-level-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1a1a2e;
+    padding: 0 4px;
+}
+
+.ygv-stats-username {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================
+   STATS ITEMS (XP, Tokens, Coins)
+   ============================================ */
+.ygv-stats-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+.ygv-stats-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ygv-stats-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* XP Icon - Gold Star */
+.ygv-stats-xp .ygv-stats-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #fff;
+}
+
+/* Token Icon - Purple */
+.ygv-stats-icon-token {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: #fff;
+}
+
+/* Coin Icon - Gold */
+.ygv-stats-icon-coin {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #92400e;
+}
+
+/* Bell Icon */
+.ygv-stats-icon-bell {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    position: relative;
+}
+
+.ygv-stats-notifications:hover .ygv-stats-icon-bell {
+    color: #fff;
+}
+
+.ygv-stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ygv-stats-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.ygv-stats-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.ygv-token-max {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   XP PROGRESS BAR
+   ============================================ */
+.ygv-stats-xp {
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.ygv-stats-xp-bar {
+    position: absolute;
+    bottom: 4px;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.ygv-stats-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* ============================================
+   TOKEN TIMER
+   ============================================ */
+.ygv-stats-timer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+.ygv-timer-icon {
+    font-size: 10px;
+}
+
+.ygv-timer-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: #c4b5fd;
+}
+
+/* ============================================
+   NOTIFICATION BELL
+   ============================================ */
+.ygv-stats-notifications {
+    padding: 8px;
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.ygv-stats-notifications:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ygv-notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid #1a1a2e;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+    .ygv-user-stats-bar {
+        padding: 6px 12px;
+    }
+    
+    .ygv-stats-bar-inner {
+        gap: 10px;
+    }
+    
+    .ygv-stats-username {
+        display: none;
+    }
+    
+    .ygv-stats-user {
+        padding: 4px;
+        border-radius: 50%;
+    }
+    
+    .ygv-stats-item {
+        padding: 6px 8px;
+    }
+    
+    .ygv-stats-label {
+        display: none;
+    }
+    
+    .ygv-stats-content {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .ygv-stats-xp {
+        padding-bottom: 6px;
+    }
+    
+    .ygv-stats-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .ygv-stats-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ygv-stats-bar-inner {
+        gap: 6px;
+    }
+    
+    /* Hide coins on very small screens */
+    .ygv-stats-coins {
+        display: none;
+    }
+    
+    .ygv-stats-timer {
+        display: none;
+    }
+    
+    .ygv-stats-value {
+        font-size: 13px;
+    }
+}
+
+/* ============================================
+   ANIMATION: Pulse for level up
+   ============================================ */
+@keyframes ygv-level-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.ygv-stats-level-badge.ygv-level-up {
+    animation: ygv-level-pulse 0.6s ease-in-out 3;
+}
+
+/* ============================================
+   DARK/LIGHT MODE VARIANTS
+   ============================================ */
+/* For use in light headers if needed */
+.ygv-user-stats-bar.ygv-stats-bar-light {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ygv-stats-bar-light .ygv-stats-user {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.ygv-stats-bar-light .ygv-stats-user:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.ygv-stats-bar-light .ygv-stats-avatar img {
+    border-color: #6366f1;
+}
+
+.ygv-stats-bar-light .ygv-stats-level-badge {
+    border-color: #f8fafc;
+}
+
+.ygv-stats-bar-light .ygv-stats-username {
+    color: #1e293b;
+}
+
+.ygv-stats-bar-light .ygv-stats-item {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.ygv-stats-bar-light .ygv-stats-item:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.ygv-stats-bar-light .ygv-stats-label {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.ygv-stats-bar-light .ygv-stats-value {
+    color: #1e293b;
+}
+
+.ygv-stats-bar-light .ygv-token-max {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+.ygv-stats-bar-light .ygv-stats-xp-bar {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.ygv-stats-bar-light .ygv-stats-icon-bell {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.ygv-stats-bar-light .ygv-stats-notifications:hover .ygv-stats-icon-bell {
+    color: #1e293b;
+}
+
+.ygv-stats-bar-light .ygv-notification-badge {
+    border-color: #f8fafc;
+}
+
+/* ============================================
+   TRANSPARENT VARIANT (for overlaying header)
+   ============================================ */
+.ygv-user-stats-bar.ygv-stats-bar-transparent {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+.ygv-stats-bar-transparent .ygv-stats-user,
+.ygv-stats-bar-transparent .ygv-stats-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.ygv-stats-bar-transparent .ygv-stats-user:hover,
+.ygv-stats-bar-transparent .ygv-stats-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
