@@ -1058,4 +1058,269 @@
   font-size: 0.85rem;
 }
 
+/* ========================================
+   Level Up Popup with Mascot
+   ======================================== */
+.ygv-levelup-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-out;
+}
+
+.ygv-levelup-popup--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ygv-levelup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.ygv-levelup-content {
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 
+    0 0 0 4px var(--levelup-color, #4457A5),
+    0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  transform: scale(0.8) translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.ygv-levelup-popup--visible .ygv-levelup-content {
+  transform: scale(1) translateY(0);
+}
+
+/* Confetti-like background decoration */
+.ygv-levelup-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 20% 30%, var(--levelup-color) 0%, transparent 2%),
+    radial-gradient(circle at 80% 20%, var(--levelup-color) 0%, transparent 1.5%),
+    radial-gradient(circle at 40% 70%, var(--levelup-color) 0%, transparent 1%),
+    radial-gradient(circle at 70% 80%, var(--levelup-color) 0%, transparent 2%),
+    radial-gradient(circle at 10% 60%, var(--levelup-color) 0%, transparent 1.5%);
+  opacity: 0.15;
+  animation: levelup-sparkle 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes levelup-sparkle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.05); }
+}
+
+.ygv-levelup-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: #e2e8f0;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.ygv-levelup-close:hover {
+  background: #cbd5e1;
+  color: #334155;
+}
+
+.ygv-levelup__header {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.ygv-levelup__mascot-circle {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--levelup-color) 0%, color-mix(in srgb, var(--levelup-color) 70%, black) 100%);
+  padding: 0.5rem;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: levelup-bounce 0.6s ease-out;
+}
+
+@keyframes levelup-bounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.15); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.ygv-levelup__mascot {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.ygv-levelup__mascot-placeholder {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.ygv-levelup__stars {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  animation: levelup-stars 1s ease-out infinite;
+}
+
+@keyframes levelup-stars {
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+}
+
+.ygv-levelup__body {
+  position: relative;
+  z-index: 1;
+}
+
+.ygv-levelup__title {
+  font-family: var(--heading-font, 'Chendolle', sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--levelup-color);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ygv-levelup__category {
+  display: inline-block;
+  padding: 0.25rem 1rem;
+  border-radius: 2rem;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.ygv-levelup__level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.ygv-levelup__old {
+  font-family: var(--secondary-font, sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #94a3b8;
+  opacity: 0.7;
+}
+
+.ygv-levelup__arrow {
+  font-size: 1.5rem;
+  color: var(--levelup-color);
+  animation: levelup-arrow 0.8s ease-in-out infinite;
+}
+
+@keyframes levelup-arrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.ygv-levelup__new {
+  font-family: var(--secondary-font, sans-serif);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--levelup-color);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ygv-levelup__rank {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0.5rem 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.ygv-levelup__cta {
+  background: linear-gradient(135deg, var(--levelup-color) 0%, color-mix(in srgb, var(--levelup-color) 80%, black) 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 2.5rem;
+  border-radius: 2rem;
+  font-family: var(--heading-font, 'Chendolle', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ygv-levelup__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .ygv-levelup-content {
+    padding: 1.5rem;
+    max-width: 300px;
+  }
+  
+  .ygv-levelup__mascot-circle {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .ygv-levelup__title {
+    font-size: 1.75rem;
+  }
+  
+  .ygv-levelup__new {
+    font-size: 2.5rem;
+  }
+}
+
 /* Deploy test: Fri Jan  9 11:23:39 CET 2026 */

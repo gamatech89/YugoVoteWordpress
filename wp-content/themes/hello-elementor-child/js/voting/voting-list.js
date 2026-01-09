@@ -250,6 +250,74 @@
             }, duration);
         }
         
+        // --- Level Up Popup Methods ---
+        _showLevelUpPopup(levelUp) {
+            // Remove any existing popup
+            $('.ygv-levelup-popup').remove();
+            
+            const isCategory = levelUp.type === 'category';
+            const mascotHtml = isCategory && levelUp.mascot_url 
+                ? `<img src="${levelUp.mascot_url}" alt="${levelUp.category_name}" class="ygv-levelup__mascot">` 
+                : `<div class="ygv-levelup__mascot-placeholder">🏆</div>`;
+            
+            const categoryBadge = isCategory 
+                ? `<span class="ygv-levelup__category" style="background: ${levelUp.color}">${levelUp.category_name}</span>` 
+                : '';
+            
+            const $popup = $(`
+                <div class="ygv-levelup-popup">
+                    <div class="ygv-levelup-overlay"></div>
+                    <div class="ygv-levelup-content" style="--levelup-color: ${levelUp.color || '#4457A5'}">
+                        <button class="ygv-levelup-close">&times;</button>
+                        <div class="ygv-levelup__header">
+                            <div class="ygv-levelup__mascot-circle">
+                                ${mascotHtml}
+                            </div>
+                            <div class="ygv-levelup__stars">✨</div>
+                        </div>
+                        <div class="ygv-levelup__body">
+                            <h2 class="ygv-levelup__title">Level Up!</h2>
+                            ${categoryBadge}
+                            <div class="ygv-levelup__level">
+                                <span class="ygv-levelup__old">${levelUp.old_level}</span>
+                                <span class="ygv-levelup__arrow">→</span>
+                                <span class="ygv-levelup__new">${levelUp.new_level}</span>
+                            </div>
+                            <p class="ygv-levelup__rank">${levelUp.title}</p>
+                        </div>
+                        <button class="ygv-levelup__cta">Nastavi!</button>
+                    </div>
+                </div>
+            `);
+            
+            $('body').append($popup);
+            
+            // Animate in
+            setTimeout(() => $popup.addClass('ygv-levelup-popup--visible'), 10);
+            
+            // Close handlers
+            $popup.find('.ygv-levelup-close, .ygv-levelup-overlay, .ygv-levelup__cta').on('click', () => {
+                $popup.removeClass('ygv-levelup-popup--visible');
+                setTimeout(() => $popup.remove(), 300);
+            });
+        }
+        
+        _handleLevelUps(levelUps) {
+            if (!levelUps || !Array.isArray(levelUps) || levelUps.length === 0) return;
+            
+            // Show category level-ups first, then overall
+            const sorted = [...levelUps].sort((a, b) => {
+                if (a.type === 'category' && b.type === 'overall') return -1;
+                if (a.type === 'overall' && b.type === 'category') return 1;
+                return 0;
+            });
+            
+            // Show first level-up immediately, queue others with delay
+            sorted.forEach((levelUp, index) => {
+                setTimeout(() => this._showLevelUpPopup(levelUp), index * 4000);
+            });
+        }
+        
         _buildVoteFeedbackMessage(data) {
             let parts = [];
             
@@ -286,6 +354,12 @@
                             const feedbackMsg = this._buildVoteFeedbackMessage(response.data);
                             if (feedbackMsg) {
                                 this._showToast(feedbackMsg, 'success', 3500);
+                            }
+                            
+                            // Handle level-ups (show popup with mascot)
+                            if (response.data.level_ups && response.data.level_ups.length > 0) {
+                                // Delay slightly so toast shows first
+                                setTimeout(() => this._handleLevelUps(response.data.level_ups), 1000);
                             }
                         }
                     }

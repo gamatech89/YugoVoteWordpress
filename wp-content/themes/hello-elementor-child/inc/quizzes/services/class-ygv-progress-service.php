@@ -173,16 +173,22 @@ class YGV_Progress_Service {
             "SELECT * FROM {$this->t_cat} WHERE user_id=%d AND category_term_id=%d",
             $user_id, $term_id
         ), ARRAY_A);
+        
+        $old_cat_level = 1;
         if (!$row) {
             $row = ['user_id'=>$user_id,'category_term_id'=>$term_id,'xp'=>0,'level'=>1,'streak'=>0,'last_attempt_at'=>current_time('mysql', true)];
             $wpdb->insert($this->t_cat, $row, ['%d','%d','%d','%d','%d','%s']);
+        } else {
+            $old_cat_level = (int)$row['level'];
         }
 
         $new_xp = (int)$row['xp'] + $xp;
         $lev = $this->xp_to_level($new_xp, 'category');
+        $new_cat_level = (int)$lev['level'];
+        
         $wpdb->update($this->t_cat, [
             'xp' => $new_xp,
-            'level' => (int)$lev['level'],
+            'level' => $new_cat_level,
             'last_attempt_at' => current_time('mysql', true),
         ], ['user_id'=>$user_id, 'category_term_id'=>$term_id], ['%d','%d','%s'], ['%d','%d']);
 
@@ -191,6 +197,12 @@ class YGV_Progress_Service {
             "SELECT COALESCE(SUM(xp),0) FROM {$this->t_cat} WHERE user_id=%d", $user_id
         ));
         $levO = $this->xp_to_level($sum, 'overall');
+        
+        // Get old overall level
+        $old_overall_level = (int)$wpdb->get_var($wpdb->prepare(
+            "SELECT overall_level FROM {$this->t_over} WHERE user_id=%d", $user_id
+        )) ?: 1;
+        $new_overall_level = (int)$levO['level'];
 
         $exists_over = (int)$wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$this->t_over} WHERE user_id=%d", $user_id
@@ -198,22 +210,53 @@ class YGV_Progress_Service {
         if ($exists_over) {
             $wpdb->update($this->t_over, [
                 'overall_xp' => $sum,
-                'overall_level' => (int)$levO['level'],
+                'overall_level' => $new_overall_level,
                 'last_updated' => current_time('mysql', true),
             ], ['user_id'=>$user_id], ['%d','%d','%s'], ['%d']);
         } else {
             $wpdb->insert($this->t_over, [
                 'user_id'=>$user_id,
                 'overall_xp'=>$sum,
-                'overall_level'=>(int)$levO['level'],
+                'overall_level'=>$new_overall_level,
                 'last_updated'=>current_time('mysql', true),
             ], ['%d','%d','%d','%s']);
+        }
+        
+        // Build level-up info if any level changed
+        $level_ups = [];
+        
+        if ($new_cat_level > $old_cat_level && $term_id > 0) {
+            $term = get_term($term_id, 'voting_list_category');
+            $term_name = $term ? $term->name : 'Kategorija';
+            $mascot_id = get_term_meta($term_id, 'category_logo', true);
+            $mascot_url = $mascot_id ? wp_get_attachment_image_url($mascot_id, 'medium') : '';
+            $color = get_term_meta($term_id, 'category_color', true) ?: '#4457A5';
+            
+            $level_ups[] = [
+                'type' => 'category',
+                'category_name' => $term_name,
+                'old_level' => $old_cat_level,
+                'new_level' => $new_cat_level,
+                'mascot_url' => $mascot_url,
+                'color' => $color,
+                'title' => $this->get_level_title($new_cat_level),
+            ];
+        }
+        
+        if ($new_overall_level > $old_overall_level) {
+            $level_ups[] = [
+                'type' => 'overall',
+                'old_level' => $old_overall_level,
+                'new_level' => $new_overall_level,
+                'title' => $this->get_level_title($new_overall_level),
+            ];
         }
 
         return [
             'awarded'=>$xp,
-            'category'=>['xp'=>$new_xp,'level'=>(int)$lev['level']],
-            'overall' =>['xp'=>$sum,'level'=>(int)$levO['level']],
+            'category'=>['xp'=>$new_xp,'level'=>$new_cat_level],
+            'overall' =>['xp'=>$sum,'level'=>$new_overall_level],
+            'level_ups' => $level_ups,
         ];
     }
 

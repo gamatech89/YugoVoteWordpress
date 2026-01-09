@@ -302,6 +302,11 @@ function submit_vote() {
         $response['xp_awarded'] = $xp_awarded;
         $response['votes_today'] = $votes_today;
         $response['xp_limit_reached'] = $limit_reached;
+        
+        // Add level-up info if any
+        if (!empty($xp_result['level_ups'])) {
+            $response['level_ups'] = $xp_result['level_ups'];
+        }
     }
     
     wp_send_json_success($response);
