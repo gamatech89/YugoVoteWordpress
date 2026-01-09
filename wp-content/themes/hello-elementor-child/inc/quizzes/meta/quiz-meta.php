@@ -44,83 +44,112 @@ function ygv_render_quiz_meta_box(WP_Post $post) {
 
     wp_nonce_field('ygv_save_quiz_meta', 'ygv_quiz_meta_nonce');
 
-    echo '<label><strong>'.esc_html__('Quiz Description', 'hello-elementor-child').':</strong></label>';
-    echo '<textarea name="quiz_description" rows="4" style="width:100%;">' . esc_textarea($quiz_description) . '</textarea><br><br>';
-
-    echo '<label><strong>'.esc_html__('Number of Questions', 'hello-elementor-child').':</strong></label>';
-    echo '<input type="number" name="num_questions" value="' . esc_attr($num_questions) . '" min="1" style="width:100%;"><br><br>';
-
-    echo '<label><strong>'.esc_html__('Time per Question (seconds)', 'hello-elementor-child').':</strong></label>';
-    echo '<input type="number" name="time_per_question" value="' . esc_attr($time_per_question) . '" min="1" style="width:100%;"><br><br>';
-
-    echo '<label><strong>'.esc_html__('Token Cost (per attempt)', 'hello-elementor-child').':</strong></label>';
-    echo '<input type="number" name="quiz_token_cost" value="' . esc_attr($quiz_token_cost) . '" min="0" step="1" style="width:100%;"><br><br>';
-
-    echo '<label><strong>'.esc_html__('Base XP (per quiz)', 'hello-elementor-child').':</strong></label>';
-    echo '<input type="number" name="quiz_xp_value" value="' . esc_attr($quiz_xp_value) . '" min="1" style="width:100%;"><br><br>';
-
-    echo '<label><input type="checkbox" name="allow_guest_play" value="1" ' . checked($allow_guest_play, '1', false) . '> ';
-    echo '<strong>' . esc_html__('Allow Guest Play', 'hello-elementor-child') . '</strong></label>';
-    echo '<p class="description">' . esc_html__('Allow non-logged-in users to play this quiz (scores will not be saved).', 'hello-elementor-child') . '</p><br><br>';
-
-    echo '<label><strong>'.esc_html__('Quiz Difficulty', 'hello-elementor-child').':</strong></label>';
-    echo '<select name="quiz_difficulty" style="width:100%;">';
-    echo '<option value="">-- '.esc_html__('Select Difficulty', 'hello-elementor-child').' --</option>';
-    foreach ($quiz_levels as $level) {
-        echo '<option value="' . esc_attr($level->ID) . '" ' . selected($quiz_difficulty, $level->ID, false) . '>' . esc_html($level->post_title) . '</option>';
-    }
-    echo '</select><br><br>';
-
-    echo '<label><strong>'.esc_html__('Question Selection Type', 'hello-elementor-child').':</strong></label>';
-    echo '<select id="quiz_type" name="quiz_type" style="width:100%;">';
-    echo '<option value="automatic" ' . selected($quiz_type, 'automatic', false) . '>Automatic</option>';
-    echo '<option value="manual" ' . selected($quiz_type, 'manual', false) . '>Manual</option>';
-    echo '</select><br><br>';
-
-    echo '<label><strong>'.esc_html__('Quiz Mode', 'hello-elementor-child').':</strong></label>';
-    echo '<select id="quiz_mode" name="quiz_mode" style="width:100%;">';
-    echo '<option value="classic" ' . selected($quiz_mode, 'classic', false) . '>Classic</option>';
-    echo '<option value="speedtime" ' . selected($quiz_mode, 'speedtime', false) . '>SpeedTime</option>';
-    echo '</select><br><br>';
-
-    echo '<label><strong>'.esc_html__('Choose Question Categories', 'hello-elementor-child').':</strong></label>';
-    echo '<select id="quiz_question_categories" name="quiz_question_categories[]" multiple="multiple" style="width:100%;">';
-    foreach ($categories as $category) {
-        $sel = in_array($category->term_id, $selected_categories, true) ? 'selected' : '';
-        echo '<option value="' . esc_attr($category->term_id) . '" '.$sel.'>' . esc_html($category->name) . '</option>';
-    }
-    echo '</select><br><br>';
-
-    echo '<div id="automatic_options" style="display:' . ($quiz_type === 'automatic' ? 'block' : 'none') . ';">';
-    echo '<p><em>'.esc_html__('Automatic mode will randomly select questions based on selected categories.', 'hello-elementor-child').'</em></p>';
-    echo '</div>';
-
-    echo '<div id="manual_options" style="display:' . ($quiz_type === 'manual' ? 'block' : 'none') . ';">';
-    echo '<p><em>'.esc_html__('Manually select questions for the quiz below.', 'hello-elementor-child').'</em></p>';
-
-    echo '<label><strong>'.esc_html__('Filter Questions by Category', 'hello-elementor-child').':</strong></label>';
-    echo '<select id="quiz_category_filter" style="width:100%;">';
-    echo '<option value="">-- '.esc_html__('Select Category', 'hello-elementor-child').' --</option>';
-    foreach ($categories as $category) {
-        echo '<option value="' . esc_attr($category->term_id) . '">' . esc_html($category->name) . '</option>';
-    }
-    echo '</select> ';
-    echo '<button type="button" id="filter_questions" class="button">'.esc_html__('Filter Questions', 'hello-elementor-child').'</button><br><br>';
-
-    echo '<label><strong>'.esc_html__('Select Questions', 'hello-elementor-child').':</strong></label>';
-    echo '<select id="quiz_question_select" style="width:100%;"></select> ';
-    echo '<button type="button" id="add_quiz_question" class="button">'.esc_html__('Add Question', 'hello-elementor-child').'</button><br><br>';
-
-    echo '<table id="quiz_questions_table" class="widefat">';
-    echo '<thead><tr><th>'.esc_html__('Question','hello-elementor-child').'</th><th>'.esc_html__('Action','hello-elementor-child').'</th></tr></thead>';
-    echo '<tbody></tbody>';
-    echo '</table><br>';
-
     $selected_questions_json = get_post_meta($post->ID, '_quiz_questions', true);
-    if (!is_string($selected_questions_json)) $selected_questions_json = '[]';
+    if (!is_string($selected_questions_json)) {
+        $selected_questions_json = '[]';
+    }
 
-    echo '<input type="hidden" id="quiz_questions" name="quiz_questions" value="' . esc_attr($selected_questions_json) . '">';
-    echo '</div>';
+    ?>
+    <div class="ygv-quiz-meta">
+        <label><strong><?php esc_html_e('Quiz Description', 'hello-elementor-child'); ?>:</strong></label>
+        <textarea name="quiz_description" rows="4" style="width:100%;"><?php echo esc_textarea($quiz_description); ?></textarea>
+        <br><br>
+
+        <label><strong><?php esc_html_e('Number of Questions', 'hello-elementor-child'); ?>:</strong></label>
+        <input type="number" name="num_questions" value="<?php echo esc_attr($num_questions); ?>" min="1" style="width:100%;">
+        <br><br>
+
+        <label><strong><?php esc_html_e('Time per Question (seconds)', 'hello-elementor-child'); ?>:</strong></label>
+        <input type="number" name="time_per_question" value="<?php echo esc_attr($time_per_question); ?>" min="1" style="width:100%;">
+        <br><br>
+
+        <label><strong><?php esc_html_e('Token Cost (per attempt)', 'hello-elementor-child'); ?>:</strong></label>
+        <input type="number" name="quiz_token_cost" value="<?php echo esc_attr($quiz_token_cost); ?>" min="0" step="1" style="width:100%;">
+        <br><br>
+
+        <label><strong><?php esc_html_e('Base XP (per quiz)', 'hello-elementor-child'); ?>:</strong></label>
+        <input type="number" name="quiz_xp_value" value="<?php echo esc_attr($quiz_xp_value); ?>" min="1" style="width:100%;">
+        <br><br>
+
+        <label>
+            <input type="checkbox" name="allow_guest_play" value="1" <?php checked($allow_guest_play, '1'); ?>>
+            <strong><?php esc_html_e('Allow Guest Play', 'hello-elementor-child'); ?></strong>
+        </label>
+        <p class="description"><?php esc_html_e('Allow non-logged-in users to play this quiz (scores will not be saved).', 'hello-elementor-child'); ?></p>
+        <br><br>
+
+        <label><strong><?php esc_html_e('Quiz Difficulty', 'hello-elementor-child'); ?>:</strong></label>
+        <select name="quiz_difficulty" style="width:100%;">
+            <option value="">-- <?php esc_html_e('Select Difficulty', 'hello-elementor-child'); ?> --</option>
+            <?php foreach ($quiz_levels as $level) : ?>
+                <option value="<?php echo esc_attr($level->ID); ?>" <?php selected($quiz_difficulty, $level->ID); ?>>
+                    <?php echo esc_html($level->post_title); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
+
+        <label><strong><?php esc_html_e('Question Selection Type', 'hello-elementor-child'); ?>:</strong></label>
+        <select id="quiz_type" name="quiz_type" style="width:100%;">
+            <option value="automatic" <?php selected($quiz_type, 'automatic'); ?>>Automatic</option>
+            <option value="manual" <?php selected($quiz_type, 'manual'); ?>>Manual</option>
+        </select>
+        <br><br>
+
+        <label><strong><?php esc_html_e('Quiz Mode', 'hello-elementor-child'); ?>:</strong></label>
+        <select id="quiz_mode" name="quiz_mode" style="width:100%;">
+            <option value="classic" <?php selected($quiz_mode, 'classic'); ?>>Classic</option>
+            <option value="speedtime" <?php selected($quiz_mode, 'speedtime'); ?>>SpeedTime</option>
+        </select>
+        <br><br>
+
+        <label><strong><?php esc_html_e('Choose Question Categories', 'hello-elementor-child'); ?>:</strong></label>
+        <select id="quiz_question_categories" name="quiz_question_categories[]" multiple="multiple" style="width:100%;">
+            <?php foreach ($categories as $category) : ?>
+                <option value="<?php echo esc_attr($category->term_id); ?>" <?php selected(in_array($category->term_id, $selected_categories, true)); ?>>
+                    <?php echo esc_html($category->name); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
+
+        <div id="automatic_options" style="display:<?php echo ($quiz_type === 'automatic') ? 'block' : 'none'; ?>;">
+            <p><em><?php esc_html_e('Automatic mode will randomly select questions based on selected categories.', 'hello-elementor-child'); ?></em></p>
+        </div>
+
+        <div id="manual_options" style="display:<?php echo ($quiz_type === 'manual') ? 'block' : 'none'; ?>;">
+            <p><em><?php esc_html_e('Manually select questions for the quiz below.', 'hello-elementor-child'); ?></em></p>
+
+            <label><strong><?php esc_html_e('Filter Questions by Category', 'hello-elementor-child'); ?>:</strong></label>
+            <select id="quiz_category_filter" style="width:100%;">
+                <option value="">-- <?php esc_html_e('Select Category', 'hello-elementor-child'); ?> --</option>
+                <?php foreach ($categories as $category) : ?>
+                    <option value="<?php echo esc_attr($category->term_id); ?>"><?php echo esc_html($category->name); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <button type="button" id="filter_questions" class="button"><?php esc_html_e('Filter Questions', 'hello-elementor-child'); ?></button>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Select Questions', 'hello-elementor-child'); ?>:</strong></label>
+            <select id="quiz_question_select" style="width:100%;"></select>
+            <button type="button" id="add_quiz_question" class="button"><?php esc_html_e('Add Question', 'hello-elementor-child'); ?></button>
+            <br><br>
+
+            <table id="quiz_questions_table" class="widefat">
+                <thead>
+                    <tr>
+                        <th><?php esc_html_e('Question', 'hello-elementor-child'); ?></th>
+                        <th><?php esc_html_e('Action', 'hello-elementor-child'); ?></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <br>
+
+            <input type="hidden" id="quiz_questions" name="quiz_questions" value="<?php echo esc_attr($selected_questions_json); ?>">
+        </div>
+    </div>
+    <?php
 }
 
 /** Save (only for quiz post type) */
