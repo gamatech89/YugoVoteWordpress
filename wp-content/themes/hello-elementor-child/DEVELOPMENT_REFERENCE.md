@@ -20,13 +20,13 @@ YugoVote is a modular WordPress voting & quiz platform built as a child theme fo
 
 ### Core Features
 
-| Module | Description |
-|--------|-------------|
-| **Voting** | Lists, items, categories, user voting |
-| **Tournament** | Bracket-style competitions with timed matches |
-| **Quizzes** | Multi-level quizzes with token-based progression |
-| **Polls** | Standalone voting polls |
-| **Account** | Custom authentication and user profiles |
+| Module         | Description                                      |
+| -------------- | ------------------------------------------------ |
+| **Voting**     | Lists, items, categories, user voting            |
+| **Tournament** | Bracket-style competitions with timed matches    |
+| **Quizzes**    | Multi-level quizzes with token-based progression |
+| **Polls**      | Standalone voting polls                          |
+| **Account**    | Custom authentication and user profiles          |
 
 ### Technology Stack
 
@@ -296,42 +296,42 @@ tail -f wp-content/debug.log
 
 ### Voting Module
 
-| Shortcode | Usage | Description |
-|-----------|-------|-------------|
-| `[voting_list id="123"]` | Specific list | Display voting list by ID |
-| `[voting_list_single]` | On single post | Display current post as voting list |
-| `[voting_list_total_score id="123"]` | Anywhere | Show total score for a list |
-| `[lists_with_this_item]` | On voting_items single | Show lists containing current item |
-| `[voting_category_hero]` | Category archive | Hero section with featured lists |
-| `[homepage_categories_slider]` | Homepage | Category carousel slider |
-| `[voting_top_categories]` | Homepage | Top categories with rankings |
-| `[voting_trending]` | Anywhere | Trending/popular lists |
+| Shortcode                            | Usage                  | Description                         |
+| ------------------------------------ | ---------------------- | ----------------------------------- |
+| `[voting_list id="123"]`             | Specific list          | Display voting list by ID           |
+| `[voting_list_single]`               | On single post         | Display current post as voting list |
+| `[voting_list_total_score id="123"]` | Anywhere               | Show total score for a list         |
+| `[lists_with_this_item]`             | On voting_items single | Show lists containing current item  |
+| `[voting_category_hero]`             | Category archive       | Hero section with featured lists    |
+| `[homepage_categories_slider]`       | Homepage               | Category carousel slider            |
+| `[voting_top_categories]`            | Homepage               | Top categories with rankings        |
+| `[voting_trending]`                  | Anywhere               | Trending/popular lists              |
 
 ### Quiz Module
 
-| Shortcode | Usage | Description |
-|-----------|-------|-------------|
-| `[yuv_quiz_grid]` | Archive page | Grid of quiz cards with filters |
-| `[ygv_levels_per_category]` | Profile | User levels by category |
+| Shortcode                   | Usage        | Description                     |
+| --------------------------- | ------------ | ------------------------------- |
+| `[yuv_quiz_grid]`           | Archive page | Grid of quiz cards with filters |
+| `[ygv_levels_per_category]` | Profile      | User levels by category         |
 
 ### Tournament Module
 
-| Shortcode | Usage | Description |
-|-----------|-------|-------------|
+| Shortcode           | Usage           | Description               |
+| ------------------- | --------------- | ------------------------- |
 | `[yuv_active_duel]` | Tournament page | Active bracket/arena view |
 
 ### Polls Module
 
-| Shortcode | Usage | Description |
-|-----------|-------|-------------|
+| Shortcode             | Usage    | Description        |
+| --------------------- | -------- | ------------------ |
 | `[yuv_poll id="123"]` | Anywhere | Display poll by ID |
 
 ### Account Module
 
-| Shortcode | Usage | Description |
-|-----------|-------|-------------|
-| `[ygv_account_panel]` | Profile page | User account dashboard |
-| `[ygv_token_display]` | Header/sidebar | Token balance display |
+| Shortcode             | Usage          | Description            |
+| --------------------- | -------------- | ---------------------- |
+| `[ygv_account_panel]` | Profile page   | User account dashboard |
+| `[ygv_token_display]` | Header/sidebar | Token balance display  |
 
 ---
 
@@ -339,11 +339,11 @@ tail -f wp-content/debug.log
 
 ### REST Endpoints (Quiz Module)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/wp-json/yugovote/v1/quiz/{id}` | GET | Get quiz data with questions |
-| `/wp-json/yugovote/v1/quiz/{id}/start` | POST | Start quiz attempt (charges tokens) |
-| `/wp-json/yugovote/v1/quiz/{id}/submit` | POST | Submit quiz results |
+| Endpoint                                | Method | Description                         |
+| --------------------------------------- | ------ | ----------------------------------- |
+| `/wp-json/yugovote/v1/quiz/{id}`        | GET    | Get quiz data with questions        |
+| `/wp-json/yugovote/v1/quiz/{id}/start`  | POST   | Start quiz attempt (charges tokens) |
+| `/wp-json/yugovote/v1/quiz/{id}/submit` | POST   | Submit quiz results                 |
 
 ### AJAX Endpoints
 
@@ -446,11 +446,13 @@ hello-elementor-child/
 ### Server Deployment
 
 SSH into server and run:
+
 ```bash
 ~/yugovote-theme/deploy-theme.sh
 ```
 
 This will:
+
 1. `git pull` latest changes
 2. `rsync` child theme to production
 3. Display "Deploy complete."

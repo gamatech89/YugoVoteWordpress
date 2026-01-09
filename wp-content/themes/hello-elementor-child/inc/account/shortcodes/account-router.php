@@ -51,7 +51,12 @@ return '<div class="cs-card">'.sprintf(
     }
 
     $tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'kvizovi';
-    $nav = ygv_account_render_nav($tab);
+    
+    // Hidden tabs that don't show in nav (like create-list form)
+    $hidden_tabs = ['kreiraj-listu'];
+    
+    // Only show nav for regular tabs
+    $nav = in_array($tab, $hidden_tabs) ? '' : ygv_account_render_nav($tab);
 
     $base = get_stylesheet_directory() . '/inc/account/templates/';
     $file = $base . 'account-tab-' . $tab . '.php';

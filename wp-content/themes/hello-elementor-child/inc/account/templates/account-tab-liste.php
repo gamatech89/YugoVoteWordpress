@@ -32,7 +32,7 @@ $parent_categories = get_terms([
         <div class="ygv-card-header">
             <h3><?php echo esc_html__('Moje Liste', 'hello-elementor-child'); ?></h3>
             <?php if ($can_create['can_create']): ?>
-                <a href="<?php echo esc_url(home_url('/kreiraj-listu/')); ?>" class="ygv-btn ygv-btn-primary">
+                <a href="<?php echo esc_url(ygv_account_page_url(['tab' => 'kreiraj-listu'])); ?>" class="ygv-btn ygv-btn-primary">
                     + <?php echo esc_html__('Kreiraj Novu Listu', 'hello-elementor-child'); ?>
                 </a>
             <?php endif; ?>
