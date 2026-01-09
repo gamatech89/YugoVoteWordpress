@@ -57,9 +57,8 @@ $max_tokens = 48;
 $next_refill = 0;
 $regen_interval = 60; // minutes
 
-if (class_exists('YGV_Token_Service')) {
-    $token_service = new YGV_Token_Service();
-    $wallet = $token_service->current_wallet($user_id);
+if (function_exists('ygv_tokens')) {
+    $wallet = ygv_tokens()->current_wallet($user_id);
     
     $tokens_in_db = (int)($wallet['tokens'] ?? 0);
     $max_tokens = (int)($wallet['max_tokens'] ?? 48);

@@ -581,12 +581,11 @@ function ygv_ajax_create_list() {
     
     // Award XP for creating a list
     $xp_awarded = 0;
-    if (!class_exists('YGV_Progress_Service')) {
-        require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-progress-service.php';
+    $progress_service = function_exists('ygv_progress') ? ygv_progress() : null;
+    if ($progress_service) {
+        $xp_result = $progress_service->award_list_creation_xp($user_id, $category_id);
+        $xp_awarded = $xp_result['awarded_xp'] ?? 0;
     }
-    $progress_service = new YGV_Progress_Service();
-    $xp_result = $progress_service->award_list_creation_xp($user_id, $category_id);
-    $xp_awarded = $xp_result['awarded_xp'] ?? 0;
     
     wp_send_json_success([
         'message' => sprintf(__('Lista je kreirana i čeka odobrenje! +%d XP', 'hello-elementor-child'), $xp_awarded),
