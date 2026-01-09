@@ -1,0 +1,212 @@
+<?php
+namespace HelloElementorChild\Quizzes\Meta;
+
+use WP_Post;
+
+if (!defined('ABSPATH')) {
+    exit();
+}
+
+class QuizMetaBox {
+    public static function register(): void {
+        add_action('add_meta_boxes', [self::class, 'addMetaBoxes']);
+        add_action('save_post_quiz', [self::class, 'save'], 10, 1);
+    }
+
+    public static function addMetaBoxes(): void {
+        add_meta_box(
+            'quiz_settings',
+            __('Quiz Settings', 'hello-elementor-child'),
+            [self::class, 'render'],
+            'quiz',
+            'normal',
+            'high'
+        );
+    }
+
+    public static function render(WP_Post $post): void {
+        $num_questions       = (int) get_post_meta($post->ID, '_num_questions', true) ?: 10;
+        $time_per_question   = (int) get_post_meta($post->ID, '_time_per_question', true) ?: 10;
+        $quiz_type           = get_post_meta($post->ID, '_quiz_type', true) ?: 'automatic';
+        $quiz_mode           = get_post_meta($post->ID, '_quiz_mode', true) ?: 'classic';
+        $quiz_description    = get_post_meta($post->ID, '_quiz_description', true) ?: '';
+        $quiz_difficulty     = get_post_meta($post->ID, '_quiz_difficulty', true) ?: '';
+        $selected_categories = (array) get_post_meta($post->ID, '_quiz_question_categories', true) ?: [];
+        $quiz_token_cost     = (int) get_post_meta($post->ID, '_quiz_token_cost', true) ?: 8;
+        $quiz_xp_value       = (int) get_post_meta($post->ID, '_quiz_xp_value', true) ?: 20;
+        $allow_guest_play    = get_post_meta($post->ID, '_allow_guest_play', true);
+
+        $categories = get_terms([
+            'taxonomy'   => 'question_category',
+            'hide_empty' => false,
+        ]);
+
+        $quiz_levels = get_posts([
+            'post_type'   => 'quiz_levels',
+            'numberposts' => -1,
+            'post_status' => 'publish',
+        ]);
+
+        wp_nonce_field('ygv_save_quiz_meta', 'ygv_quiz_meta_nonce');
+
+        $selected_questions_json = get_post_meta($post->ID, '_quiz_questions', true);
+        if (!is_string($selected_questions_json)) {
+            $selected_questions_json = '[]';
+        }
+
+        ?>
+        <div class="ygv-quiz-meta">
+            <label><strong><?php esc_html_e('Quiz Description', 'hello-elementor-child'); ?>:</strong></label>
+            <textarea name="quiz_description" rows="4" style="width:100%;"><?php echo esc_textarea($quiz_description); ?></textarea>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Number of Questions', 'hello-elementor-child'); ?>:</strong></label>
+            <input type="number" name="num_questions" value="<?php echo esc_attr($num_questions); ?>" min="1" style="width:100%;">
+            <br><br>
+
+            <label><strong><?php esc_html_e('Time per Question (seconds)', 'hello-elementor-child'); ?>:</strong></label>
+            <input type="number" name="time_per_question" value="<?php echo esc_attr($time_per_question); ?>" min="1" style="width:100%;">
+            <br><br>
+
+            <label><strong><?php esc_html_e('Token Cost (per attempt)', 'hello-elementor-child'); ?>:</strong></label>
+            <input type="number" name="quiz_token_cost" value="<?php echo esc_attr($quiz_token_cost); ?>" min="0" step="1" style="width:100%;">
+            <br><br>
+
+            <label><strong><?php esc_html_e('Base XP (per quiz)', 'hello-elementor-child'); ?>:</strong></label>
+            <input type="number" name="quiz_xp_value" value="<?php echo esc_attr($quiz_xp_value); ?>" min="1" style="width:100%;">
+            <br><br>
+
+            <label>
+                <input type="checkbox" name="allow_guest_play" value="1" <?php checked($allow_guest_play, '1'); ?>>
+                <strong><?php esc_html_e('Allow Guest Play', 'hello-elementor-child'); ?></strong>
+            </label>
+            <p class="description"><?php esc_html_e('Allow non-logged-in users to play this quiz (scores will not be saved).', 'hello-elementor-child'); ?></p>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Quiz Difficulty', 'hello-elementor-child'); ?>:</strong></label>
+            <select name="quiz_difficulty" style="width:100%;">
+                <option value="">-- <?php esc_html_e('Select Difficulty', 'hello-elementor-child'); ?> --</option>
+                <?php foreach ($quiz_levels as $level) : ?>
+                    <option value="<?php echo esc_attr($level->ID); ?>" <?php selected($quiz_difficulty, $level->ID); ?>>
+                        <?php echo esc_html($level->post_title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Question Selection Type', 'hello-elementor-child'); ?>:</strong></label>
+            <select id="quiz_type" name="quiz_type" style="width:100%;">
+                <option value="automatic" <?php selected($quiz_type, 'automatic'); ?>>Automatic</option>
+                <option value="manual" <?php selected($quiz_type, 'manual'); ?>>Manual</option>
+            </select>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Quiz Mode', 'hello-elementor-child'); ?>:</strong></label>
+            <select id="quiz_mode" name="quiz_mode" style="width:100%;">
+                <option value="classic" <?php selected($quiz_mode, 'classic'); ?>>Classic</option>
+                <option value="speedtime" <?php selected($quiz_mode, 'speedtime'); ?>>SpeedTime</option>
+            </select>
+            <br><br>
+
+            <label><strong><?php esc_html_e('Choose Question Categories', 'hello-elementor-child'); ?>:</strong></label>
+            <select id="quiz_question_categories" name="quiz_question_categories[]" multiple="multiple" style="width:100%;">
+                <?php foreach ($categories as $category) : ?>
+                    <option value="<?php echo esc_attr($category->term_id); ?>" <?php selected(in_array($category->term_id, $selected_categories, true)); ?>>
+                        <?php echo esc_html($category->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <br><br>
+
+            <div id="automatic_options" style="display:<?php echo ($quiz_type === 'automatic') ? 'block' : 'none'; ?>;">
+                <p><em><?php esc_html_e('Automatic mode will randomly select questions based on selected categories.', 'hello-elementor-child'); ?></em></p>
+            </div>
+
+            <div id="manual_options" style="display:<?php echo ($quiz_type === 'manual') ? 'block' : 'none'; ?>;">
+                <p><em><?php esc_html_e('Manually select questions for the quiz below.', 'hello-elementor-child'); ?></em></p>
+
+                <label><strong><?php esc_html_e('Filter Questions by Category', 'hello-elementor-child'); ?>:</strong></label>
+                <select id="quiz_category_filter" style="width:100%;">
+                    <option value="">-- <?php esc_html_e('Select Category', 'hello-elementor-child'); ?> --</option>
+                    <?php foreach ($categories as $category) : ?>
+                        <option value="<?php echo esc_attr($category->term_id); ?>"><?php echo esc_html($category->name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="button" id="filter_questions" class="button"><?php esc_html_e('Filter Questions', 'hello-elementor-child'); ?></button>
+                <br><br>
+
+                <label><strong><?php esc_html_e('Select Questions', 'hello-elementor-child'); ?>:</strong></label>
+                <select id="quiz_question_select" style="width:100%;"></select>
+                <button type="button" id="add_quiz_question" class="button"><?php esc_html_e('Add Question', 'hello-elementor-child'); ?></button>
+                <br><br>
+
+                <table id="quiz_questions_table" class="widefat">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Question', 'hello-elementor-child'); ?></th>
+                            <th><?php esc_html_e('Action', 'hello-elementor-child'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <br>
+
+                <input type="hidden" id="quiz_questions" name="quiz_questions" value="<?php echo esc_attr($selected_questions_json); ?>">
+            </div>
+        </div>
+        <?php
+    }
+
+    public static function save(int $post_id): void {
+        if (wp_is_post_revision($post_id)) return;
+        if (!isset($_POST['ygv_quiz_meta_nonce']) || !wp_verify_nonce($_POST['ygv_quiz_meta_nonce'], 'ygv_save_quiz_meta')) return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (!current_user_can('edit_post', $post_id)) return;
+
+        if (isset($_POST['num_questions'])) {
+            update_post_meta($post_id, '_num_questions', max(1, (int) $_POST['num_questions']));
+        }
+        if (isset($_POST['time_per_question'])) {
+            update_post_meta($post_id, '_time_per_question', max(1, (int) $_POST['time_per_question']));
+        }
+        if (isset($_POST['quiz_token_cost'])) {
+            update_post_meta($post_id, '_quiz_token_cost', max(0, (int) $_POST['quiz_token_cost']));
+        }
+        if (isset($_POST['quiz_xp_value'])) {
+            update_post_meta($post_id, '_quiz_xp_value', max(1, (int) $_POST['quiz_xp_value']));
+        }
+        if (isset($_POST['quiz_difficulty'])) {
+            update_post_meta($post_id, '_quiz_difficulty', (int) $_POST['quiz_difficulty']);
+        }
+
+        if (isset($_POST['quiz_type'])) {
+            update_post_meta($post_id, '_quiz_type', sanitize_text_field($_POST['quiz_type']));
+        }
+        if (isset($_POST['quiz_mode'])) {
+            update_post_meta($post_id, '_quiz_mode', sanitize_text_field($_POST['quiz_mode']));
+        }
+        if (isset($_POST['quiz_description'])) {
+            update_post_meta($post_id, '_quiz_description', sanitize_textarea_field($_POST['quiz_description']));
+        }
+
+        if (isset($_POST['quiz_question_categories']) && is_array($_POST['quiz_question_categories'])) {
+            $cats = array_map('intval', $_POST['quiz_question_categories']);
+            update_post_meta($post_id, '_quiz_question_categories', $cats);
+        }
+
+        if (isset($_POST['quiz_questions'])) {
+            $json = wp_unslash($_POST['quiz_questions']);
+            $arr  = json_decode($json, true);
+            if (is_array($arr)) {
+                $arr = array_map('intval', $arr);
+                update_post_meta($post_id, '_quiz_questions', wp_json_encode(array_values($arr)));
+            }
+        }
+
+        if (isset($_POST['allow_guest_play'])) {
+            update_post_meta($post_id, '_allow_guest_play', '1');
+        } else {
+            delete_post_meta($post_id, '_allow_guest_play');
+        }
+    }
+}

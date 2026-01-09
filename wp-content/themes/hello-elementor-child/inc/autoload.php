@@ -17,7 +17,13 @@ spl_autoload_register(function ($class) {
     }
 
     $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    $path           = str_replace('\\', '/', $relative_class);
+
+    $parts     = explode('/', $path);
+    $filename  = array_pop($parts);
+    $directory = implode('/', array_map('strtolower', $parts));
+
+    $file = $base_dir . ($directory ? $directory . '/' : '') . $filename . '.php';
 
     if (file_exists($file)) {
         require $file;

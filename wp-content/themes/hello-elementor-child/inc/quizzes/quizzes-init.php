@@ -20,15 +20,18 @@ require_once $quizzes_inc_path . 'cpts/taxonomy-question-category.php';
 require_once $quizzes_inc_path . 'cpts/taxonomy-quiz-category.php';
 
 // --- Meta Boxes ---
-// Namespaced class-based meta box
 if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuizMetaBox')) {
     HelloElementorChild\Quizzes\Meta\QuizMetaBox::register();
 }
-
-// Legacy/meta files still procedural
-require_once $quizzes_inc_path . 'meta/quiz-level-meta.php';
-require_once $quizzes_inc_path . 'meta/question-meta.php';
-require_once $quizzes_inc_path . 'meta/quiz-category-meta.php';
+if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuestionMetaBox')) {
+    HelloElementorChild\Quizzes\Meta\QuestionMetaBox::register();
+}
+if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuizLevelMetaBox')) {
+    HelloElementorChild\Quizzes\Meta\QuizLevelMetaBox::register();
+}
+if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuizCategoryMeta')) {
+    HelloElementorChild\Quizzes\Meta\QuizCategoryMeta::register();
+}
 
 // --- Services ---
 require_once $quizzes_inc_path . 'services/class-ygv-token-service.php';
