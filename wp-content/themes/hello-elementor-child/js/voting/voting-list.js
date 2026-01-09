@@ -427,7 +427,9 @@
       // Show XP earned with streak bonus breakdown
       if (data.xp_awarded && data.xp_awarded > 0) {
         if (data.streak_bonus_xp && data.streak_bonus_xp > 0) {
-          parts.push(`+${data.xp_awarded} XP (${data.base_xp} + ${data.streak_bonus_xp} streak)`);
+          parts.push(
+            `+${data.xp_awarded} XP (${data.base_xp} + ${data.streak_bonus_xp} streak)`
+          );
         } else {
           parts.push(`+${data.xp_awarded} XP`);
         }
@@ -465,7 +467,10 @@
             <h2 class="ygv-streak-popup__title">${milestone.title}</h2>
             <div class="ygv-streak-popup__days">${streakDays} dana zaredom!</div>
             <p class="ygv-streak-popup__message">${milestone.message}</p>
-            <div class="ygv-streak-popup__bonus">+${Math.min(streakDays, 10)} XP streak bonus po glasu</div>
+            <div class="ygv-streak-popup__bonus">+${Math.min(
+              streakDays,
+              10
+            )} XP streak bonus po glasu</div>
             <button class="ygv-streak-popup__cta">Nastavi! 💪</button>
           </div>
         </div>
@@ -485,8 +490,9 @@
     }
 
     _handleStreakMilestone(streakData) {
-      if (!streakData || !streakData.milestone || !streakData.is_new_day) return;
-      
+      if (!streakData || !streakData.milestone || !streakData.is_new_day)
+        return;
+
       // Only show milestone popup on new day when milestone is reached
       const milestone = streakData.milestone;
       this._showStreakMilestonePopup(milestone, streakData.days);
@@ -541,9 +547,14 @@
               }
 
               // Handle streak milestones (show after achievements)
-              if (response.data.streak && response.data.streak.milestone && response.data.streak.is_new_day) {
+              if (
+                response.data.streak &&
+                response.data.streak.milestone &&
+                response.data.streak.is_new_day
+              ) {
                 const achievementDelay =
-                  response.data.achievements && response.data.achievements.length > 0
+                  response.data.achievements &&
+                  response.data.achievements.length > 0
                     ? response.data.achievements.length * 4500 + 2000
                     : 0;
                 const levelUpDelay =

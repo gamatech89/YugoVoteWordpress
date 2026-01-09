@@ -46,26 +46,33 @@ $available_quizzes = $wpdb->get_var(
     "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'quiz' AND post_status = 'publish'"
 );
 
-// Token info
-$max_tokens = 20;
-$refill_rate = 60 * 60 * 4; // 4 hours in seconds
-$token_bucket = get_user_meta($user_id, 'quiz_token_bucket', true);
-$current_tokens = $max_tokens;
+// Token info - use Token Service for accurate data
+$current_tokens = 0;
+$max_tokens = 48;
 $next_refill = 0;
+$regen_interval = 60; // minutes
 
-if (is_array($token_bucket) && isset($token_bucket['tokens'])) {
-    $current_tokens = (int)$token_bucket['tokens'];
-    $last_refill = (int)($token_bucket['last_refill'] ?? 0);
-    $now = time();
-    $time_passed = $now - $last_refill;
+if (class_exists('YGV_Token_Service')) {
+    $token_service = new YGV_Token_Service();
+    $wallet = $token_service->current_wallet($user_id);
     
-    // Calculate tokens gained since last refill
-    $tokens_gained = floor($time_passed / $refill_rate);
-    $current_tokens = min($max_tokens, $current_tokens + $tokens_gained);
+    $tokens_in_db = (int)($wallet['tokens'] ?? 0);
+    $max_tokens = (int)($wallet['max_tokens'] ?? 48);
+    $regen_rate = (int)($wallet['regen_rate'] ?? 2);
+    $regen_interval = (int)($wallet['regen_interval_minutes'] ?? 60);
+    $refill_anchor = (int)($wallet['refill_anchor'] ?? time());
+    
+    // Calculate current tokens based on refill
+    $now = time();
+    $elapsed = $now - $refill_anchor;
+    $regen_interval_sec = $regen_interval * 60;
+    $intervals_passed = floor($elapsed / $regen_interval_sec);
+    $regenerated = $intervals_passed * $regen_rate;
+    $current_tokens = min($max_tokens, $tokens_in_db + $regenerated);
     
     // Time until next token
     if ($current_tokens < $max_tokens) {
-        $next_refill = $refill_rate - ($time_passed % $refill_rate);
+        $next_refill = $regen_interval_sec - ($elapsed % $regen_interval_sec);
     }
 }
 

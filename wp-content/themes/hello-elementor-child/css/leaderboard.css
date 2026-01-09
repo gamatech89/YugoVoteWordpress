@@ -231,33 +231,33 @@
   .ygv-lb-tabs {
     flex-wrap: nowrap;
   }
-  
+
   .ygv-lb-tab {
     padding: 12px 10px;
     font-size: 12px;
     min-width: 70px;
   }
-  
+
   .ygv-lb-row {
     padding: 10px 16px;
     gap: 10px;
   }
-  
+
   .ygv-lb-avatar {
     width: 38px;
     height: 38px;
   }
-  
+
   .ygv-lb-rank {
     width: 28px;
     height: 28px;
     font-size: 12px;
   }
-  
+
   .ygv-lb-name {
     font-size: 14px;
   }
-  
+
   .ygv-lb-value {
     flex-wrap: wrap;
     gap: 4px;
