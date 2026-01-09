@@ -311,7 +311,7 @@ class YGV_Achievement_Service {
     /**
      * Get user statistics for achievement checking
      */
-    protected function get_user_stats(int $user_id): array {
+    public function get_user_stats(int $user_id): array {
         global $wpdb;
         
         $stats = [
