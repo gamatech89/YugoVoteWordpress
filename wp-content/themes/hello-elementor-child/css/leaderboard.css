@@ -1,0 +1,265 @@
+/**
+ * Leaderboard Styles
+ * 
+ * @package HelloElementorChild
+ */
+
+/* ============================================
+   LEADERBOARD CONTAINER
+   ============================================ */
+
+.ygv-leaderboard {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+
+.ygv-lb-tabs {
+  display: flex;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ygv-lb-tab {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.ygv-lb-tab:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.ygv-lb-tab.active {
+  background: #fff;
+  color: #6366f1;
+  border-bottom-color: #6366f1;
+}
+
+/* ============================================
+   CONTENT
+   ============================================ */
+
+.ygv-lb-content {
+  display: none;
+  padding: 0;
+}
+
+.ygv-lb-content.active {
+  display: block;
+}
+
+/* ============================================
+   LIST
+   ============================================ */
+
+.ygv-lb-list {
+  padding: 8px 0;
+}
+
+.ygv-lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  transition: all 0.2s;
+}
+
+.ygv-lb-row:hover {
+  background: #f8fafc;
+}
+
+.ygv-lb-row-current {
+  background: linear-gradient(90deg, #eef2ff, #e0e7ff);
+  border-left: 4px solid #6366f1;
+}
+
+.ygv-lb-row-current:hover {
+  background: linear-gradient(90deg, #e0e7ff, #c7d2fe);
+}
+
+/* Rank */
+.ygv-lb-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.ygv-lb-rank-gold {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.ygv-lb-rank-silver {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+.ygv-lb-rank-bronze {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3);
+}
+
+/* Avatar */
+.ygv-lb-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+}
+
+.ygv-lb-row-current .ygv-lb-avatar {
+  border-color: #6366f1;
+}
+
+/* User Info */
+.ygv-lb-user {
+  flex: 1;
+  min-width: 0;
+}
+
+.ygv-lb-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ygv-lb-name small {
+  font-weight: 400;
+  color: #6366f1;
+}
+
+.ygv-lb-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.ygv-lb-level {
+  background: #6366f1;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ygv-lb-xp {
+  color: #64748b;
+}
+
+.ygv-lb-votes,
+.ygv-lb-streak,
+.ygv-lb-achievements {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.ygv-lb-streak {
+  color: #ea580c;
+}
+
+/* Divider */
+.ygv-lb-divider {
+  text-align: center;
+  padding: 8px 0;
+  color: #94a3b8;
+  font-size: 18px;
+  letter-spacing: 4px;
+}
+
+/* Empty State */
+.ygv-lb-empty {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.ygv-lb-empty-icon {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.ygv-lb-empty p {
+  color: #64748b;
+  margin: 0;
+}
+
+/* ============================================
+   MOBILE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 480px) {
+  .ygv-lb-tabs {
+    flex-wrap: nowrap;
+  }
+  
+  .ygv-lb-tab {
+    padding: 12px 10px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+  
+  .ygv-lb-row {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  
+  .ygv-lb-avatar {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .ygv-lb-rank {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .ygv-lb-name {
+    font-size: 14px;
+  }
+  
+  .ygv-lb-value {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
