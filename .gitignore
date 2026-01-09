@@ -1,0 +1,24 @@
+# Local environment
+.env
+.db/
+
+# Ignore all wp-content by default, then whitelist our custom theme
+wp-content/*
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/hello-elementor-child/**
+
+wp-content/uploads/
+wp-content/cache/
+wp-content/advanced-cache.php
+wp-content/object-cache.php
+wp-content/debug.log
+wp-content/plugins/
+wp-content/mu-plugins/
+wp-content/upgrade/
+wp-content/upgrade-temp-backup/
+wp-content/themes/hello-elementor/
+
+# Node/vendor caches
+node_modules/
+vendor/

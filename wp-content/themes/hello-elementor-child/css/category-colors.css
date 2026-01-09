@@ -1,0 +1,297 @@
+:root {
+  --category-color-historija: #e9e33a;
+  --category-color-albumi: #000000;
+  --category-color-astro: #ffffff;
+  --category-color-biznis: #7183da;
+  --category-color-culture-club: #e89521;
+  --category-color-hot: #ffffff;
+  --category-color-emisije: #a59de1;
+  --category-color-festivali-muzika: #ffffff;
+  --category-color-film: #a59c9c;
+  --category-color-film-i-tv: #e65552;
+  --category-color-fitnes-i-zdravlje: #000000;
+  --category-color-folk: #ff14d4;
+  --category-color-fudbal: #93ce3b;
+  --category-color-glumci: #eecb6d;
+  --category-color-izlasci: #000000;
+  --category-color-izvodaci-muzika: #328813;
+  --category-color-klinci: #f8a85d;
+  --category-color-knjizevnost: #e9e33a;
+  --category-color-kompanije: #989de1;
+  --category-color-kosarka: #ffc805;
+  --category-color-ljubimci: #ffffff;
+  --category-color-mediji: #989de1;
+  --category-color-moda-i-lepota: #d6388c;
+  --category-color-muzika: #06acf4;
+  --category-color-navijaci: #a3149f;
+  --category-color-net: #000000;
+  --category-color-odbojka: #0f94e6;
+  --category-color-ostali-sportovi: #188f00;
+  --category-color-pesme: #ffffff;
+  --category-color-pice-i-klopa: #000000;
+  --category-color-po-sumama-i-gorama: #000000;
+  --category-color-pop: #dd370e;
+  --category-color-poznati: #000000;
+  --category-color-pozoriste: #ffadad;
+  --category-color-proizvodi: #989de1;
+  --category-color-putovanja-lifestyle: #000000;
+  --category-color-rep-trap-ostalo: #d7c1c1;
+  --category-color-rok: #1c90fd;
+  --category-color-rukomet: #ff6524;
+  --category-color-serije: #c961e5;
+  --category-color-sport: #a6ce39;
+  --category-color-sportisti: #d4c8ea;
+  --category-color-trendy-lifestyle: #f98bea;
+  --category-color-trgovina: #989de1;
+  --category-color-turizam: #989de1;
+  --category-color-umetnost: #19f09e;
+  --category-color-usluge: #989de1;
+  --category-color-vaterpolo: #000000;
+  --category-color-veliki-ljudi: #ffffff;
+}
+
+.cs-bg--historija { background-color: var(--category-color-historija); }
+.cs-color--historija { color: var(--category-color-historija); }
+.cs-border--historija { border-color: var(--category-color-historija); }
+.cs-bg-hover--historija:hover { background-color: var(--category-color-historija); }
+.cs-color-hover--historija:hover { color: var(--category-color-historija); }
+.cs-bg--albumi { background-color: var(--category-color-albumi); }
+.cs-color--albumi { color: var(--category-color-albumi); }
+.cs-border--albumi { border-color: var(--category-color-albumi); }
+.cs-bg-hover--albumi:hover { background-color: var(--category-color-albumi); }
+.cs-color-hover--albumi:hover { color: var(--category-color-albumi); }
+.cs-bg--astro { background-color: var(--category-color-astro); }
+.cs-color--astro { color: var(--category-color-astro); }
+.cs-border--astro { border-color: var(--category-color-astro); }
+.cs-bg-hover--astro:hover { background-color: var(--category-color-astro); }
+.cs-color-hover--astro:hover { color: var(--category-color-astro); }
+.cs-bg--biznis { background-color: var(--category-color-biznis); }
+.cs-color--biznis { color: var(--category-color-biznis); }
+.cs-border--biznis { border-color: var(--category-color-biznis); }
+.cs-bg-hover--biznis:hover { background-color: var(--category-color-biznis); }
+.cs-color-hover--biznis:hover { color: var(--category-color-biznis); }
+.cs-bg--culture-club { background-color: var(--category-color-culture-club); }
+.cs-color--culture-club { color: var(--category-color-culture-club); }
+.cs-border--culture-club { border-color: var(--category-color-culture-club); }
+.cs-bg-hover--culture-club:hover { background-color: var(--category-color-culture-club); }
+.cs-color-hover--culture-club:hover { color: var(--category-color-culture-club); }
+.cs-bg--hot { background-color: var(--category-color-hot); }
+.cs-color--hot { color: var(--category-color-hot); }
+.cs-border--hot { border-color: var(--category-color-hot); }
+.cs-bg-hover--hot:hover { background-color: var(--category-color-hot); }
+.cs-color-hover--hot:hover { color: var(--category-color-hot); }
+.cs-bg--emisije { background-color: var(--category-color-emisije); }
+.cs-color--emisije { color: var(--category-color-emisije); }
+.cs-border--emisije { border-color: var(--category-color-emisije); }
+.cs-bg-hover--emisije:hover { background-color: var(--category-color-emisije); }
+.cs-color-hover--emisije:hover { color: var(--category-color-emisije); }
+.cs-bg--festivali-muzika { background-color: var(--category-color-festivali-muzika); }
+.cs-color--festivali-muzika { color: var(--category-color-festivali-muzika); }
+.cs-border--festivali-muzika { border-color: var(--category-color-festivali-muzika); }
+.cs-bg-hover--festivali-muzika:hover { background-color: var(--category-color-festivali-muzika); }
+.cs-color-hover--festivali-muzika:hover { color: var(--category-color-festivali-muzika); }
+.cs-bg--film { background-color: var(--category-color-film); }
+.cs-color--film { color: var(--category-color-film); }
+.cs-border--film { border-color: var(--category-color-film); }
+.cs-bg-hover--film:hover { background-color: var(--category-color-film); }
+.cs-color-hover--film:hover { color: var(--category-color-film); }
+.cs-bg--film-i-tv { background-color: var(--category-color-film-i-tv); }
+.cs-color--film-i-tv { color: var(--category-color-film-i-tv); }
+.cs-border--film-i-tv { border-color: var(--category-color-film-i-tv); }
+.cs-bg-hover--film-i-tv:hover { background-color: var(--category-color-film-i-tv); }
+.cs-color-hover--film-i-tv:hover { color: var(--category-color-film-i-tv); }
+.cs-bg--fitnes-i-zdravlje { background-color: var(--category-color-fitnes-i-zdravlje); }
+.cs-color--fitnes-i-zdravlje { color: var(--category-color-fitnes-i-zdravlje); }
+.cs-border--fitnes-i-zdravlje { border-color: var(--category-color-fitnes-i-zdravlje); }
+.cs-bg-hover--fitnes-i-zdravlje:hover { background-color: var(--category-color-fitnes-i-zdravlje); }
+.cs-color-hover--fitnes-i-zdravlje:hover { color: var(--category-color-fitnes-i-zdravlje); }
+.cs-bg--folk { background-color: var(--category-color-folk); }
+.cs-color--folk { color: var(--category-color-folk); }
+.cs-border--folk { border-color: var(--category-color-folk); }
+.cs-bg-hover--folk:hover { background-color: var(--category-color-folk); }
+.cs-color-hover--folk:hover { color: var(--category-color-folk); }
+.cs-bg--fudbal { background-color: var(--category-color-fudbal); }
+.cs-color--fudbal { color: var(--category-color-fudbal); }
+.cs-border--fudbal { border-color: var(--category-color-fudbal); }
+.cs-bg-hover--fudbal:hover { background-color: var(--category-color-fudbal); }
+.cs-color-hover--fudbal:hover { color: var(--category-color-fudbal); }
+.cs-bg--glumci { background-color: var(--category-color-glumci); }
+.cs-color--glumci { color: var(--category-color-glumci); }
+.cs-border--glumci { border-color: var(--category-color-glumci); }
+.cs-bg-hover--glumci:hover { background-color: var(--category-color-glumci); }
+.cs-color-hover--glumci:hover { color: var(--category-color-glumci); }
+.cs-bg--izlasci { background-color: var(--category-color-izlasci); }
+.cs-color--izlasci { color: var(--category-color-izlasci); }
+.cs-border--izlasci { border-color: var(--category-color-izlasci); }
+.cs-bg-hover--izlasci:hover { background-color: var(--category-color-izlasci); }
+.cs-color-hover--izlasci:hover { color: var(--category-color-izlasci); }
+.cs-bg--izvodaci-muzika { background-color: var(--category-color-izvodaci-muzika); }
+.cs-color--izvodaci-muzika { color: var(--category-color-izvodaci-muzika); }
+.cs-border--izvodaci-muzika { border-color: var(--category-color-izvodaci-muzika); }
+.cs-bg-hover--izvodaci-muzika:hover { background-color: var(--category-color-izvodaci-muzika); }
+.cs-color-hover--izvodaci-muzika:hover { color: var(--category-color-izvodaci-muzika); }
+.cs-bg--klinci { background-color: var(--category-color-klinci); }
+.cs-color--klinci { color: var(--category-color-klinci); }
+.cs-border--klinci { border-color: var(--category-color-klinci); }
+.cs-bg-hover--klinci:hover { background-color: var(--category-color-klinci); }
+.cs-color-hover--klinci:hover { color: var(--category-color-klinci); }
+.cs-bg--knjizevnost { background-color: var(--category-color-knjizevnost); }
+.cs-color--knjizevnost { color: var(--category-color-knjizevnost); }
+.cs-border--knjizevnost { border-color: var(--category-color-knjizevnost); }
+.cs-bg-hover--knjizevnost:hover { background-color: var(--category-color-knjizevnost); }
+.cs-color-hover--knjizevnost:hover { color: var(--category-color-knjizevnost); }
+.cs-bg--kompanije { background-color: var(--category-color-kompanije); }
+.cs-color--kompanije { color: var(--category-color-kompanije); }
+.cs-border--kompanije { border-color: var(--category-color-kompanije); }
+.cs-bg-hover--kompanije:hover { background-color: var(--category-color-kompanije); }
+.cs-color-hover--kompanije:hover { color: var(--category-color-kompanije); }
+.cs-bg--kosarka { background-color: var(--category-color-kosarka); }
+.cs-color--kosarka { color: var(--category-color-kosarka); }
+.cs-border--kosarka { border-color: var(--category-color-kosarka); }
+.cs-bg-hover--kosarka:hover { background-color: var(--category-color-kosarka); }
+.cs-color-hover--kosarka:hover { color: var(--category-color-kosarka); }
+.cs-bg--ljubimci { background-color: var(--category-color-ljubimci); }
+.cs-color--ljubimci { color: var(--category-color-ljubimci); }
+.cs-border--ljubimci { border-color: var(--category-color-ljubimci); }
+.cs-bg-hover--ljubimci:hover { background-color: var(--category-color-ljubimci); }
+.cs-color-hover--ljubimci:hover { color: var(--category-color-ljubimci); }
+.cs-bg--mediji { background-color: var(--category-color-mediji); }
+.cs-color--mediji { color: var(--category-color-mediji); }
+.cs-border--mediji { border-color: var(--category-color-mediji); }
+.cs-bg-hover--mediji:hover { background-color: var(--category-color-mediji); }
+.cs-color-hover--mediji:hover { color: var(--category-color-mediji); }
+.cs-bg--moda-i-lepota { background-color: var(--category-color-moda-i-lepota); }
+.cs-color--moda-i-lepota { color: var(--category-color-moda-i-lepota); }
+.cs-border--moda-i-lepota { border-color: var(--category-color-moda-i-lepota); }
+.cs-bg-hover--moda-i-lepota:hover { background-color: var(--category-color-moda-i-lepota); }
+.cs-color-hover--moda-i-lepota:hover { color: var(--category-color-moda-i-lepota); }
+.cs-bg--muzika { background-color: var(--category-color-muzika); }
+.cs-color--muzika { color: var(--category-color-muzika); }
+.cs-border--muzika { border-color: var(--category-color-muzika); }
+.cs-bg-hover--muzika:hover { background-color: var(--category-color-muzika); }
+.cs-color-hover--muzika:hover { color: var(--category-color-muzika); }
+.cs-bg--navijaci { background-color: var(--category-color-navijaci); }
+.cs-color--navijaci { color: var(--category-color-navijaci); }
+.cs-border--navijaci { border-color: var(--category-color-navijaci); }
+.cs-bg-hover--navijaci:hover { background-color: var(--category-color-navijaci); }
+.cs-color-hover--navijaci:hover { color: var(--category-color-navijaci); }
+.cs-bg--net { background-color: var(--category-color-net); }
+.cs-color--net { color: var(--category-color-net); }
+.cs-border--net { border-color: var(--category-color-net); }
+.cs-bg-hover--net:hover { background-color: var(--category-color-net); }
+.cs-color-hover--net:hover { color: var(--category-color-net); }
+.cs-bg--odbojka { background-color: var(--category-color-odbojka); }
+.cs-color--odbojka { color: var(--category-color-odbojka); }
+.cs-border--odbojka { border-color: var(--category-color-odbojka); }
+.cs-bg-hover--odbojka:hover { background-color: var(--category-color-odbojka); }
+.cs-color-hover--odbojka:hover { color: var(--category-color-odbojka); }
+.cs-bg--ostali-sportovi { background-color: var(--category-color-ostali-sportovi); }
+.cs-color--ostali-sportovi { color: var(--category-color-ostali-sportovi); }
+.cs-border--ostali-sportovi { border-color: var(--category-color-ostali-sportovi); }
+.cs-bg-hover--ostali-sportovi:hover { background-color: var(--category-color-ostali-sportovi); }
+.cs-color-hover--ostali-sportovi:hover { color: var(--category-color-ostali-sportovi); }
+.cs-bg--pesme { background-color: var(--category-color-pesme); }
+.cs-color--pesme { color: var(--category-color-pesme); }
+.cs-border--pesme { border-color: var(--category-color-pesme); }
+.cs-bg-hover--pesme:hover { background-color: var(--category-color-pesme); }
+.cs-color-hover--pesme:hover { color: var(--category-color-pesme); }
+.cs-bg--pice-i-klopa { background-color: var(--category-color-pice-i-klopa); }
+.cs-color--pice-i-klopa { color: var(--category-color-pice-i-klopa); }
+.cs-border--pice-i-klopa { border-color: var(--category-color-pice-i-klopa); }
+.cs-bg-hover--pice-i-klopa:hover { background-color: var(--category-color-pice-i-klopa); }
+.cs-color-hover--pice-i-klopa:hover { color: var(--category-color-pice-i-klopa); }
+.cs-bg--po-sumama-i-gorama { background-color: var(--category-color-po-sumama-i-gorama); }
+.cs-color--po-sumama-i-gorama { color: var(--category-color-po-sumama-i-gorama); }
+.cs-border--po-sumama-i-gorama { border-color: var(--category-color-po-sumama-i-gorama); }
+.cs-bg-hover--po-sumama-i-gorama:hover { background-color: var(--category-color-po-sumama-i-gorama); }
+.cs-color-hover--po-sumama-i-gorama:hover { color: var(--category-color-po-sumama-i-gorama); }
+.cs-bg--pop { background-color: var(--category-color-pop); }
+.cs-color--pop { color: var(--category-color-pop); }
+.cs-border--pop { border-color: var(--category-color-pop); }
+.cs-bg-hover--pop:hover { background-color: var(--category-color-pop); }
+.cs-color-hover--pop:hover { color: var(--category-color-pop); }
+.cs-bg--poznati { background-color: var(--category-color-poznati); }
+.cs-color--poznati { color: var(--category-color-poznati); }
+.cs-border--poznati { border-color: var(--category-color-poznati); }
+.cs-bg-hover--poznati:hover { background-color: var(--category-color-poznati); }
+.cs-color-hover--poznati:hover { color: var(--category-color-poznati); }
+.cs-bg--pozoriste { background-color: var(--category-color-pozoriste); }
+.cs-color--pozoriste { color: var(--category-color-pozoriste); }
+.cs-border--pozoriste { border-color: var(--category-color-pozoriste); }
+.cs-bg-hover--pozoriste:hover { background-color: var(--category-color-pozoriste); }
+.cs-color-hover--pozoriste:hover { color: var(--category-color-pozoriste); }
+.cs-bg--proizvodi { background-color: var(--category-color-proizvodi); }
+.cs-color--proizvodi { color: var(--category-color-proizvodi); }
+.cs-border--proizvodi { border-color: var(--category-color-proizvodi); }
+.cs-bg-hover--proizvodi:hover { background-color: var(--category-color-proizvodi); }
+.cs-color-hover--proizvodi:hover { color: var(--category-color-proizvodi); }
+.cs-bg--putovanja-lifestyle { background-color: var(--category-color-putovanja-lifestyle); }
+.cs-color--putovanja-lifestyle { color: var(--category-color-putovanja-lifestyle); }
+.cs-border--putovanja-lifestyle { border-color: var(--category-color-putovanja-lifestyle); }
+.cs-bg-hover--putovanja-lifestyle:hover { background-color: var(--category-color-putovanja-lifestyle); }
+.cs-color-hover--putovanja-lifestyle:hover { color: var(--category-color-putovanja-lifestyle); }
+.cs-bg--rep-trap-ostalo { background-color: var(--category-color-rep-trap-ostalo); }
+.cs-color--rep-trap-ostalo { color: var(--category-color-rep-trap-ostalo); }
+.cs-border--rep-trap-ostalo { border-color: var(--category-color-rep-trap-ostalo); }
+.cs-bg-hover--rep-trap-ostalo:hover { background-color: var(--category-color-rep-trap-ostalo); }
+.cs-color-hover--rep-trap-ostalo:hover { color: var(--category-color-rep-trap-ostalo); }
+.cs-bg--rok { background-color: var(--category-color-rok); }
+.cs-color--rok { color: var(--category-color-rok); }
+.cs-border--rok { border-color: var(--category-color-rok); }
+.cs-bg-hover--rok:hover { background-color: var(--category-color-rok); }
+.cs-color-hover--rok:hover { color: var(--category-color-rok); }
+.cs-bg--rukomet { background-color: var(--category-color-rukomet); }
+.cs-color--rukomet { color: var(--category-color-rukomet); }
+.cs-border--rukomet { border-color: var(--category-color-rukomet); }
+.cs-bg-hover--rukomet:hover { background-color: var(--category-color-rukomet); }
+.cs-color-hover--rukomet:hover { color: var(--category-color-rukomet); }
+.cs-bg--serije { background-color: var(--category-color-serije); }
+.cs-color--serije { color: var(--category-color-serije); }
+.cs-border--serije { border-color: var(--category-color-serije); }
+.cs-bg-hover--serije:hover { background-color: var(--category-color-serije); }
+.cs-color-hover--serije:hover { color: var(--category-color-serije); }
+.cs-bg--sport { background-color: var(--category-color-sport); }
+.cs-color--sport { color: var(--category-color-sport); }
+.cs-border--sport { border-color: var(--category-color-sport); }
+.cs-bg-hover--sport:hover { background-color: var(--category-color-sport); }
+.cs-color-hover--sport:hover { color: var(--category-color-sport); }
+.cs-bg--sportisti { background-color: var(--category-color-sportisti); }
+.cs-color--sportisti { color: var(--category-color-sportisti); }
+.cs-border--sportisti { border-color: var(--category-color-sportisti); }
+.cs-bg-hover--sportisti:hover { background-color: var(--category-color-sportisti); }
+.cs-color-hover--sportisti:hover { color: var(--category-color-sportisti); }
+.cs-bg--trendy-lifestyle { background-color: var(--category-color-trendy-lifestyle); }
+.cs-color--trendy-lifestyle { color: var(--category-color-trendy-lifestyle); }
+.cs-border--trendy-lifestyle { border-color: var(--category-color-trendy-lifestyle); }
+.cs-bg-hover--trendy-lifestyle:hover { background-color: var(--category-color-trendy-lifestyle); }
+.cs-color-hover--trendy-lifestyle:hover { color: var(--category-color-trendy-lifestyle); }
+.cs-bg--trgovina { background-color: var(--category-color-trgovina); }
+.cs-color--trgovina { color: var(--category-color-trgovina); }
+.cs-border--trgovina { border-color: var(--category-color-trgovina); }
+.cs-bg-hover--trgovina:hover { background-color: var(--category-color-trgovina); }
+.cs-color-hover--trgovina:hover { color: var(--category-color-trgovina); }
+.cs-bg--turizam { background-color: var(--category-color-turizam); }
+.cs-color--turizam { color: var(--category-color-turizam); }
+.cs-border--turizam { border-color: var(--category-color-turizam); }
+.cs-bg-hover--turizam:hover { background-color: var(--category-color-turizam); }
+.cs-color-hover--turizam:hover { color: var(--category-color-turizam); }
+.cs-bg--umetnost { background-color: var(--category-color-umetnost); }
+.cs-color--umetnost { color: var(--category-color-umetnost); }
+.cs-border--umetnost { border-color: var(--category-color-umetnost); }
+.cs-bg-hover--umetnost:hover { background-color: var(--category-color-umetnost); }
+.cs-color-hover--umetnost:hover { color: var(--category-color-umetnost); }
+.cs-bg--usluge { background-color: var(--category-color-usluge); }
+.cs-color--usluge { color: var(--category-color-usluge); }
+.cs-border--usluge { border-color: var(--category-color-usluge); }
+.cs-bg-hover--usluge:hover { background-color: var(--category-color-usluge); }
+.cs-color-hover--usluge:hover { color: var(--category-color-usluge); }
+.cs-bg--vaterpolo { background-color: var(--category-color-vaterpolo); }
+.cs-color--vaterpolo { color: var(--category-color-vaterpolo); }
+.cs-border--vaterpolo { border-color: var(--category-color-vaterpolo); }
+.cs-bg-hover--vaterpolo:hover { background-color: var(--category-color-vaterpolo); }
+.cs-color-hover--vaterpolo:hover { color: var(--category-color-vaterpolo); }
+.cs-bg--veliki-ljudi { background-color: var(--category-color-veliki-ljudi); }
+.cs-color--veliki-ljudi { color: var(--category-color-veliki-ljudi); }
+.cs-border--veliki-ljudi { border-color: var(--category-color-veliki-ljudi); }
+.cs-bg-hover--veliki-ljudi:hover { background-color: var(--category-color-veliki-ljudi); }
+.cs-color-hover--veliki-ljudi:hover { color: var(--category-color-veliki-ljudi); }

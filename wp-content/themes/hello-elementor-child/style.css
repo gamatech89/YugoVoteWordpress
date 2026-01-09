@@ -1,0 +1,1822 @@
+/*
+Theme Name: Hello Elementor Child
+Theme URI: https://github.com/elementor/hello-theme-child/
+Description: Hello Elementor Child is a child theme of Hello Elementor, created by Elementor team
+Author: Elementor Team
+Author URI: https://elementor.com/
+Template: hello-elementor
+Version: 2.0.0
+Text Domain: hello-elementor-child
+License: GNU General Public License v3 or later.
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
+*/
+
+/* ==========================================================================
+   1. VARIABLES & CONFIGURATION
+   ========================================================================== */
+
+:root {
+    /* --- Brand Colors --- */
+    --primary-color: #4456A6;
+    --secondary-color: #FE6555;
+    --text-color: #000000;
+    --light-color: #ffffff;
+    
+    /* --- Category Colors --- */
+    --yellow-color: #ffcb05;
+    --green-color: #A6CE39;
+    --coral-color: #F15F4E;
+    --sky-color: #A5C3D2;
+    --azure-color: #00AEEF;
+    --orchid-color: #C657A0;
+    --teal-color: #4FA392;
+    --blue-color: #4355A4;
+    --dark-blue-color: #213071;
+    --red-color: #FE6555;
+    
+    /* --- Transparent Colors --- */
+    --red-color-transparent: rgba(254, 101, 85, 0.3);
+    --green-color-transparent: rgba(166, 206, 57, 0.3);
+
+    /* --- Auth Colors --- */
+    --cs-auth-bg-color: #f4f7f6;
+    --cs-auth-card-bg: #ffffff;
+    --cs-auth-primary-color: #4456A6; /* Usaglašeno sa primary */
+    --cs-auth-primary-hover-color: #213071;
+    --cs-auth-text-color: #333;
+    --cs-auth-label-color: #555;
+    --cs-auth-input-border-color: #ddd;
+    --cs-auth-input-focus-border-color: var(--primary-color);
+    --cs-auth-error-color: #dc3545;
+    --cs-auth-success-color: #28a745;
+    --cs-auth-link-color: var(--primary-color);
+
+    /* --- Typography --- */
+    --heading-font: 'Jockey One', sans-serif;
+    --primary-font: 'Inter', sans-serif;
+    --secondary-font: 'Chendolle', sans-serif;
+    --cs-auth-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    --regular-font-size: 1rem;
+    --small-font-size: 14px;
+
+    /* --- Layout & Sizing --- */
+    --max-container-width: 1400px;
+    --header-height: 120px;
+    --container-vertical-padding: 100px;
+    --border-radius: 16px;
+    --card-image-width: 160px;
+    --card-list-image-height: 50vh;
+}
+
+/* ==========================================================================
+   2. GLOBAL STYLES & RESET
+   ========================================================================== */
+
+body {
+    overflow-x: hidden;
+    font-family: var(--primary-font);
+    color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+}
+
+a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Custom Container Utility */
+.cs-container {
+    width: 100%;
+    max-width: var(--max-container-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box;
+}
+
+.cs-container h2 {
+    font-size: 2.5rem;
+}
+
+/* ==========================================================================
+   3. UTILITY CLASSES (Colors)
+   ========================================================================== */
+
+.cs-color--yellow { background: var(--yellow-color); }
+.cs-color--green { background: var(--green-color); }
+.cs-color--red { background: var(--red-color); }
+.cs-color--coral { background: var(--coral-color); }
+.cs-color--sky { background: var(--sky-color); }
+.cs-color--azure { background: var(--azure-color); }
+.cs-color--orchid { background: var(--orchid-color); }
+.cs-color--teal { background: var(--teal-color); }
+
+/* ==========================================================================
+   4. HEADER MENU (Standard WP Menu with dots)
+   ========================================================================== */
+
+.cs-header-menu .menu-item {
+    padding: 0;
+}
+
+.cs-header-menu .menu-item a {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Dot indicator before menu items */
+.cs-header-menu .menu-item::before {
+    content: '';
+    position: relative;
+    height: 18px;
+    width: 18px;
+    background: #ffcb05; /* Default */
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    border-radius: 100%;
+    margin-right: 8px;
+    margin-left: 16px;
+    display: inline-block;
+}
+
+/* Specific dot colors */
+.cs-header-menu .menu-item.cs-color-item--yellow::before { background: var(--yellow-color); }
+.cs-header-menu .menu-item.cs-color-item--green::before { background: var(--green-color); }
+.cs-header-menu .menu-item.cs-color-item--red::before { background: var(--red-color); }
+.cs-header-menu .menu-item.cs-color-item--coral::before { background: var(--coral-color); }
+.cs-header-menu .menu-item.cs-color-item--sky::before { background: var(--sky-color); }
+.cs-header-menu .menu-item.cs-color-item--azure::before { background: var(--azure-color); }
+.cs-header-menu .menu-item.cs-color-item--orchide::before { background: var(--orchid-color); }
+.cs-header-menu .menu-item.cs-color-item--teal::before { background: var(--teal-color); }
+
+/* Hide specific item ID 98 (Example from your code) */
+.cs-header-menu .menu-item-98 {
+    display: none !important;
+}
+
+/* Responsive Header Menu */
+@media only screen and (max-width: 1024px) {
+    .cs-header-menu .elementor-nav-menu li { z-index: 15; }
+    .cs-header-menu .elementor-nav-menu--dropdown {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: -110px;
+        right: -63px;
+        height: 100vh;
+        width: 70vw;
+        z-index: 10;
+    }
+    .cs-header-menu .sub-menu {
+        display: flex;
+        flex-direction: column;
+        width: 70vw;
+        align-items: start;
+        justify-content: flex-start;
+        margin-top: 120px;
+        left: 0;
+    }
+    .cs-header-menu .menu-item .elementor-item { margin-left: 10px; }
+    .cs-header-menu .menu-item::before { left: 10px; }
+    .cs-header-menu .elementor-menu-toggle__icon--close { z-index: 11; }
+}
+
+@media only screen and (max-width: 767px) {
+    .cs-header-menu .elementor-nav-menu--dropdown {
+        right: -45px;
+        width: 100vw;
+    }
+    .cs-header-menu .sub-menu { width: 70vw; }
+    .cs-header-menu .elementor-menu-toggle__icon--close {
+        position: absolute;
+        bottom: 80px;
+        z-index: 11;
+    }
+}
+
+/* ==========================================================================
+   5. VOTING MEGA MENU (The New Shortcode Menu)
+   ========================================================================== */
+
+/* --- Wrapper & Nav --- */
+.cs-mega-menu-wrapper {
+    width: 100%;
+    background: #fff;
+    position: relative;
+    font-family: var(--primary-font);
+    z-index: 1000;
+}
+
+.cs-mega-menu-nav {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.cs-menu-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cs-menu-item {
+    position: static; /* For full-width dropdown */
+}
+
+/* --- Menu Links --- */
+.cs-menu-link {
+    text-decoration: none;
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 20px 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    transition: color 0.3s;
+}
+
+/* Colored Dot Indicator */
+.cs-menu-link::before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--cat-color, #ccc);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+/* Active/Hover States */
+.cs-menu-item:hover .cs-menu-link,
+.cs-menu-item.current-menu-item .cs-menu-link {
+    color: var(--cat-color);
+}
+
+.cs-menu-item:hover .cs-menu-link::before,
+.cs-menu-item.current-menu-item .cs-menu-link::before {
+    transform: scale(1.4);
+}
+
+/* --- Dropdown (Desktop) --- */
+.cs-mega-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-top: 1px solid #f0f0f0;
+}
+
+.cs-menu-item:hover .cs-mega-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.cs-mega-menu-inner {
+    display: flex;
+    min-height: 320px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* Left Sidebar (Brand/Mascot) */
+.cs-dropdown-brand {
+    width: 280px;
+    flex-shrink: 0;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.cs-brand-curve {
+    position: absolute;
+    top: 0;
+    right: -40px;
+    width: 80px;
+    height: 100%;
+    background: #fff;
+    transform: skewX(-10deg);
+    z-index: 1;
+}
+
+.cs-brand-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.cs-mascot-circle {
+    width: 80px;
+    height: 80px;
+    background: #fff;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.4);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.cs-mascot-circle img {
+    width: 80%;
+    height: auto;
+}
+
+.cs-dropdown-brand h3 {
+    color: #fff;
+    font-size: 24px;
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    font-family: var(--secondary-font) !important;
+}
+
+.cs-brand-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.cs-brand-btn:hover {
+    background: #fff;
+    color: var(--cat-color);
+}
+
+/* Right Content (Pills) */
+.cs-dropdown-content {
+    flex-grow: 1;
+    padding: 40px 40px 40px 60px;
+}
+
+.cs-trending-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #aaa;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.cs-pills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cs-pill-link {
+    display: inline-block;
+    background: #f7f7f7;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+
+.cs-pill-link:hover {
+    background: #fff;
+    color: var(--cat-color);
+    border-color: var(--cat-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* --- Mobile Menu Styles (Mega Menu) --- */
+.cs-mobile-menu-toggle, 
+.cs-mobile-menu-close, 
+.cs-mobile-logo-area, 
+.cs-mobile-overlay,
+.cs-mobile-dropdown-trigger {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .cs-mobile-menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 15px;
+    }
+    .cs-mobile-menu-toggle .bar {
+        display: block;
+        width: 25px;
+        height: 2px;
+        background: #000;
+        margin: 5px 0;
+        border-radius: 2px;
+    }
+    
+    .cs-mobile-dropdown-trigger {
+        display: flex; /* Show only on mobile */
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        font-size: 12px;
+        color: #aaa;
+        border: 1px solid #eee;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .cs-mega-menu-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        background: #fff;
+        z-index: 99999;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .cs-mega-menu-nav.active { transform: translateX(0); }
+
+    .cs-mobile-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99990;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+        backdrop-filter: blur(2px);
+    }
+    .cs-mobile-overlay.active { opacity: 1; visibility: visible; }
+
+    .cs-mobile-logo-area {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+    .cs-menu-title { font-weight: 900; font-size: 18px; color: #333; letter-spacing: 1px; }
+
+    .cs-mobile-menu-close {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: #555;
+        cursor: pointer;
+        padding: 0 10px;
+    }
+
+    .cs-menu-list {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+
+    .cs-menu-item { border-bottom: 1px solid #f0f0f0; width: 100%; }
+
+    .cs-mobile-link-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 15px;
+    }
+
+    .cs-menu-link { padding: 18px 20px; font-size: 16px; flex-grow: 1; }
+    .cs-menu-link::before { width: 12px; height: 12px; }
+
+    .cs-mobile-dropdown-trigger.open {
+        transform: rotate(180deg);
+        background: var(--cat-color);
+        color: #fff;
+        border-color: var(--cat-color);
+    }
+
+    .cs-mega-menu-dropdown {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        display: none;
+        box-shadow: none;
+        border-top: none;
+        background: #fcfcfc;
+        padding-left: 0;
+    }
+
+    .cs-mega-menu-inner { flex-direction: column; min-height: auto; }
+    .cs-dropdown-brand { display: none; } /* Hide brand on mobile */
+    .cs-dropdown-content { padding: 15px 20px 25px 20px; }
+    
+    .cs-pill-link {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        width: 100%;
+        text-align: left;
+    }
+}
+
+/* ==========================================================================
+   6. AUTH PAGES (Login, Register, Complete Profile)
+   ========================================================================== */
+
+.cs-custom-auth-page {
+    background-color: var(--cs-auth-bg-color);
+    font-family: var(--cs-auth-font-family);
+    color: var(--cs-auth-text-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+}
+
+.cs-custom-auth-page #site-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-auth-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.cs-auth-form-wrapper {
+    background-color: var(--cs-auth-card-bg);
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.cs-auth-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--cs-auth-text-color);
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+/* Login Form Specifics */
+#cs-login-form p, .cs-custom-form p { margin-bottom: 20px; }
+#cs-login-form label, .cs-custom-form label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cs-auth-label-color);
+    margin-bottom: 8px;
+}
+
+#cs-login-form input[type="text"],
+#cs-login-form input[type="password"],
+#cs-login-form input[type="email"],
+.cs-custom-form input[type="text"],
+.cs-custom-form input[type="password"],
+.cs-custom-form input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--cs-auth-input-border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.2s ease-in-out;
+}
+
+#cs-login-form input:focus, .cs-custom-form input:focus {
+    border-color: var(--cs-auth-input-focus-border-color);
+    outline: none;
+}
+
+/* Submit Buttons */
+#cs-login-form #wp-submit-login,
+.cs-custom-form input[type="submit"] {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--cs-auth-primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#cs-login-form #wp-submit-login:hover,
+.cs-custom-form input[type="submit"]:hover {
+    background-color: var(--cs-auth-primary-hover-color);
+}
+
+/* Auth Helpers */
+.cs-auth-message {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.cs-auth-error { background-color: #f8d7da; color: var(--cs-auth-error-color); border: 1px solid #f5c6cb; }
+.cs-auth-success { background-color: #d4edda; color: var(--cs-auth-success-color); border: 1px solid #c3e6cb; }
+
+.cs-auth-links { margin-top: 25px; font-size: 14px; }
+.cs-auth-links a { color: var(--cs-auth-link-color); text-decoration: none; }
+.cs-auth-links a:hover { text-decoration: underline; }
+
+.cs-social-login-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--cs-auth-input-border-color);
+}
+
+@media (max-width: 480px) {
+    .cs-auth-form-wrapper { padding: 25px 20px; margin: 15px; }
+}
+
+/* ==========================================================================
+   7. SPECIFIC COMPONENTS (Cards, Grids)
+   ========================================================================== */
+
+.cs-levels-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.cs-level-card {
+    border: 1px solid #e6e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+}
+
+.cs-level-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.cs-level-line {
+    height: 8px;
+    background: #f2f4f7;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.cs-level-line > span {
+    display: block;
+    height: 100%;
+    background: #6DB24A;
+}
+
+.cs-level-meta {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* --- SEARCH POPUP (Full Screen & Responsive) --- */
+.cs-search-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+    display: none; /* JS kontroliše ovo */
+}
+
+.cs-search-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(22, 28, 45, 0.98); /* Malo tamnija za bolji kontrast */
+    backdrop-filter: blur(5px);
+}
+
+.cs-search-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 700px;
+    margin: 100px auto 0; /* Desktop margina */
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Close Button - Desktop */
+.cs-search-close {
+    position: absolute;
+    top: -60px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 40px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: 0.3s;
+    padding: 10px; /* Veća površina za klik */
+}
+.cs-search-close:hover { opacity: 1; transform: scale(1.1); }
+
+/* Input Field */
+.cs-search-input-wrapper {
+    position: relative;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+#cs-search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 32px; /* Desktop font */
+    font-weight: 700;
+    padding: 20px 40px 20px 0; /* Desni padding zbog loadera */
+    font-family: var(--primary-font, sans-serif);
+    box-shadow: none;
+    border-radius: 0;
+}
+#cs-search-input:focus { outline: none; border-bottom-color: var(--secondary-color, #fe6555); }
+#cs-search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+/* Loader */
+.cs-search-loader {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -12px; /* Pola visine */
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Results Container */
+.cs-search-results {
+    margin-top: 30px;
+    max-height: 60vh; /* Da ne ide van ekrana */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Glatko skrolovanje na iOS */
+}
+
+/* Scrollbar stilizacija za rezultate */
+.cs-search-results::-webkit-scrollbar { width: 6px; }
+.cs-search-results::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+.cs-search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+.cs-search-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cs-search-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 10px;
+    text-decoration: none;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+.cs-search-item:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+}
+
+.cs-search-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 15px;
+    flex-shrink: 0;
+    background: #333;
+}
+.cs-search-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cs-search-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.cs-search-cat {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--secondary-color, #FE6555);
+    margin-bottom: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.cs-search-msg {
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* =========================================
+   RESPONSIVE (Mobilni)
+   ========================================= */
+@media (max-width: 767px) {
+    .cs-search-content {
+        margin-top: 60px; /* Manje od vrha */
+        padding: 0 15px;
+    }
+
+    /* Fiksiraj X dugme u ćošak ekrana na mobilnom */
+    .cs-search-close {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.5); /* Mala pozadina da se vidi bolje */
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        z-index: 10;
+    }
+
+    #cs-search-input {
+        font-size: 20px; /* Manji font */
+        padding: 15px 30px 15px 0;
+    }
+    
+    .cs-search-results {
+        margin-top: 20px;
+        max-height: 75vh; /* Više prostora za rezultate */
+    }
+
+    .cs-search-item {
+        padding: 10px;
+    }
+
+    .cs-search-img {
+        width: 50px; /* Manja slika */
+        height: 50px;
+        margin-right: 12px;
+    }
+
+    .cs-search-info h4 {
+        font-size: 15px; /* Manji naslov */
+    }
+    
+    .cs-search-cat {
+        font-size: 10px;
+    }
+}
+
+/* ==========================================================================
+   4. HERO SECTIONS & SLIDERS (Homepage & Archives)
+   ========================================================================== */
+
+/* --- Wrapper & Swiper Structure --- */
+.cs-home-slider-wrapper {
+    width: 100%;
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    background: #fff;
+    /* Ensure arrows outside the swiper container are clickable */
+    z-index: 1; 
+}
+
+.cs-home-category-swiper {
+    width: 100%;
+    overflow: visible; /* Important for arrows to be visible outside */
+    padding-bottom: 32px !important;
+    position: relative;
+}
+
+.cs-home-category-swiper .swiper-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.cs-home-category-swiper .swiper-slide {
+    width: 100% !important;
+    flex-shrink: 0;
+    height: auto;
+}
+
+/* --- Hero Card Container --- */
+.cs-home-cat-hero {
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.cs-home-cat-hero__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px; /* Space for arrows */
+}
+
+/* --- LEFT SIDE: MEDIA --- */
+.cs-home-cat-hero__media-group {
+    width: 55%;
+    position: relative;
+}
+
+.cs-home-cat-hero__img-link {
+    display: flex;
+    align-items: flex-end; 
+    text-decoration: none;
+    position: relative;
+    /* Important: We trigger hover effects on this link */
+}
+
+/* 1. Mascot Wrapper */
+.cs-mascot-wrapper {
+    position: relative;
+    width: 140px;
+    flex-shrink: 0;
+    margin-right: -20px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.cs-hero-mascot-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.2));
+    position: relative;
+    z-index: 2;
+    margin-bottom: -3px; 
+    /* Smooth transition for hover effect */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: bottom center;
+}
+
+/* The Line */
+.cs-mascot-line {
+    height: 6px;
+    background-color: var(--cat-hero-color, #4457A5);
+    border-radius: 6px 0 0 6px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* 2. Featured Image Frame */
+.cs-home-cat-hero__featured-img {
+    flex-grow: 1;
+    border-radius: 20px;
+    border: 6px solid var(--cat-hero-color, #4457A5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    overflow: hidden; /* Crucial for Ken Burns effect */
+    aspect-ratio: 16 / 9;
+    z-index: 5;
+    background: #fff;
+    position: relative;
+}
+
+/* The Image Itself */
+.cs-home-cat-hero__featured-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures it fills the frame perfectly */
+    display: block;
+    transition: transform 0.8s ease; /* Slower, smoother zoom */
+}
+
+/* --- HOVER EFFECTS --- */
+
+/* Ken Burns Effect on Image (Zoom inside frame) */
+.cs-home-cat-hero__img-link:hover .cs-home-cat-hero__featured-img img {
+    transform: scale(1.08);
+}
+
+/* Mascot Rotation (Wiggle) */
+.cs-home-cat-hero__img-link:hover .cs-hero-mascot-img {
+    transform: rotate(-8deg) scale(1.05);
+}
+
+
+/* --- RIGHT SIDE: CONTENT --- */
+.cs-home-cat-hero__content {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.cs-home-cat-hero__label-link {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cs-home-cat-hero__label {
+    display: inline-block;
+    background-color: var(--cat-hero-color, #4457A5);
+    color: #fff;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    font-family: 'Chendolle', sans-serif !important;
+}
+
+.cs-home-cat-hero__label:hover {
+    transform: translateY(-2px);
+}
+
+.cs-home-cat-hero__title {
+    margin: 0 0 20px 0;
+    line-height: 1.1;
+}
+
+.cs-home-cat-hero__title a {
+    text-decoration: none;
+    font-family: var(--heading-font, 'Jockey One', sans-serif);
+    font-size: 3rem;
+    font-weight: 400;
+    color: #222;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    line-height: 1.1;
+}
+
+.cs-home-cat-hero__title a:hover {
+    color: var(--cat-hero-color, #4457A5);
+}
+
+.cs-home-cat-hero__text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 90%;
+}
+
+.cs-home-cat-hero__stats {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    width: 100%;
+}
+
+.cs-home-cat-hero__count {
+    font-size: 22px;
+    color: var(--cat-hero-color, #4457A5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Chendolle', sans-serif !important;
+}
+
+.cs-home-cat-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 35px;
+    background-color: var(--cat-hero-color, #4457A5);
+    color: #fff;
+    font-family: var(--heading-font, sans-serif);
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.cs-home-cat-hero__btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    filter: brightness(1.1);
+}
+
+.cs-home-category-swiper .swiper-button-next, 
+.cs-home-category-swiper .swiper-button-prev {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    color: #333;
+    z-index: 100; /* High Z to be clickable */
+    cursor: pointer;
+    margin-top: -30px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-home-category-swiper .swiper-button-prev {
+    left: 0;
+}
+
+.cs-home-category-swiper .swiper-button-next {
+    right: 0;
+}
+
+.cs-home-category-swiper .swiper-button-next::after, 
+.cs-home-category-swiper .swiper-button-prev::after {
+    display: none;
+}
+
+/* Ensure SVG is visible */
+.custom-arrow svg {
+    width: 30px;
+    height: auto;
+    display: block; /* Make sure it's block */
+}
+
+.custom-arrow svg path {
+    stroke: var(--primary-color, #4456A6);
+    stroke-width: 3;
+}
+
+.custom-arrow:hover svg {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+}
+
+.cs-home-category-swiper .swiper-pagination {
+    bottom: 0;
+    text-align: center;
+}
+
+.cs-home-category-swiper .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    opacity: 1;
+    transition: 0.3s;
+}
+
+.cs-home-category-swiper .swiper-pagination-bullet-active {
+    width: 25px;
+    border-radius: 5px;
+    background-color: var(--primary-color, #4456A6);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 991px) {
+    .cs-home-cat-hero__inner {
+        flex-direction: column;
+        gap: 30px;
+        text-align: center;
+        padding: 0 15px;
+    }
+
+    .cs-home-cat-hero__media-group {
+        width: 100%;
+    }
+    
+    .cs-home-cat-hero__img-link {
+        flex-direction: column-reverse; 
+        align-items: center;
+    }
+    .cs-home-cat-hero__text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #666;
+    margin:auto;
+    }
+   
+
+    .cs-mascot-wrapper {
+        margin-right: 0;
+        margin-top: -30px;
+        z-index: 10;
+    }
+    
+    .cs-mascot-line {
+        display: none;
+    }
+
+    .cs-home-cat-hero__content {
+        width: 100%;
+        align-items: center;
+    }
+
+    .cs-home-cat-hero__title a {
+        font-size: 2.2rem;
+    }
+
+    .cs-home-cat-hero__stats {
+        justify-content: center;
+        flex-direction: column-reverse;
+        gap: 15px;
+    }
+
+    .cs-home-cat-hero__btn {
+        width: 100%;
+    }
+
+    .cs-home-category-swiper .swiper-button-next, 
+    .cs-home-category-swiper .swiper-button-prev {
+        display: none;
+    }
+}
+/* ==========================================================================
+   TRENDING LEADERBOARD SECTION
+   ========================================================================== */
+
+.cs-trending-leaderboard {
+    padding: 0 0 0 0;
+    background-color: transparent;
+}
+
+/* --- GRID LAYOUT --- */
+.cs-leaderboard-grid {
+    display: grid;
+    /* 4 Equal Columns */
+    grid-template-columns: repeat(4, 1fr);
+    /* STRICT ROW HEIGHT: 280px per row. Total Hero height = 280 + 20 + 280 = 580px */
+    grid-template-rows: 280px 280px; 
+    gap: 20px;
+}
+
+/* --- CARD BASE STYLE --- */
+.cs-lb-card {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.cs-lb-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    border-color: var(--accent-color);
+}
+
+/* --- 1. HERO CARD (Left, Big) --- */
+.cs-lb-card--hero {
+    grid-column: 1 / 3; /* Spans 2 cols */
+    grid-row: 1 / 3;    /* Spans 2 rows */
+    height: 100%;       /* Fill grid area */
+}
+
+/* Hero Image: Takes up fixed height to leave room for text */
+.cs-lb-card--hero .cs-lb-media {
+    height: 380px; /* Fixed height! */
+    flex-shrink: 0;
+}
+
+/* Hero Title: Allow more lines */
+.cs-lb-card--hero .cs-lb-title {
+    font-size: 1.8rem;
+    -webkit-line-clamp: 3;
+    margin-bottom: 10px;
+}
+
+/* --- 2. STANDARD CARDS (Right, Small) --- */
+.cs-lb-card--standard {
+    height: 100%; /* Fill the grid row */
+}
+
+/* Standard Image: Fixed height */
+.cs-lb-card--standard .cs-lb-media {
+    height: 150px; /* Fixed height! */
+    flex-shrink: 0;
+}
+
+/* Standard Title: Clamp to 2 lines */
+.cs-lb-card--standard .cs-lb-title {
+    font-size: 1.1rem;
+    -webkit-line-clamp: 2;
+}
+
+/* Standard Excerpt: Hide to save space */
+.cs-lb-card--standard .cs-lb-excerpt {
+    display: none;
+}
+
+/* --- COMMON ELEMENTS --- */
+
+/* Media Container */
+.cs-lb-media {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.cs-lb-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.cs-lb-card:hover .cs-lb-media img {
+    transform: scale(1.05);
+}
+
+/* Badge (Category) */
+.cs-lb-cat-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Rank Number */
+.cs-lb-rank {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px; /* Fixed Width */
+    height: 40px; /* Fixed Height */
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-right-radius: 10px;
+    z-index: 5;
+    font-family: var(--heading-font, sans-serif);
+}
+
+.cs-lb-card--hero .cs-lb-rank {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border-bottom-right-radius: 16px;
+}
+
+/* Content Container */
+.cs-lb-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes meta to bottom */
+    flex-grow: 1; /* Fills remaining space */
+    min-height: 0; /* Important for flex truncation */
+}
+
+/* Text Styles */
+.cs-lb-title {
+    font-family: var(--heading-font, sans-serif);
+    line-height: 1.2;
+    color: #222;
+    margin: 0 0 5px 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cs-lb-excerpt {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cs-lb-meta {
+    margin-top: auto; /* Force to bottom */
+    font-size: 12px;
+    color: #777;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cs-lb-score strong {
+    color: var(--accent-color);
+    font-size: 1.1em;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 991px) {
+    .cs-leaderboard-grid {
+        grid-template-columns: 1fr 1fr; /* 2 Columns */
+        /* Auto rows allows flexible height on tablet */
+        grid-template-rows: auto; 
+    }
+    
+    .cs-lb-card--hero {
+        grid-column: 1 / 3; /* Full width */
+        min-height: 400px;
+        grid-row: auto;
+    }
+    .cs-lb-card--hero .cs-lb-media {
+        height: 250px;
+    }
+    
+    .cs-lb-card--standard {
+        min-height: 280px; 
+    }
+}
+
+/* Mobile: Horizontal Carousel */
+@media (max-width: 576px) {
+    .cs-trending-leaderboard {
+        padding: 20px 0;
+        overflow: hidden;
+    }
+
+    .cs-leaderboard-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 15px;
+        padding-bottom: 20px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        margin-right: -15px;
+        padding-right: 15px;
+        grid-template-rows: unset;
+    }
+    
+    .cs-leaderboard-grid::-webkit-scrollbar { display: none; }
+
+ /* Force uniformity */
+    .cs-lb-card, 
+    .cs-lb-card--hero, 
+    .cs-lb-card--standard {
+        min-width: 280px !important;
+        max-width: 280px !important;
+        height: 360px !important; /* Fixed height for ALL */
+        min-height: 360px !important;
+        grid-column: auto !important; /* Reset grid */
+        grid-row: auto !important;
+    }
+
+    /* Reset Hero Image to match Standard */
+    .cs-lb-media,
+    .cs-lb-card--hero .cs-lb-media,
+    .cs-lb-card--standard .cs-lb-media {
+        height: 160px !important; 
+    }
+
+    /* Reset Hero Rank to match Standard */
+    .cs-lb-card--hero .cs-lb-rank,
+    .cs-lb-rank {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 14px !important;
+        border-bottom-right-radius: 10px !important;
+    }
+
+    /* Reset Title */
+    .cs-lb-card--hero .cs-lb-title,
+    .cs-lb-title {
+        font-size: 1.1rem !important;
+        -webkit-line-clamp: 2 !important; 
+    }
+    
+    /* Hide excerpt on mobile to ensure uniform height */
+    .cs-lb-excerpt {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   POLLS MODULE STYLES
+   ========================================================================== */
+
+/* --- 1. DAILY POLL SECTION (Pocetna) --- */
+.cs-daily-poll-section {
+    padding: 60px 0;
+    background: #f8f9fa; /* Blaga siva pozadina za sekciju */
+}
+
+.cs-poll-wrapper-split {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start; /* Poravnanje na gore */
+    background: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+/* Leva strana (Info) */
+.cs-poll-info {
+    flex: 1;
+}
+
+.cs-poll-badge {
+    background: #ff4757;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.cs-poll-title {
+    font-size: 2rem;
+    margin: 0 0 15px 0;
+    line-height: 1.2;
+    color: #222;
+    font-family: var(--heading-font, sans-serif);
+}
+
+.cs-poll-desc {
+    color: #555;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.cs-poll-image {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.cs-poll-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Desna strana (Action) */
+.cs-poll-action {
+    flex: 0 0 400px; /* Fiksna širina za formu */
+}
+
+/* Ukloni stilove box-a kada je unutar split view-a da izgleda integrisano */
+.cs-poll-action .cs-poll-box {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    margin: 0;
+}
+
+/* Responsive Split */
+@media (max-width: 991px) {
+    .cs-poll-wrapper-split {
+        flex-direction: column;
+        padding: 30px;
+    }
+    .cs-poll-action {
+        flex: 1;
+        width: 100%;
+    }
+}
+
+/* --- 2. POLL BOX (Standard Widget) --- */
+.cs-poll-box { 
+    background: #fff; 
+    padding: 25px; 
+    border-radius: 16px; 
+    border: 1px solid #eee; 
+    margin-bottom: 20px; 
+    position: relative;
+}
+
+.cs-poll-question { 
+    margin-top: 0; 
+    font-size: 1.3rem; 
+    margin-bottom: 20px; 
+    color: #333;
+    font-weight: 700;
+}
+
+/* Options (Radio) */
+.cs-poll-option { 
+    display: flex; 
+    gap: 12px; 
+    align-items: center;
+    margin-bottom: 12px; 
+    cursor: pointer; 
+    padding: 12px 15px; 
+    border-radius: 8px; 
+    border: 2px solid #f0f0f0; 
+    transition: all 0.2s ease; 
+}
+
+.cs-poll-option:hover { 
+    background: #fdfdfd; 
+    border-color: #4456A6; 
+}
+
+.cs-poll-option input[type="radio"] {
+    accent-color: #4456A6;
+    transform: scale(1.2);
+}
+
+.cs-poll-opt-text {
+    font-weight: 500;
+    color: #444;
+}
+
+/* Vote Button */
+.cs-btn-vote { 
+    background: #4456A6; 
+    color: #fff; 
+    border: none; 
+    padding: 12px 30px; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-top: 15px; 
+    width: 100%;
+    transition: background 0.2s;
+}
+
+.cs-btn-vote:hover { 
+    background: #334385; 
+}
+
+.cs-btn-vote:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* --- 3. RESULTS VIEW --- */
+.cs-poll-result-item { 
+    margin-bottom: 18px; 
+}
+
+.cs-poll-res-info { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 14px; 
+    font-weight: 600; 
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.cs-poll-bar-bg { 
+    height: 10px; 
+    background: #eee; 
+    border-radius: 10px; 
+    overflow: hidden; 
+}
+
+.cs-poll-bar-fill { 
+    height: 100%; 
+    background: #4456A6; 
+    border-radius: 10px;
+}
+
+.cs-poll-votes-count { 
+    font-size: 11px; 
+    color: #888; 
+    margin-top: 4px; 
+    text-align: right;
+}
+
+.cs-poll-meta { 
+    font-size: 12px; 
+    color: #888; 
+    text-align: center; 
+    border-top: 1px solid #eee; 
+    padding-top: 15px; 
+    margin-top: 10px;
+}
+
+/* --- 4. ARCHIVE GRID (Stare Ankete) --- */
+.cs-poll-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.cs-archive-poll-card {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.cs-archive-poll-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+}
+
+.cs-archive-meta {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.cs-poll-mini-render .cs-poll-box {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+.cs-poll-mini-render .cs-poll-question {
+    display: none; /* Sakrij naslov unutar mini rendera jer ga već imamo gore */
+}

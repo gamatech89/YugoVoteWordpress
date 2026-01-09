@@ -1,0 +1,24 @@
+/* Nav */
+.cs-acc-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cs-chip{padding:8px 12px;border:1px solid #e1e4ea;border-radius:10px;background:#fff;text-decoration:none;line-height:1}
+.cs-chip.is-active{background:#6DB24A;border-color:#6DB24A;color:#fff}
+
+/* Cards & text */
+.cs-card{border:1px solid #e6e7eb;border-radius:12px;padding:16px;background:#fff}
+.cs-muted{color:#6b7280}
+
+/* Panel layout */
+.cs-account{max-width:880px;margin:24px auto}
+.cs-row{display:flex;gap:16px;flex-wrap:wrap}
+.cs-meter{height:10px;background:#f2f4f7;border-radius:6px;overflow:hidden}
+.cs-meter>span{display:block;height:100%;background:#6DB24A;width:0}
+.cs-list{margin:0;padding:0;list-style:none}
+.cs-list li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee}
+.cs-list li:last-child{border-bottom:0}
+.cs-inline{display:flex;gap:8px;align-items:center}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.cs-grid{grid-template-columns:1fr}}
+
+/* Buttons */
+.cs-btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #d9dde4;background:#f8f9fb;cursor:pointer}
+.cs-btn.primary{background:#6DB24A;color:#fff;border-color:#6DB24A}
