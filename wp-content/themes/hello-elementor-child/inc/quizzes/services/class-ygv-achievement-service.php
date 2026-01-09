@@ -509,9 +509,8 @@ class YGV_Achievement_Service {
                 $user_id
             ));
             
-            if ($first_cat > 0 && class_exists('YGV_Progress_Service')) {
-                $progress = new YGV_Progress_Service();
-                $progress->add_xp($user_id, $first_cat, $xp_reward);
+            if ($first_cat > 0 && function_exists('ygv_progress')) {
+                ygv_progress()->add_xp($user_id, $first_cat, $xp_reward);
             }
         }
         

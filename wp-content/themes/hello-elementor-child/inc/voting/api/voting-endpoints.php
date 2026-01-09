@@ -272,13 +272,10 @@ function submit_vote() {
     $streak_info = null;
     
     if ($user_id > 0) {
-        // Get or create progress service instance
-        if (!class_exists('YGV_Progress_Service')) {
-            require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-progress-service.php';
+        $progress_service = function_exists('ygv_progress') ? ygv_progress() : null;
+        if ($progress_service) {
+            $xp_result = $progress_service->award_voting_xp($user_id, $voting_list_id);
         }
-        
-        $progress_service = new YGV_Progress_Service();
-        $xp_result = $progress_service->award_voting_xp($user_id, $voting_list_id);
         
         $xp_awarded = $xp_result['awarded_xp'] ?? 0;
         $votes_today = $xp_result['votes_today'] ?? 0;

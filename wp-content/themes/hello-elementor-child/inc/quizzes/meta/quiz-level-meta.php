@@ -44,13 +44,21 @@ function save_quiz_level_meta($post_id) {
     }
 
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+
+    if (get_post_type($post_id) !== 'quiz_levels') return;
+
     if (!current_user_can('edit_post', $post_id)) return;
 
-    update_post_meta($post_id, '_required_points', intval($_POST['required_points']));
-    update_post_meta($post_id, '_voting_multiplicator', floatval($_POST['voting_multiplicator']));
-    update_post_meta($post_id, '_quiz_question_points', intval($_POST['quiz_question_points']));
-    update_post_meta($post_id, '_quiz_level_image', esc_url($_POST['quiz_level_image']));
+    $required_points      = isset($_POST['required_points']) ? max(0, (int) $_POST['required_points']) : 0;
+    $voting_multiplicator = isset($_POST['voting_multiplicator']) ? max(0, (float) $_POST['voting_multiplicator']) : 1;
+    $quiz_question_points = isset($_POST['quiz_question_points']) ? max(0, (int) $_POST['quiz_question_points']) : 0;
+    $image                = isset($_POST['quiz_level_image']) ? esc_url_raw(wp_unslash($_POST['quiz_level_image'])) : '';
+
+    update_post_meta($post_id, '_required_points', $required_points);
+    update_post_meta($post_id, '_voting_multiplicator', $voting_multiplicator);
+    update_post_meta($post_id, '_quiz_question_points', $quiz_question_points);
+    update_post_meta($post_id, '_quiz_level_image', $image);
 }
-add_action('save_post', 'save_quiz_level_meta');
+add_action('save_post_quiz_levels', 'save_quiz_level_meta');
 
 

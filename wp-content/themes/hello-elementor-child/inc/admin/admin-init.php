@@ -50,4 +50,23 @@ if (file_exists($admin_inc_path . 'level-settings.php')) {
     require_once $admin_inc_path . 'level-settings.php';
 }
 
+// Admin styles for quiz-related screens
+add_action('admin_enqueue_scripts', function($hook) {
+    $screen = get_current_screen();
+    if (!$screen) return;
+
+    $post_types = ['quiz', 'question', 'quiz_levels'];
+    if (in_array($screen->post_type, $post_types, true)) {
+        $style_path = get_stylesheet_directory() . '/admin-style.css';
+        $version    = file_exists($style_path) ? filemtime($style_path) : HELLO_ELEMENTOR_CHILD_VERSION;
+
+        wp_enqueue_style(
+            'ygv-admin-style',
+            get_stylesheet_directory_uri() . '/admin-style.css',
+            [],
+            $version
+        );
+    }
+});
+
 ?>

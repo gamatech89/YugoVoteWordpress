@@ -1,4 +1,4 @@
-# YugoVote Development Status
+O# YugoVote Development Status
 
 **Last Updated:** January 9, 2026  
 **Environment:** WordPress with Elementor, Hello Elementor Child Theme
@@ -29,7 +29,7 @@
 - Streak bonus XP (up to +10 XP per vote at 10+ day streak)
 - Milestone progress visualization (3 → 7 → 14 → 30 → 60 → 100 days)
 
-#### 4. Quiz Token System (`YGV_Token_Service`)
+#### 4. Quiz Token System (`TokenService` via `ygv_tokens()`)
 
 - Token wallet per user (default: 48 max tokens)
 - Token regeneration over time (configurable rate)
@@ -94,8 +94,8 @@ wp-content/themes/hello-elementor-child/
 │   ├── quizzes/
 │   │   └── services/
 │   │       ├── class-ygv-achievement-service.php
-│   │       ├── class-ygv-progress-service.php
-│   │       └── class-ygv-token-service.php
+│   │       ├── ProgressService.php
+│   │       └── TokenService.php
 │   ├── voting/
 │   │   ├── frontend-submit.php
 │   │   └── api/voting-endpoints.php
@@ -132,6 +132,16 @@ wp-content/themes/hello-elementor-child/
 3. **Stats bar CSS broke Elementor** - Removed global `.elementor-shortcode` selectors, now targets only `.cs-player-stats-container`
 4. **Stats bar CSS not loading** - Changed from `has_shortcode()` check to `is_user_logged_in()` (Elementor bypasses shortcode detection)
 5. **Icons not displaying** - Added fallback `require_once` for `icons.php` in all tab templates
+
+---
+
+## 🚧 In-Flight (feature/theme-improvements)
+
+- Added PSR-4 autoloading under `HelloElementorChild` via `inc/autoload.php`, loaded from `functions.php`
+- Quiz meta boxes are now namespaced classes with nonce/cap checks and sanitization; rendering tidied for readability
+- Admin UI styling is scoped and conditionally enqueued on quiz/question admin screens; refined quiz question selectors and voting modal styles
+- Token/Progress services namespaced to `HelloElementorChild\Quizzes\Services` with accessors `ygv_tokens()` / `ygv_progress()` used across frontend
+- Removed legacy `class-ygv-token-service.php` and `class-ygv-progress-service.php` files after migration
 
 ---
 

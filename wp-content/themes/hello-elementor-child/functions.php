@@ -16,6 +16,12 @@ if (file_exists(get_stylesheet_directory() . '/inc/config.php')) {
     require_once get_stylesheet_directory() . '/inc/config.php';
 }
 
+// PSR-4 autoloader for theme classes
+$autoload = get_stylesheet_directory() . '/inc/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
+}
+
 require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 

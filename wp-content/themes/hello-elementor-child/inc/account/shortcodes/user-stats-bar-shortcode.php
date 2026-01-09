@@ -187,9 +187,8 @@ function ygv_get_xp_thresholds() {
  */
 function ygv_get_user_token_data($user_id) {
     // Try to use the token service if available
-    if (class_exists('YGV_Token_Service')) {
-        $token_service = new YGV_Token_Service();
-        $wallet = $token_service->current_wallet($user_id);
+    if (function_exists('ygv_tokens')) {
+        $wallet = ygv_tokens()->current_wallet($user_id);
         
         // Calculate next token time
         $tokens = (int)($wallet['tokens'] ?? 0);
