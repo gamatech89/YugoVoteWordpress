@@ -253,6 +253,11 @@ $category_icons = [
                     $cat_name = $cat['category_name'] ?: 'Unknown';
                     $icon_name = $category_icons[$cat_name] ?? 'folder';
                     
+                    // Get category color for dynamic styling
+                    $cat_color = function_exists('ygv_get_quiz_category_color') 
+                        ? ygv_get_quiz_category_color($cat['category_term_id']) 
+                        : '#6db24a';
+                    
                     // Get vote bonus for this level
                     $vote_bonus = 0;
                     if ($level_config) {
@@ -263,20 +268,44 @@ $category_icons = [
                             }
                         }
                     }
+                    
+                    // Calculate progress to next level
+                    $cat_xp = (int)$cat['xp'];
+                    $cat_next_xp = ygv_get_next_level_xp($cat_level, $level_config);
+                    $cat_current_threshold = 0;
+                    if ($level_config) {
+                        $thresholds = $level_config['xp_thresholds'] ?? [];
+                        if (isset($thresholds[$cat_level])) {
+                            $cat_current_threshold = $thresholds[$cat_level];
+                        } elseif ($cat_level > 10) {
+                            $base = $thresholds[10] ?? 1250;
+                            $xp_per = $level_config['xp_per_level_after_10'] ?? 300;
+                            $cat_current_threshold = $base + (($cat_level - 10) * $xp_per);
+                        }
+                    }
+                    $cat_xp_in_level = $cat_xp - $cat_current_threshold;
+                    $cat_xp_needed = $cat_next_xp ? ($cat_next_xp - $cat_current_threshold) : 0;
+                    $cat_progress_pct = $cat_xp_needed > 0 ? min(100, ($cat_xp_in_level / $cat_xp_needed) * 100) : 100;
                 ?>
-                <div class="ygv-category-level-item">
-                    <div class="ygv-cat-icon"><?php ygv_icon_e($icon_name, 24); ?></div>
+                <div class="ygv-category-level-item" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
+                    <div class="ygv-cat-accent" style="background: var(--cat-color);"></div>
+                    <div class="ygv-cat-icon" style="color: var(--cat-color);"><?php ygv_icon_e($icon_name, 24); ?></div>
                     <div class="ygv-cat-info">
                         <div class="ygv-cat-name"><?php echo esc_html($cat_name); ?></div>
                         <div class="ygv-cat-level">
                             <?php echo esc_html__('Nivo', 'hello-elementor-child'); ?> <?php echo esc_html($cat_level); ?> 
-                            <span class="ygv-cat-title">(<?php echo esc_html($cat_title); ?>)</span>
+                            <span class="ygv-cat-title" style="color: var(--cat-color);">(<?php echo esc_html($cat_title); ?>)</span>
                         </div>
-                        <div class="ygv-cat-xp"><?php echo number_format((int)$cat['xp']); ?> XP</div>
+                        <div class="ygv-cat-progress-bar">
+                            <div class="ygv-progress-unified ygv-progress-unified--sm">
+                                <div class="ygv-progress-unified__fill" style="width: <?php echo esc_attr($cat_progress_pct); ?>%;"></div>
+                            </div>
+                        </div>
+                        <div class="ygv-cat-xp"><?php echo number_format($cat_xp); ?> XP</div>
                     </div>
                     <div class="ygv-cat-bonus">
                         <?php if ($vote_bonus > 0): ?>
-                            <span class="ygv-bonus-badge">+<?php echo $vote_bonus; ?></span>
+                            <span class="ygv-bonus-badge" style="background: var(--cat-color);">+<?php echo $vote_bonus; ?></span>
                             <span class="ygv-bonus-label"><?php echo esc_html__('bonus', 'hello-elementor-child'); ?></span>
                         <?php else: ?>
                             <span class="ygv-bonus-none"><?php echo esc_html__('Nivo 10 za bonus', 'hello-elementor-child'); ?></span>

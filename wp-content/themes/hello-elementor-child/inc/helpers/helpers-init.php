@@ -24,6 +24,11 @@ if (file_exists($base . 'category-color-generator.php')) {
     require_once $base . 'category-color-generator.php';
 }
 
+// Category color helper functions
+if (file_exists($base . 'category-colors-helper.php')) {
+    require_once $base . 'category-colors-helper.php';
+}
+
 // Utility functions
 if (file_exists($base . 'utilities.php')) {
     require_once $base . 'utilities.php';

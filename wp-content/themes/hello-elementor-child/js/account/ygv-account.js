@@ -1,3 +1,68 @@
+/**
+ * Account Navigation Mobile Dropdown
+ * Handles the mobile bottom sheet navigation for account tabs
+ */
+(function() {
+  'use strict';
+  
+  const trigger = document.querySelector('.cs-acc-nav-mobile-trigger');
+  const dropdown = document.querySelector('.cs-acc-nav-mobile-dropdown');
+  const overlay = document.querySelector('.cs-acc-nav-overlay');
+  const closeBtn = document.querySelector('.cs-acc-nav-mobile-dropdown__close');
+  
+  if (!trigger || !dropdown || !overlay) return;
+  
+  function openDropdown() {
+    trigger.setAttribute('aria-expanded', 'true');
+    dropdown.setAttribute('aria-hidden', 'false');
+    dropdown.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeDropdown() {
+    trigger.setAttribute('aria-expanded', 'false');
+    dropdown.setAttribute('aria-hidden', 'true');
+    dropdown.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  // Toggle on trigger click
+  trigger.addEventListener('click', function(e) {
+    e.preventDefault();
+    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  });
+  
+  // Close on overlay click
+  overlay.addEventListener('click', closeDropdown);
+  
+  // Close on close button click
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeDropdown);
+  }
+  
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && dropdown.classList.contains('active')) {
+      closeDropdown();
+    }
+  });
+  
+  // Close when clicking a nav item (for smooth UX before navigation)
+  dropdown.querySelectorAll('.cs-acc-nav-mobile-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      // Small delay to show the click feedback before navigation
+      closeDropdown();
+    });
+  });
+})();
+
 (function () {
   // Require the container and the localized config
   const root = document.getElementById('ygv-account');

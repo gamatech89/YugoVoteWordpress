@@ -149,8 +149,8 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                 <strong><?php echo $total_quizzes; ?></strong> / <strong><?php echo $available_quizzes; ?></strong> 
                 <?php echo esc_html__('kvizova rešeno', 'hello-elementor-child'); ?>
             </div>
-            <div class="ygv-quiz-progress-bar">
-                <div class="ygv-quiz-progress-fill" style="width: <?php echo $available_quizzes > 0 ? ($total_quizzes / $available_quizzes) * 100 : 0; ?>%"></div>
+            <div class="ygv-progress-unified">
+                <div class="ygv-progress-unified__fill" style="width: <?php echo $available_quizzes > 0 ? ($total_quizzes / $available_quizzes) * 100 : 0; ?>%; --cat-color: #f59e0b;"></div>
             </div>
         </div>
     </div>
@@ -165,6 +165,12 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
             <?php foreach ($category_progress as $cat): 
                 $cat_level = (int)$cat['level'];
                 $cat_xp = (int)$cat['xp'];
+                $cat_term_id = (int)$cat['category_term_id'];
+                
+                // Get category color
+                $cat_color = function_exists('ygv_get_quiz_category_color') 
+                    ? ygv_get_quiz_category_color($cat_term_id) 
+                    : '#6db24a';
                 
                 // Get title for level
                 $cat_title = 'Rookie';
@@ -177,13 +183,13 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                     }
                 }
             ?>
-            <div class="ygv-cat-progress-item">
-                <div class="ygv-cat-progress-level">
+            <div class="ygv-cat-progress-item" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
+                <div class="ygv-cat-progress-level" style="background: var(--cat-color);">
                     <span class="ygv-cat-level-number"><?php echo $cat_level; ?></span>
                 </div>
                 <div class="ygv-cat-progress-info">
                     <div class="ygv-cat-progress-name"><?php echo esc_html($cat['category_name'] ?? 'Unknown'); ?></div>
-                    <div class="ygv-cat-progress-title"><?php echo esc_html($cat_title); ?></div>
+                    <div class="ygv-cat-progress-title" style="color: var(--cat-color);"><?php echo esc_html($cat_title); ?></div>
                 </div>
                 <div class="ygv-cat-progress-xp">
                     <?php echo number_format($cat_xp); ?> XP

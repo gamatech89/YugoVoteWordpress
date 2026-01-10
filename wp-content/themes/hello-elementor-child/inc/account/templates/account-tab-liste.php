@@ -203,14 +203,20 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 $max_votes = max(array_column($votes_by_category, 'vote_count'));
                 foreach ($votes_by_category as $cat): 
                     $percent = $max_votes > 0 ? ($cat['vote_count'] / $max_votes) * 100 : 0;
+                    
+                    // Get category color by name (find term first)
+                    $cat_term = get_term_by('name', $cat['category_name'], 'voting_list_category');
+                    $cat_color = $cat_term && function_exists('ygv_get_quiz_category_color') 
+                        ? ygv_get_quiz_category_color($cat_term->term_id) 
+                        : '#4f46e5';
                 ?>
-                <div class="ygv-category-vote-item">
+                <div class="ygv-category-vote-item" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
                     <div class="ygv-cat-vote-header">
                         <span class="ygv-cat-vote-name"><?php echo esc_html($cat['category_name']); ?></span>
-                        <span class="ygv-cat-vote-count"><?php echo number_format($cat['vote_count']); ?></span>
+                        <span class="ygv-cat-vote-count" style="color: var(--cat-color);"><?php echo number_format($cat['vote_count']); ?></span>
                     </div>
-                    <div class="ygv-cat-vote-bar">
-                        <div class="ygv-cat-vote-bar-fill" style="width: <?php echo $percent; ?>%"></div>
+                    <div class="ygv-progress-unified ygv-progress-unified--sm">
+                        <div class="ygv-progress-unified__fill" style="width: <?php echo $percent; ?>%;"></div>
                     </div>
                 </div>
                 <?php endforeach; ?>

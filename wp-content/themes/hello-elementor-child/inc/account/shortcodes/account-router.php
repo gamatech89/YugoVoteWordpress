@@ -9,34 +9,88 @@ function ygv_account_page_url(array $args = []): string {
     return $args ? add_query_arg($args, $url) : $url;
 }
 
-/** Tabs config (filterable) */
+/** Tabs config (filterable) - Reordered with Profile first, includes icons */
 function ygv_account_nav_items(): array {
-    // key => [label, tabKey]
+    // key => [label, tabKey, icon]
     $items = [
-        'kvizovi'     => [__('Kvizovi', 'hello-elementor-child'), 'kvizovi'],
-        'profil'      => [__('Profil', 'hello-elementor-child'), 'profil'],
-        'liste'       => [__('Moje Liste', 'hello-elementor-child'), 'liste'],
-        'dostignuca'  => [__('Dostignuća', 'hello-elementor-child'), 'dostignuca'],
-        'podesavanja' => [__('Podešavanja', 'hello-elementor-child'), 'podesavanja'],
-        'sigurnost'   => [__('Sigurnost', 'hello-elementor-child'), 'sigurnost'],
+        'profil'      => [__('Profil', 'hello-elementor-child'), 'profil', 'user'],
+        'kvizovi'     => [__('Kvizovi', 'hello-elementor-child'), 'kvizovi', 'gamepad'],
+        'liste'       => [__('Moje Liste', 'hello-elementor-child'), 'liste', 'clipboard-list'],
+        'dostignuca'  => [__('Dostignuća', 'hello-elementor-child'), 'dostignuca', 'trophy'],
+        'podesavanja' => [__('Podešavanja', 'hello-elementor-child'), 'podesavanja', 'settings'],
+        'sigurnost'   => [__('Sigurnost', 'hello-elementor-child'), 'sigurnost', 'shield'],
     ];
     return apply_filters('ygv_account_nav_items', $items);
 }
 
-/** Render tab nav */
+/** Get active tab info */
+function ygv_account_get_active_tab_info(string $active): array {
+    $items = ygv_account_nav_items();
+    foreach ($items as $key => $item) {
+        if ($item[1] === $active) {
+            return ['label' => $item[0], 'icon' => $item[2]];
+        }
+    }
+    // Fallback to first tab
+    $first = reset($items);
+    return ['label' => $first[0], 'icon' => $first[2]];
+}
+
+/** Render tab nav with icons + mobile dropdown */
 function ygv_account_render_nav(string $active): string {
     $items = ygv_account_nav_items();
+    $active_info = ygv_account_get_active_tab_info($active);
     ob_start(); ?>
-    <nav class="cs-acc-nav">
-      <?php foreach ($items as $key => [$label, $tab]): 
+    
+    <!-- Mobile dropdown trigger (hidden on desktop) -->
+    <button class="cs-acc-nav-mobile-trigger" type="button" aria-expanded="false" aria-controls="cs-acc-nav-dropdown">
+      <span class="cs-acc-nav-mobile-trigger__content">
+        <?php ygv_icon_e($active_info['icon'], 18); ?>
+        <span class="cs-acc-nav-mobile-trigger__label"><?php echo esc_html($active_info['label']); ?></span>
+      </span>
+      <?php ygv_icon_e('chevron-down', 18, 'cs-acc-nav-mobile-trigger__chevron'); ?>
+    </button>
+    
+    <!-- Mobile overlay backdrop -->
+    <div class="cs-acc-nav-overlay"></div>
+    
+    <!-- Desktop nav (chip style) -->
+    <nav class="cs-acc-nav" role="navigation" aria-label="<?php esc_attr_e('Account navigation', 'hello-elementor-child'); ?>">
+      <?php foreach ($items as $key => [$label, $tab, $icon]): 
         $href = esc_url( ygv_account_page_url(['tab'=>$tab]) );
         $is   = ($active === $tab);
       ?>
-        <a class="cs-chip<?php echo $is ? ' is-active':''; ?>" href="<?php echo $href; ?>">
-          <?php echo esc_html($label); ?>
+        <a class="cs-chip<?php echo $is ? ' is-active':''; ?>" href="<?php echo $href; ?>" <?php echo $is ? 'aria-current="page"' : ''; ?>>
+          <?php ygv_icon_e($icon, 16); ?>
+          <span class="cs-chip__label"><?php echo esc_html($label); ?></span>
         </a>
       <?php endforeach; ?>
     </nav>
+    
+    <!-- Mobile bottom sheet dropdown -->
+    <div class="cs-acc-nav-mobile-dropdown" id="cs-acc-nav-dropdown" aria-hidden="true">
+      <div class="cs-acc-nav-mobile-dropdown__header">
+        <span class="cs-acc-nav-mobile-dropdown__title"><?php esc_html_e('Navigacija', 'hello-elementor-child'); ?></span>
+        <button class="cs-acc-nav-mobile-dropdown__close" type="button" aria-label="<?php esc_attr_e('Zatvori', 'hello-elementor-child'); ?>">
+          <?php ygv_icon_e('x', 20); ?>
+        </button>
+      </div>
+      <div class="cs-acc-nav-mobile-dropdown__items">
+        <?php foreach ($items as $key => [$label, $tab, $icon]): 
+          $href = esc_url( ygv_account_page_url(['tab'=>$tab]) );
+          $is   = ($active === $tab);
+        ?>
+          <a class="cs-acc-nav-mobile-item<?php echo $is ? ' is-active':''; ?>" href="<?php echo $href; ?>" <?php echo $is ? 'aria-current="page"' : ''; ?>>
+            <?php ygv_icon_e($icon, 20); ?>
+            <span class="cs-acc-nav-mobile-item__label"><?php echo esc_html($label); ?></span>
+            <?php if ($is): ?>
+              <?php ygv_icon_e('check', 18, 'cs-acc-nav-mobile-item__check'); ?>
+            <?php endif; ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    
     <?php return ob_get_clean();
 }
 
