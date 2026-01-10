@@ -1,9 +1,38 @@
 /**
  * User Stats Bar JavaScript
- * Handles live countdown timers for token regeneration
+ * Handles live countdown timers and expand/collapse functionality
  */
 (function () {
   "use strict";
+
+  // Initialize expand/collapse toggle
+  function initExpandToggle() {
+    const bars = document.querySelectorAll('.ygv-user-stats-bar');
+    
+    bars.forEach((bar) => {
+      const toggleBtn = bar.querySelector('.ygv-stats-expand');
+      if (!toggleBtn) return;
+      
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        bar.classList.toggle('is-expanded');
+        
+        // Save preference
+        const isExpanded = bar.classList.contains('is-expanded');
+        try {
+          localStorage.setItem('ygv_stats_expanded', isExpanded ? '1' : '0');
+        } catch (e) {}
+      });
+      
+      // Restore saved preference
+      try {
+        const saved = localStorage.getItem('ygv_stats_expanded');
+        if (saved === '1') {
+          bar.classList.add('is-expanded');
+        }
+      } catch (e) {}
+    });
+  }
 
   // Find all timer elements
   function initTimers() {
@@ -51,10 +80,16 @@
     }
   }
 
+  // Initialize all
+  function init() {
+    initExpandToggle();
+    initTimers();
+  }
+
   // Initialize on DOM ready
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initTimers);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initTimers();
+    init();
   }
 })();

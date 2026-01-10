@@ -141,6 +141,101 @@ class ProgressService {
         return 'Rookie';
     }
 
+    /**
+     * Award XP for voting on a list
+     * XP is awarded to the PARENT category of the list
+     */
+    public function award_voting_xp(int $user_id, int $voting_list_id): array {
+        global $wpdb;
+        
+        // Get level config
+        $config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
+        $xp_per_vote = $config['xp_per_vote'] ?? 2;
+        $daily_limit = $config['daily_vote_limit'] ?? 50;
+        
+        // Check daily vote limit
+        $today = current_time('Y-m-d');
+        $votes_today = (int)$wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}voting_list_votes 
+             WHERE user_id = %d AND DATE(created_at) = %s",
+            $user_id, $today
+        ));
+        
+        $limit_reached = ($votes_today >= $daily_limit);
+        $base_xp = $limit_reached ? 0 : $xp_per_vote;
+        
+        // Get streak bonus
+        $streak_bonus_xp = 0;
+        $streak_info = null;
+        if (class_exists('YGV_Achievement_Service')) {
+            $ach = new \YGV_Achievement_Service();
+            $stats = $ach->get_user_stats($user_id);
+            $streak = (int)($stats['voting_streak'] ?? 0);
+            $streak_bonus_xp = min($streak, 10); // Max 10 XP bonus
+            $streak_info = ['days' => $streak, 'bonus' => $streak_bonus_xp];
+        }
+        
+        $awarded_xp = $base_xp + ($limit_reached ? 0 : $streak_bonus_xp);
+        
+        // Get PARENT category of the list
+        $categories = wp_get_object_terms($voting_list_id, 'voting_list_category', ['fields' => 'all']);
+        $parent_cat_id = 0;
+        
+        if (!empty($categories)) {
+            foreach ($categories as $cat) {
+                // Find parent category
+                if ($cat->parent === 0) {
+                    $parent_cat_id = $cat->term_id;
+                    break;
+                }
+            }
+            // If no parent found directly, get parent of first category
+            if ($parent_cat_id === 0 && !empty($categories[0])) {
+                $first_cat = $categories[0];
+                if ($first_cat->parent > 0) {
+                    $parent_cat_id = $first_cat->parent;
+                } else {
+                    $parent_cat_id = $first_cat->term_id;
+                }
+            }
+        }
+        
+        // Award XP to parent category
+        $result = ['awarded_xp' => 0, 'votes_today' => $votes_today, 'limit_reached' => $limit_reached];
+        
+        if ($awarded_xp > 0 && $parent_cat_id > 0) {
+            $xp_result = $this->add_xp($user_id, $parent_cat_id, $awarded_xp);
+            $result['awarded_xp'] = $awarded_xp;
+            $result['base_xp'] = $base_xp;
+            $result['streak_bonus_xp'] = $streak_bonus_xp;
+            $result['level_ups'] = $xp_result['level_ups'] ?? [];
+        }
+        
+        $result['streak'] = $streak_info;
+        
+        return $result;
+    }
+
+    /**
+     * Award XP for creating a list
+     */
+    public function award_list_creation_xp(int $user_id, int $category_id): array {
+        $config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
+        $xp_for_list = $config['xp_per_list_creation'] ?? 50;
+        
+        // Get parent category if this is a child
+        $term = get_term($category_id, 'voting_list_category');
+        $parent_cat_id = $category_id;
+        if ($term && !is_wp_error($term) && $term->parent > 0) {
+            $parent_cat_id = $term->parent;
+        }
+        
+        $result = $this->add_xp($user_id, $parent_cat_id, $xp_for_list);
+        $result['awarded_xp'] = $xp_for_list;
+        
+        return $result;
+    }
+
     public function add_xp(int $user_id, int $term_id, int $xp): array {
         global $wpdb;
         if ($xp <= 0) return ['awarded'=>0];

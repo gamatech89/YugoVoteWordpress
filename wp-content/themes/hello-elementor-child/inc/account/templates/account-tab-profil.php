@@ -34,12 +34,16 @@ $overall = $wpdb->get_row($wpdb->prepare(
     $user_id
 ), ARRAY_A) ?: ['overall_xp' => 0, 'overall_level' => 1];
 
-// Category progress
+// Category progress - Only show PARENT categories (those with parent = 0)
+// Join with term_taxonomy to filter for parent categories only
 $cat_progress = $wpdb->get_results($wpdb->prepare(
     "SELECT cp.category_term_id, cp.xp, cp.level, t.name as category_name
      FROM {$t_cat} cp
      LEFT JOIN {$wpdb->terms} t ON cp.category_term_id = t.term_id
-     WHERE cp.user_id = %d
+     LEFT JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+     WHERE cp.user_id = %d 
+       AND tt.taxonomy = 'voting_list_category'
+       AND tt.parent = 0
      ORDER BY cp.xp DESC",
     $user_id
 ), ARRAY_A) ?: [];

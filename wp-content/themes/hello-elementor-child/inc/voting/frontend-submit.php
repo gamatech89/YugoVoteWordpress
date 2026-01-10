@@ -56,15 +56,28 @@ function yugo_create_list_shortcode() {
     $required_level = $level_config['list_creation_category_level'] ?? 10;
     
     // Check which categories user can create in
+    // Look at both parent category level AND aggregate XP from child categories
     global $wpdb;
     $t_cat = $wpdb->prefix . 'ygv_user_category_progress';
     $available_categories = [];
     
     foreach ($list_categories as $cat) {
+        // Get child category IDs for this parent
+        $child_ids = get_terms([
+            'taxonomy' => 'voting_list_category',
+            'parent' => $cat->term_id,
+            'fields' => 'ids',
+            'hide_empty' => false,
+        ]);
+        
+        // Include parent and all children in the query
+        $all_cat_ids = array_merge([$cat->term_id], is_array($child_ids) ? $child_ids : []);
+        $placeholders = implode(',', array_fill(0, count($all_cat_ids), '%d'));
+        
+        // Get the combined level - use the highest level among parent and children
         $user_cat_level = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT level FROM {$t_cat} WHERE user_id = %d AND category_term_id = %d",
-            $user_id,
-            $cat->term_id
+            "SELECT MAX(level) FROM {$t_cat} WHERE user_id = %d AND category_term_id IN ({$placeholders})",
+            array_merge([$user_id], $all_cat_ids)
         )) ?: 1;
         
         if ($user_cat_level >= $required_level) {

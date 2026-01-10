@@ -1,10 +1,10 @@
 /**
- * User Stats Bar CSS
- * A compact header bar showing user stats: Level, XP, Tokens, Coins, Notifications
+ * User Stats Bar CSS - Compact Redesign
+ * Features: Clean compact view with expandable details
  */
 
 /* ============================================
-   STATS BAR CONTAINER - Target specific wrapper
+   WRAPPER - Elementor compatibility
    ============================================ */
 .cs-player-stats-container .elementor-widget-container,
 .cs-player-stats-container .elementor-shortcode {
@@ -12,59 +12,62 @@
   width: auto !important;
 }
 
+/* ============================================
+   MAIN CONTAINER - Compact by default
+   ============================================ */
 .ygv-user-stats-bar {
   display: inline-flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  padding: 6px 12px;
-  border-radius: 50px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  background: #fff;
+  padding: 6px 8px;
+  border-radius: 40px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  flex-wrap: nowrap !important;
-  width: auto !important;
-  max-width: 100%;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+/* Dark theme variant */
+.ygv-user-stats-bar.ygv-stats-bar-dark {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
 }
 
 .ygv-stats-bar-inner {
   display: inline-flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  gap: 8px;
-  flex-wrap: nowrap !important;
-  width: auto !important;
+  gap: 6px;
 }
 
 /* ============================================
-   USER AVATAR & NAME
+   USER AVATAR - Always Visible
    ============================================ */
 .ygv-stats-user {
   display: inline-flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  gap: 8px;
+  gap: 6px;
   text-decoration: none !important;
-  padding: 4px 10px 4px 4px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background 0.2s ease;
-  flex-shrink: 0;
+  padding: 2px 8px 2px 2px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  transition: background 0.2s;
 }
 
 .ygv-stats-user:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: #e2e8f0;
 }
 
 .ygv-stats-avatar {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
 .ygv-stats-avatar img {
-  width: 32px !important;
-  height: 32px !important;
+  width: 28px !important;
+  height: 28px !important;
   border-radius: 50% !important;
   object-fit: cover;
   border: 2px solid #8b5cf6;
@@ -72,8 +75,8 @@
 
 .ygv-stats-level-badge {
   position: absolute;
-  bottom: -3px;
-  right: -3px;
+  bottom: -2px;
+  right: -4px;
   background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: #fff;
   font-size: 9px;
@@ -84,48 +87,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #1a1a2e;
+  border: 2px solid #fff;
   padding: 0 3px;
   line-height: 1;
+  box-shadow: 0 1px 3px rgba(139,92,246,0.3);
 }
 
 .ygv-stats-username {
-  color: #fff;
-  font-size: 12px;
+  color: #334155;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  max-width: 80px;
+  max-width: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 /* ============================================
-   STATS ITEMS (XP, Tokens, Coins)
+   COMPACT STAT PILLS
    ============================================ */
 .ygv-stats-item {
   display: inline-flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  gap: 6px;
-  padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  cursor: default;
 }
 
 .ygv-stats-item:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .ygv-stats-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: inline-flex !important;
-  flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 6px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
@@ -133,71 +137,216 @@
 .ygv-stats-icon .ygv-icon {
   width: 14px !important;
   height: 14px !important;
-  display: inline-block !important;
 }
 
-/* XP Icon - Gold Star */
+/* XP Icon - Gold */
 .ygv-stats-xp .ygv-stats-icon {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   color: #fff;
 }
 
 /* Token Icon - Purple */
 .ygv-stats-icon-token {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
   color: #fff;
 }
 
 /* Coin Icon - Gold */
 .ygv-stats-icon-coin {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #78350f;
+  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+  color: #92400e;
 }
 
-/* Bell Icon */
-.ygv-stats-icon-bell {
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.7);
-  position: relative;
-  width: 20px;
-  height: 20px;
-}
-
-.ygv-stats-notifications:hover .ygv-stats-icon-bell {
-  color: #fff;
-}
-
+/* ============================================
+   STAT VALUES - Clean Typography
+   ============================================ */
 .ygv-stats-content {
-  display: inline-flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 0;
-  line-height: 1.1;
-}
-
-.ygv-stats-label {
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  font-weight: 500;
-  line-height: 1;
+  display: none; /* Hidden by default in compact mode */
 }
 
 .ygv-stats-value {
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
+  color: #1e293b;
+  line-height: 1;
   white-space: nowrap;
 }
 
-.ygv-stats-value .ygv-token-current {
-  color: #fff;
+.ygv-token-current {
+  color: #1e293b;
 }
 
-.ygv-stats-value .ygv-token-max {
+.ygv-token-max {
   font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ============================================
+   TIMER BADGE
+   ============================================ */
+.ygv-stats-timer {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2px;
+  padding: 2px 6px;
+  background: rgba(139,92,246,0.1);
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.ygv-timer-icon {
+  display: none;
+}
+
+.ygv-timer-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7c3aed;
+  font-family: "SF Mono", Monaco, "Cascadia Mono", monospace;
+}
+
+/* ============================================
+   NOTIFICATION BELL
+   ============================================ */
+.ygv-stats-notifications {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px;
+  height: 32px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.ygv-stats-notifications:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.ygv-stats-icon-bell {
+  background: transparent !important;
+  color: #64748b;
+  width: auto !important;
+  height: auto !important;
+}
+
+.ygv-stats-notifications:hover .ygv-stats-icon-bell {
+  color: #475569;
+}
+
+.ygv-notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(239,68,68,0.3);
+}
+
+/* ============================================
+   EXPAND TOGGLE BUTTON
+   ============================================ */
+.ygv-stats-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.ygv-stats-expand:hover {
+  background: #f1f5f9;
+}
+
+.ygv-stats-expand svg {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+  transition: transform 0.3s ease;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-expand svg {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   EXPANDED STATE - Show full details
+   ============================================ */
+.ygv-user-stats-bar.is-expanded {
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-bar-inner {
+  gap: 8px;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-content {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  gap: 0;
+  line-height: 1;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-label {
+  font-size: 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+/* XP Progress Bar - only visible when expanded */
+.ygv-stats-xp-bar {
+  display: none;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-xp {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.ygv-user-stats-bar.is-expanded .ygv-stats-xp-bar {
+  display: block;
+  position: absolute;
+  bottom: 3px;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ygv-stats-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  border-radius: 2px;
+}
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -307,11 +456,7 @@
    ============================================ */
 @media (max-width: 768px) {
   .ygv-user-stats-bar {
-    padding: 5px 10px;
-  }
-
-  .ygv-stats-bar-inner {
-    gap: 6px;
+    padding: 4px 6px;
   }
 
   .ygv-stats-username {
@@ -319,30 +464,16 @@
   }
 
   .ygv-stats-user {
-    padding: 3px;
+    padding: 2px;
     border-radius: 50%;
   }
 
   .ygv-stats-item {
     padding: 4px 8px;
   }
-
-  .ygv-stats-label {
-    display: none;
-  }
-
-  .ygv-stats-icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .ygv-stats-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .ygv-stats-value {
-    font-size: 12px;
+  
+  .ygv-stats-coins {
+    display: none !important;
   }
 }
 
@@ -351,20 +482,14 @@
     gap: 4px;
   }
 
-  /* Hide coins and timer on very small screens */
-  .ygv-stats-coins,
   .ygv-stats-timer {
     display: none !important;
   }
 
-  .ygv-stats-value {
-    font-size: 11px;
-  }
-
   .ygv-stats-avatar,
   .ygv-stats-avatar img {
-    width: 28px !important;
-    height: 28px !important;
+    width: 24px !important;
+    height: 24px !important;
   }
 
   .ygv-stats-level-badge {
@@ -372,94 +497,74 @@
     height: 14px;
     font-size: 8px;
   }
+  
+  .ygv-stats-value {
+    font-size: 12px;
+  }
+  
+  .ygv-stats-notifications {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 /* ============================================
    ANIMATION: Pulse for level up
    ============================================ */
 @keyframes ygv-level-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 .ygv-stats-level-badge.ygv-level-up {
-  animation: ygv-level-pulse 0.6s ease-in-out 3;
+  animation: ygv-level-pulse 0.5s ease-in-out 3;
 }
 
 /* ============================================
-   LIGHT THEME VARIANT
+   DARK THEME OVERRIDES
    ============================================ */
-.ygv-user-stats-bar.ygv-stats-bar-light {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-user {
+  background: rgba(255,255,255,0.1);
 }
 
-.ygv-stats-bar-light .ygv-stats-user {
-  background: rgba(0, 0, 0, 0.05);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-username {
+  color: #fff;
 }
 
-.ygv-stats-bar-light .ygv-stats-user:hover {
-  background: rgba(0, 0, 0, 0.08);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-item {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.1);
 }
 
-.ygv-stats-bar-light .ygv-stats-avatar img {
-  border-color: #8b5cf6;
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-value {
+  color: #fff;
 }
 
-.ygv-stats-bar-light .ygv-stats-level-badge {
-  border-color: #fff;
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-token-max {
+  color: rgba(255,255,255,0.5);
 }
 
-.ygv-stats-bar-light .ygv-stats-username {
-  color: #1e293b;
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-notifications {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.1);
 }
 
-.ygv-stats-bar-light .ygv-stats-item {
-  background: rgba(0, 0, 0, 0.05);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-icon-bell {
+  color: rgba(255,255,255,0.6);
 }
 
-.ygv-stats-bar-light .ygv-stats-item:hover {
-  background: rgba(0, 0, 0, 0.08);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-expand svg {
+  color: rgba(255,255,255,0.5);
 }
 
-.ygv-stats-bar-light .ygv-stats-label {
-  color: rgba(0, 0, 0, 0.5);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-label {
+  color: rgba(255,255,255,0.5);
 }
 
-.ygv-stats-bar-light .ygv-stats-value {
-  color: #1e293b;
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-xp-bar {
+  background: rgba(255,255,255,0.15);
 }
 
-.ygv-stats-bar-light .ygv-stats-value .ygv-token-max {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-.ygv-stats-bar-light .ygv-stats-xp-bar {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.ygv-stats-bar-light .ygv-stats-icon-bell {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.ygv-stats-bar-light .ygv-stats-notifications:hover .ygv-stats-icon-bell {
-  color: #1e293b;
-}
-
-.ygv-stats-bar-light .ygv-notification-badge {
-  border-color: #fff;
-}
-
-.ygv-stats-bar-light .ygv-timer-value {
-  color: #7c3aed;
-}
-
-.ygv-stats-bar-light .ygv-stats-timer {
-  background: rgba(139, 92, 246, 0.15);
+.ygv-user-stats-bar.ygv-stats-bar-dark .ygv-stats-level-badge {
+  border-color: #1e293b;
 }

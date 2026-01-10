@@ -53,36 +53,37 @@ function ygv_user_stats_bar_shortcode($atts) {
     
     ob_start();
     ?>
-    <div class="ygv-user-stats-bar ygv-stats-bar-light">
+    <div class="ygv-user-stats-bar">
         <div class="ygv-stats-bar-inner">
             
             <!-- User Avatar & Name -->
             <a href="<?php echo esc_url(home_url('/moj-nalog/')); ?>" class="ygv-stats-user">
                 <div class="ygv-stats-avatar">
-                    <?php echo get_avatar($user_id, 32); ?>
+                    <?php echo get_avatar($user_id, 28); ?>
                     <span class="ygv-stats-level-badge"><?php echo esc_html($progress_data['level']); ?></span>
                 </div>
                 <span class="ygv-stats-username"><?php echo esc_html($user->display_name); ?></span>
             </a>
             
             <!-- XP Progress -->
-            <div class="ygv-stats-item ygv-stats-xp" title="<?php echo esc_attr($progress_data['xp'] . ' / ' . $progress_data['next_xp'] . ' XP do sledećeg nivoa'); ?>">
+            <div class="ygv-stats-item ygv-stats-xp" title="<?php echo esc_attr($progress_data['xp'] . ' / ' . $progress_data['next_xp'] . ' XP'); ?>">
                 <div class="ygv-stats-icon">
-                    <?php ygv_icon_e('star', 18); ?>
+                    <?php ygv_icon_e('star', 14); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">XP</div>
                     <div class="ygv-stats-value"><?php echo number_format($progress_data['xp']); ?></div>
                 </div>
+                <span class="ygv-stats-value"><?php echo number_format($progress_data['xp']); ?></span>
                 <div class="ygv-stats-xp-bar">
                     <div class="ygv-stats-xp-fill" style="width: <?php echo esc_attr($progress_data['progress_percent']); ?>%"></div>
                 </div>
             </div>
             
             <!-- Quiz Tokens -->
-            <div class="ygv-stats-item ygv-stats-tokens" title="<?php echo esc_attr('Kviz Tokeni: ' . $token_data['tokens'] . '/' . $token_data['max_tokens']); ?>">
+            <div class="ygv-stats-item ygv-stats-tokens" title="<?php echo esc_attr('Tokeni: ' . $token_data['tokens'] . '/' . $token_data['max_tokens']); ?>">
                 <div class="ygv-stats-icon ygv-stats-icon-token">
-                    <?php ygv_icon_e('coins', 18); ?>
+                    <?php ygv_icon_e('coins', 14); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">Tokeni</div>
@@ -91,9 +92,13 @@ function ygv_user_stats_bar_shortcode($atts) {
                         <span class="ygv-token-max">/<?php echo esc_html($token_data['max_tokens']); ?></span>
                     </div>
                 </div>
+                <span class="ygv-stats-value">
+                    <span class="ygv-token-current"><?php echo esc_html($token_data['tokens']); ?></span>
+                    <span class="ygv-token-max">/<?php echo esc_html($token_data['max_tokens']); ?></span>
+                </span>
                 <?php if ($token_data['tokens'] < $token_data['max_tokens'] && $token_data['next_token_in'] > 0): ?>
                     <div class="ygv-stats-timer" data-next-token="<?php echo esc_attr($token_data['next_token_in']); ?>">
-                        <span class="ygv-timer-icon"><?php ygv_icon_e('timer', 14); ?></span>
+                        <span class="ygv-timer-icon"><?php ygv_icon_e('timer', 12); ?></span>
                         <span class="ygv-timer-value"><?php echo esc_html(ygv_format_time_short($token_data['next_token_in'])); ?></span>
                     </div>
                 <?php endif; ?>
@@ -102,23 +107,29 @@ function ygv_user_stats_bar_shortcode($atts) {
             <!-- YugoCoins -->
             <div class="ygv-stats-item ygv-stats-coins" title="YugoCoins">
                 <div class="ygv-stats-icon ygv-stats-icon-coin">
-                    <?php ygv_icon_e('circle-dollar', 18); ?>
+                    <?php ygv_icon_e('circle-dollar', 14); ?>
                 </div>
                 <div class="ygv-stats-content">
                     <div class="ygv-stats-label">Coins</div>
                     <div class="ygv-stats-value"><?php echo number_format($yugocoins); ?></div>
                 </div>
+                <span class="ygv-stats-value"><?php echo number_format($yugocoins); ?></span>
             </div>
             
             <!-- Notifications Bell -->
-            <a href="<?php echo esc_url(home_url('/moj-nalog/?tab=obavestenja')); ?>" class="ygv-stats-item ygv-stats-notifications" title="Obaveštenja">
+            <a href="<?php echo esc_url(home_url('/moj-nalog/?tab=obavestenja')); ?>" class="ygv-stats-notifications" title="Obaveštenja">
                 <div class="ygv-stats-icon ygv-stats-icon-bell">
-                    <?php ygv_icon_e('bell', 20); ?>
+                    <?php ygv_icon_e('bell', 18); ?>
                     <?php if ($notifications_count > 0): ?>
                         <span class="ygv-notification-badge"><?php echo $notifications_count > 9 ? '9+' : $notifications_count; ?></span>
                     <?php endif; ?>
                 </div>
             </a>
+            
+            <!-- Expand Toggle -->
+            <button class="ygv-stats-expand" type="button" aria-label="<?php esc_attr_e('Toggle details', 'hello-elementor-child'); ?>">
+                <?php ygv_icon_e('chevron-down', 14); ?>
+            </button>
             
         </div>
     </div>
