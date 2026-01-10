@@ -60,6 +60,69 @@ function ygv_get_category_color_var($slug) {
 }
 
 /**
+ * Get unified category color by term ID
+ * 
+ * First checks if the term has a color in voting_list_category.
+ * If not (e.g., quiz_category), tries to find a matching slug in voting_list_category.
+ *
+ * @param int $term_id The term ID (from any taxonomy)
+ * @param string $default Default color if none found
+ * @return string Hex color code
+ */
+function ygv_get_unified_category_color($term_id, $default = '#6db24a') {
+    if (!$term_id) {
+        return $default;
+    }
+    
+    // Get the term to find its slug and taxonomy
+    $term = get_term($term_id);
+    if (!$term || is_wp_error($term)) {
+        return $default;
+    }
+    
+    // If it's already a voting_list_category, use its color directly
+    if ($term->taxonomy === 'voting_list_category') {
+        $color = get_term_meta($term_id, 'category_color', true);
+        return $color ?: $default;
+    }
+    
+    // For quiz_category or other taxonomies, try to match by slug to voting_list_category
+    $voting_term = get_term_by('slug', $term->slug, 'voting_list_category');
+    if ($voting_term && !is_wp_error($voting_term)) {
+        $color = get_term_meta($voting_term->term_id, 'category_color', true);
+        if ($color) {
+            return $color;
+        }
+    }
+    
+    // Also try matching by name (case-insensitive)
+    $voting_terms = get_terms([
+        'taxonomy' => 'voting_list_category',
+        'hide_empty' => false,
+        'name__like' => $term->name,
+    ]);
+    
+    if (!empty($voting_terms) && !is_wp_error($voting_terms)) {
+        foreach ($voting_terms as $vt) {
+            if (strcasecmp($vt->name, $term->name) === 0) {
+                $color = get_term_meta($vt->term_id, 'category_color', true);
+                if ($color) {
+                    return $color;
+                }
+            }
+        }
+    }
+    
+    // Fall back to quiz_category_color if available
+    $quiz_color = get_term_meta($term_id, 'quiz_category_color', true);
+    if ($quiz_color) {
+        return $quiz_color;
+    }
+    
+    return $default;
+}
+
+/**
  * Output inline style attribute with category color
  *
  * @param int|string $term_id_or_slug Term ID or slug

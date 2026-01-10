@@ -60,7 +60,10 @@ function ygv_get_random_questions_for_quiz(int $quiz_id, int $count, array $ques
     return $q->posts ?? [];
 }
 
-/** Get quiz category color (returns hex code or default) */
+/** 
+ * Get quiz category color (returns hex code or default)
+ * Now uses unified color lookup to match voting_list_category colors
+ */
 function ygv_get_quiz_category_color(int $quiz_id, string $default = '#6A0DAD'): string {
     $terms = wp_get_object_terms($quiz_id, 'quiz_category', ['fields' => 'ids']);
     
@@ -68,6 +71,12 @@ function ygv_get_quiz_category_color(int $quiz_id, string $default = '#6A0DAD'):
         return $default;
     }
     
+    // Use unified color function if available (matches with voting_list_category)
+    if (function_exists('ygv_get_unified_category_color')) {
+        return ygv_get_unified_category_color($terms[0], $default);
+    }
+    
+    // Fallback to quiz-specific color
     $color = get_term_meta($terms[0], 'quiz_category_color', true);
     return $color ?: $default;
 }

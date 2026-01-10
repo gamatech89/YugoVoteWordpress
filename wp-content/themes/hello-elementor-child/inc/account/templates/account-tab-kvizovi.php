@@ -167,9 +167,9 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                 $cat_xp = (int)$cat['xp'];
                 $cat_term_id = (int)$cat['category_term_id'];
                 
-                // Get category color
-                $cat_color = function_exists('ygv_get_category_color_by_term_id') 
-                    ? ygv_get_category_color_by_term_id($cat_term_id) 
+                // Get category color - try to match with voting_list_category colors
+                $cat_color = function_exists('ygv_get_unified_category_color') 
+                    ? ygv_get_unified_category_color($cat_term_id) 
                     : '#6db24a';
                 
                 // Get title for level
