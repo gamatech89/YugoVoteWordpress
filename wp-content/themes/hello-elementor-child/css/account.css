@@ -281,19 +281,31 @@
   color: var(--ygv-accent-green);
 }
 
+/* Desktop: explicitly hide mobile elements */
+@media (min-width: 641px) {
+  .cs-acc-nav-mobile-trigger,
+  .cs-acc-nav-overlay,
+  .cs-acc-nav-mobile-dropdown {
+    display: none !important;
+    visibility: hidden;
+  }
+}
+
 /* Mobile responsive: show mobile nav, hide desktop nav */
 @media (max-width: 640px) {
   .cs-acc-nav-mobile-trigger {
-    display: flex;
+    display: flex !important;
+    visibility: visible;
   }
   
   .cs-acc-nav-overlay,
   .cs-acc-nav-mobile-dropdown {
-    display: block;
+    display: block !important;
+    visibility: visible;
   }
   
   .cs-acc-nav {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -2290,11 +2302,12 @@ select.ygv-input {
   gap: 20px;
 }
 
-/* Token Card */
+/* Token Card - Flat white with accent */
 .ygv-token-card {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border: none;
-  color: white;
+  background: var(--ygv-card-bg);
+  border: var(--ygv-card-border);
+  border-left: 4px solid #6366f1;
+  color: var(--ygv-text-primary);
 }
 
 .ygv-token-content {
@@ -2315,10 +2328,12 @@ select.ygv-input {
 }
 
 .ygv-token-title {
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ygv-text-secondary);
   margin: 0 0 4px 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .ygv-token-count {
@@ -2332,36 +2347,43 @@ select.ygv-input {
   font-weight: 800;
   line-height: 1;
   font-family: var(--secondary-font), sans-serif;
+  color: #6366f1;
 }
 
 .ygv-token-divider {
   font-size: 1.5rem;
-  opacity: 0.6;
+  color: var(--ygv-text-muted);
 }
 
 .ygv-token-max {
   font-size: 1.25rem;
-  opacity: 0.8;
+  color: var(--ygv-text-secondary);
 }
 
 .ygv-token-refill {
   font-size: 12px;
-  opacity: 0.9;
+  color: var(--ygv-text-secondary);
   margin-top: 4px;
 }
 
 .ygv-token-timer {
   font-weight: 700;
   font-family: monospace;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .ygv-token-full {
   font-size: 13px;
-  background: rgba(255, 255, 255, 0.2);
+  background: #ecfdf5;
+  color: #059669;
   padding: 4px 12px;
   border-radius: 12px;
   display: inline-block;
   margin-top: 4px;
+  font-weight: 500;
 }
 
 .ygv-token-bar-wrapper {
@@ -2371,22 +2393,23 @@ select.ygv-input {
 
 .ygv-token-bar {
   height: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--ygv-progress-bg);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .ygv-token-bar-fill {
   height: 100%;
-  background: white;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
-/* Quiz Stats Card */
+/* Quiz Stats Card - Flat white with accent */
 .ygv-quiz-stats-card {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-color: #fcd34d;
+  background: var(--ygv-card-bg);
+  border: var(--ygv-card-border);
+  border-left: 4px solid #f59e0b;
 }
 
 .ygv-quiz-stats-grid {
@@ -2397,16 +2420,16 @@ select.ygv-input {
 }
 
 .ygv-quiz-stat-box {
-  background: white;
+  background: var(--ygv-card-bg-subtle);
   padding: 16px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
 }
 
 .ygv-quiz-stat-icon {
   display: block;
-  font-size: 1.5rem;
+  color: var(--ygv-text-secondary);
   margin-bottom: 6px;
 }
 
@@ -2414,7 +2437,7 @@ select.ygv-input {
   display: block;
   font-size: 1.75rem;
   font-weight: 800;
-  color: #92400e;
+  color: #f59e0b;
   font-family: var(--secondary-font), sans-serif;
   line-height: 1.2;
 }
@@ -2422,7 +2445,7 @@ select.ygv-input {
 .ygv-quiz-stat-label {
   display: block;
   font-size: 11px;
-  color: #78350f;
+  color: var(--ygv-text-secondary);
   margin-top: 2px;
 }
 
@@ -2685,22 +2708,19 @@ select.ygv-input {
 }
 
 /* ============================================
-   ENHANCED KVIZOVI TAB STYLES (v2)
+   UNIFIED KVIZOVI TAB STYLES (v3 - Flat Design)
+   Consistent with Profile/Liste tab styling
    ============================================ */
 
-/* Token Card - Enhanced */
+/* Token Card - Flat White with Accent */
 .ygv-token-card {
-  background: linear-gradient(
-    135deg,
-    #8b5cf6 0%,
-    #6366f1 50%,
-    #4f46e5 100%
-  ) !important;
-  border: none !important;
-  color: white !important;
+  background: var(--ygv-card-bg) !important;
+  border: var(--ygv-card-border) !important;
+  border-left: 4px solid #6366f1 !important;
+  color: var(--ygv-text-primary) !important;
   padding: 24px !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
+  border-radius: var(--ygv-card-radius) !important;
+  box-shadow: none !important;
 }
 
 .ygv-token-content {
@@ -2711,8 +2731,8 @@ select.ygv-input {
 }
 
 .ygv-token-icon {
-  font-size: 3.5rem !important;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  font-size: 3rem !important;
+  color: #6366f1 !important;
 }
 
 .ygv-token-info {
@@ -2721,12 +2741,12 @@ select.ygv-input {
 }
 
 .ygv-token-title {
-  font-size: 14px !important;
-  opacity: 0.9;
-  margin: 0 0 8px 0 !important;
-  font-weight: 600 !important;
+  font-size: 12px !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  color: var(--ygv-text-secondary) !important;
+  margin: 0 0 8px 0 !important;
+  font-weight: 600 !important;
 }
 
 .ygv-token-count {
@@ -2739,26 +2759,23 @@ select.ygv-input {
   font-size: 3rem !important;
   font-weight: 800 !important;
   line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: #6366f1 !important;
 }
 
 .ygv-token-divider {
   font-size: 2rem !important;
-  opacity: 0.5 !important;
+  color: var(--ygv-text-muted) !important;
 }
 
 .ygv-token-max {
   font-size: 1.5rem !important;
-  opacity: 0.7 !important;
+  color: var(--ygv-text-secondary) !important;
 }
 
 .ygv-token-refill {
   font-size: 13px !important;
-  opacity: 0.9;
+  color: var(--ygv-text-secondary) !important;
   margin-top: 10px !important;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 14px;
-  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2767,14 +2784,16 @@ select.ygv-input {
 .ygv-token-timer {
   font-weight: 700 !important;
   font-family: "SF Mono", Monaco, monospace;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 8px;
-  border-radius: 4px;
+  background: #eef2ff !important;
+  color: #6366f1 !important;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 .ygv-token-full {
   font-size: 13px !important;
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: #ecfdf5 !important;
+  color: #059669 !important;
   padding: 8px 16px !important;
   border-radius: 20px !important;
   display: inline-block;
@@ -2789,35 +2808,30 @@ select.ygv-input {
 
 .ygv-token-bar {
   height: 10px !important;
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: var(--ygv-progress-bg) !important;
   border-radius: 5px !important;
   overflow: hidden;
 }
 
 .ygv-token-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #fff, #e0e7ff) !important;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6) !important;
   border-radius: 5px !important;
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* Quiz Stats Card - Enhanced */
+/* Quiz Stats Card - Flat White with Accent */
 .ygv-quiz-stats-card {
-  background: linear-gradient(
-    135deg,
-    #fef3c7 0%,
-    #fde68a 50%,
-    #fbbf24 100%
-  ) !important;
-  border: none !important;
+  background: var(--ygv-card-bg) !important;
+  border: var(--ygv-card-border) !important;
+  border-left: 4px solid #f59e0b !important;
   padding: 24px !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(251, 191, 36, 0.2);
+  border-radius: var(--ygv-card-radius) !important;
+  box-shadow: none !important;
 }
 
 .ygv-quiz-stats-card h3 {
-  color: #78350f !important;
+  color: var(--ygv-text-primary) !important;
   font-size: 18px !important;
   margin-bottom: 20px !important;
 }
@@ -2830,21 +2844,23 @@ select.ygv-input {
 }
 
 .ygv-quiz-stat-box {
-  background: white !important;
+  background: var(--ygv-card-bg-subtle) !important;
   padding: 20px 16px !important;
-  border-radius: 14px !important;
+  border-radius: 12px !important;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
   transition: transform 0.2s ease;
 }
 
 .ygv-quiz-stat-box:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
+  background: #f1f5f9 !important;
 }
 
 .ygv-quiz-stat-icon {
   display: block !important;
-  font-size: 2rem !important;
+  color: var(--ygv-text-secondary) !important;
   margin-bottom: 10px !important;
 }
 
@@ -2852,35 +2868,35 @@ select.ygv-input {
   display: block !important;
   font-size: 2rem !important;
   font-weight: 800 !important;
-  color: #92400e !important;
+  color: #f59e0b !important;
   line-height: 1.2;
 }
 
 .ygv-quiz-stat-label {
   display: block !important;
   font-size: 12px !important;
-  color: #78350f !important;
+  color: var(--ygv-text-secondary) !important;
   margin-top: 6px !important;
   font-weight: 500;
 }
 
 .ygv-quiz-progress-overview {
-  background: white !important;
+  background: var(--ygv-card-bg-subtle) !important;
   padding: 16px 20px !important;
   border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
 }
 
 .ygv-quiz-progress-text {
   font-size: 14px !important;
-  color: #78350f !important;
+  color: var(--ygv-text-secondary) !important;
   margin-bottom: 10px !important;
   font-weight: 500;
 }
 
 .ygv-quiz-progress-bar {
   height: 10px !important;
-  background: #fef3c7 !important;
+  background: var(--ygv-progress-bg) !important;
   border-radius: 5px !important;
   overflow: hidden;
 }
@@ -2892,7 +2908,7 @@ select.ygv-input {
   transition: width 0.5s ease;
 }
 
-/* Category Progress - Enhanced */
+/* Category Progress - Flat Design */
 .ygv-category-progress-list {
   display: flex;
   flex-direction: column;
@@ -2904,32 +2920,32 @@ select.ygv-input {
   align-items: center !important;
   gap: 16px !important;
   padding: 16px !important;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
-  border-radius: 14px !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--ygv-card-bg) !important;
+  border-radius: var(--ygv-card-radius) !important;
+  border: var(--ygv-card-border) !important;
+  border-left: 4px solid var(--cat-color, #6366f1) !important;
   transition: all 0.2s ease;
 }
 
 .ygv-cat-progress-item:hover {
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0) !important;
-  transform: translateX(4px);
+  background: var(--ygv-card-bg-subtle) !important;
+  transform: translateX(2px);
 }
 
 .ygv-cat-progress-level {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  background: var(--cat-color, #6366f1) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .ygv-cat-level-number {
   color: white !important;
-  font-size: 1.5rem !important;
+  font-size: 1.25rem !important;
   font-weight: 800 !important;
 }
 
@@ -2959,7 +2975,7 @@ select.ygv-input {
   border-radius: 20px;
 }
 
-/* Quiz History - Enhanced */
+/* Quiz History - Flat Design */
 .ygv-quiz-history-list {
   display: flex;
   flex-direction: column;
@@ -2971,16 +2987,15 @@ select.ygv-input {
   align-items: center !important;
   gap: 16px !important;
   padding: 16px !important;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
-  border-radius: 14px !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--ygv-card-bg) !important;
+  border-radius: var(--ygv-card-radius) !important;
+  border: var(--ygv-card-border) !important;
   transition: all 0.2s ease;
 }
 
 .ygv-quiz-history-item:hover {
-  background: #f1f5f9 !important;
-  transform: translateX(6px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--ygv-card-bg-subtle) !important;
+  transform: translateX(2px);
 }
 
 .ygv-quiz-history-score {
