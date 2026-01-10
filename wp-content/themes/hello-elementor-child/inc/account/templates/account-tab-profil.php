@@ -254,8 +254,8 @@ $category_icons = [
                     $icon_name = $category_icons[$cat_name] ?? 'folder';
                     
                     // Get category color for dynamic styling
-                    $cat_color = function_exists('ygv_get_quiz_category_color') 
-                        ? ygv_get_quiz_category_color($cat['category_term_id']) 
+                    $cat_color = function_exists('ygv_get_category_color_by_term_id') 
+                        ? ygv_get_category_color_by_term_id($cat['category_term_id']) 
                         : '#6db24a';
                     
                     // Get vote bonus for this level

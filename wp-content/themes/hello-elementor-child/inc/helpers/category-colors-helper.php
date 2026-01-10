@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
  * @param string $default Default color if none found
  * @return string Hex color code
  */
-function ygv_get_quiz_category_color($term_id, $default = '#6db24a') {
+function ygv_get_category_color_by_term_id($term_id, $default = '#6db24a') {
     if (!$term_id) {
         return $default;
     }
@@ -45,7 +45,7 @@ function ygv_get_category_color_by_slug($slug, $default = '#6db24a') {
         return $default;
     }
     
-    return ygv_get_quiz_category_color($term->term_id, $default);
+    return ygv_get_category_color_by_term_id($term->term_id, $default);
 }
 
 /**
@@ -67,7 +67,7 @@ function ygv_get_category_color_var($slug) {
  */
 function ygv_category_color_style($term_id_or_slug, $property = '--cat-color') {
     if (is_numeric($term_id_or_slug)) {
-        $color = ygv_get_quiz_category_color($term_id_or_slug);
+        $color = ygv_get_category_color_by_term_id($term_id_or_slug);
     } else {
         $color = ygv_get_category_color_by_slug($term_id_or_slug);
     }
@@ -82,7 +82,7 @@ function ygv_category_color_style($term_id_or_slug, $property = '--cat-color') {
  * @return array ['bg' => hex, 'text' => hex]
  */
 function ygv_get_category_colors_with_contrast($term_id) {
-    $bg = ygv_get_quiz_category_color($term_id);
+    $bg = ygv_get_category_color_by_term_id($term_id);
     
     // Calculate luminance to determine text color
     $hex = ltrim($bg, '#');

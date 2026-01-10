@@ -206,8 +206,8 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                     
                     // Get category color by name (find term first)
                     $cat_term = get_term_by('name', $cat['category_name'], 'voting_list_category');
-                    $cat_color = $cat_term && function_exists('ygv_get_quiz_category_color') 
-                        ? ygv_get_quiz_category_color($cat_term->term_id) 
+                    $cat_color = $cat_term && function_exists('ygv_get_category_color_by_term_id') 
+                        ? ygv_get_category_color_by_term_id($cat_term->term_id) 
                         : '#4f46e5';
                 ?>
                 <div class="ygv-category-vote-item" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
