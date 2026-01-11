@@ -76,7 +76,7 @@ $total_lists_voted = count($voted_list_data);
 
 // Get votes by category
 $votes_by_category = $wpdb->get_results($wpdb->prepare(
-    "SELECT t.name as category_name, COUNT(v.id) as vote_count
+    "SELECT t.name as category_name, t.term_id, COUNT(v.id) as vote_count
      FROM {$wpdb->prefix}voting_list_votes v
      JOIN {$wpdb->prefix}posts p ON v.voting_list_id = p.ID
      JOIN {$wpdb->prefix}term_relationships tr ON p.ID = tr.object_id
@@ -87,6 +87,45 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
      ORDER BY vote_count DESC",
     $user_id
 ), ARRAY_A);
+
+// Get unique items voted on
+$unique_items_voted = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT COUNT(DISTINCT voting_item_id) FROM {$wpdb->prefix}voting_list_votes WHERE user_id = %d",
+    $user_id
+));
+
+// Get highest single vote value
+$highest_vote = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT MAX(vote_value) FROM {$wpdb->prefix}voting_list_votes WHERE user_id = %d",
+    $user_id
+));
+
+// Get voting streak (consecutive days)
+$voting_days = $wpdb->get_col($wpdb->prepare(
+    "SELECT DISTINCT DATE(created_at) as vote_date 
+     FROM {$wpdb->prefix}voting_list_votes 
+     WHERE user_id = %d 
+     ORDER BY vote_date DESC 
+     LIMIT 30",
+    $user_id
+));
+$voting_streak = 0;
+if (!empty($voting_days)) {
+    $today = date('Y-m-d');
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
+    // Only count streak if voted today or yesterday
+    if ($voting_days[0] === $today || $voting_days[0] === $yesterday) {
+        $voting_streak = 1;
+        for ($i = 1; $i < count($voting_days); $i++) {
+            $expected = date('Y-m-d', strtotime($voting_days[$i-1] . ' -1 day'));
+            if ($voting_days[$i] === $expected) {
+                $voting_streak++;
+            } else {
+                break;
+            }
+        }
+    }
+}
 ?>
 
 <div class="ygv-my-lists">
@@ -256,12 +295,48 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             
             <!-- Stats & Legend -->
             <div class="ygv-stats-legend">
-                <div class="ygv-stat-box ygv-stat-box--compact">
-                    <span class="ygv-stat-number"><?php echo number_format($total_lists_voted); ?></span>
-                    <span class="ygv-stat-label"><?php echo esc_html__('Lista Glasano', 'hello-elementor-child'); ?></span>
+                <!-- Mini Stats Row -->
+                <div class="ygv-mini-stats-row">
+                    <div class="ygv-mini-stat">
+                        <span class="ygv-mini-stat-value"><?php echo number_format($total_lists_voted); ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Lista', 'hello-elementor-child'); ?></span>
+                    </div>
+                    <div class="ygv-mini-stat">
+                        <span class="ygv-mini-stat-value"><?php echo number_format($unique_items_voted); ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Stavki', 'hello-elementor-child'); ?></span>
+                    </div>
+                    <?php if ($highest_vote > 0): ?>
+                    <div class="ygv-mini-stat">
+                        <span class="ygv-mini-stat-value"><?php echo $highest_vote; ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Max glas', 'hello-elementor-child'); ?></span>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($voting_streak >= 2): ?>
+                    <div class="ygv-mini-stat ygv-mini-stat--streak">
+                        <span class="ygv-mini-stat-value">🔥 <?php echo $voting_streak; ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Dana', 'hello-elementor-child'); ?></span>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <?php if (!empty($chart_data)): ?>
+                <!-- Favorite Category Highlight -->
+                <?php 
+                $fav_cat = $chart_data[0]; // First is highest
+                $fav_cat_term = get_term_by('name', $fav_cat['name'], 'voting_list_category');
+                $fav_mascot = $fav_cat_term ? get_term_meta($fav_cat_term->term_id, 'category_mascot', true) : '';
+                ?>
+                <div class="ygv-fav-category" style="--cat-color: <?php echo esc_attr($fav_cat['color']); ?>;">
+                    <?php if ($fav_mascot): ?>
+                    <img src="<?php echo esc_url($fav_mascot); ?>" alt="" class="ygv-fav-mascot">
+                    <?php endif; ?>
+                    <div class="ygv-fav-info">
+                        <span class="ygv-fav-label">⭐ <?php echo esc_html__('Omiljena kategorija', 'hello-elementor-child'); ?></span>
+                        <span class="ygv-fav-name"><?php echo esc_html($fav_cat['name']); ?></span>
+                    </div>
+                </div>
+                
+                <!-- Category Legend -->
                 <div class="ygv-donut-legend">
                     <?php foreach ($chart_data as $item): 
                         $percent = $chart_total > 0 ? round(($item['count'] / $chart_total) * 100) : 0;
@@ -276,6 +351,25 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 <?php endif; ?>
             </div>
         </div>
+        
+        <!-- Motivational Message -->
+        <?php if ($total_votes > 0): ?>
+        <div class="ygv-stats-motivation">
+            <?php
+            // Generate fun message based on stats
+            if ($total_votes >= 100) {
+                $message = __('🏆 Super glasač! Tvoji glasovi oblikuju liste.', 'hello-elementor-child');
+            } elseif ($total_votes >= 50) {
+                $message = __('💪 Odlično napreduješ! Još malo do 100 glasova.', 'hello-elementor-child');
+            } elseif ($total_votes >= 20) {
+                $message = __('🌟 Aktivni glasač! Nastavi da rangiraš favorite.', 'hello-elementor-child');
+            } else {
+                $message = __('🚀 Dobar početak! Istraži više lista i glasaj.', 'hello-elementor-child');
+            }
+            ?>
+            <span><?php echo esc_html($message); ?></span>
+        </div>
+        <?php endif; ?>
     </div>
     
     <!-- Voting History -->

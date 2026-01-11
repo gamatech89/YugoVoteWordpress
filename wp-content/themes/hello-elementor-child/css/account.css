@@ -1638,6 +1638,102 @@
   color: #9ca3af;
 }
 
+/* Mini Stats Row */
+.ygv-mini-stats-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.ygv-mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  min-width: 60px;
+}
+
+.ygv-mini-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.ygv-mini-stat-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
+
+.ygv-mini-stat--streak {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fbbf24;
+}
+
+.ygv-mini-stat--streak .ygv-mini-stat-value {
+  color: #b45309;
+}
+
+/* Favorite Category */
+.ygv-fav-category {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(109, 178, 74, 0.08) 0%, rgba(109, 178, 74, 0.02) 100%);
+  border: 1px solid rgba(109, 178, 74, 0.2);
+  border-left: 4px solid var(--cat-color, var(--ygv-accent-green));
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.ygv-fav-mascot {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ygv-fav-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ygv-fav-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ygv-fav-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Motivational Message */
+.ygv-stats-motivation {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.ygv-stats-motivation span {
+  font-size: 13px;
+  color: #1e40af;
+  font-weight: 500;
+}
+
 @media (max-width: 600px) {
   .ygv-stats-donut-layout {
     flex-direction: column;
@@ -1646,6 +1742,10 @@
   
   .ygv-stats-legend {
     width: 100%;
+  }
+  
+  .ygv-mini-stats-row {
+    justify-content: center;
   }
 }
 
