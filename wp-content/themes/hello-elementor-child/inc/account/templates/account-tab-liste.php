@@ -317,7 +317,7 @@ if (!empty($voting_days)) {
                         <span class="ygv-mini-stat-label"><?php echo esc_html__('Poena', 'hello-elementor-child'); ?></span>
                     </div>
                     <?php endif; ?>
-                    <?php if ($voting_streak >= 2): ?>
+                    <?php if ($voting_streak >= 1): ?>
                     <div class="ygv-mini-stat ygv-mini-stat--streak">
                         <span class="ygv-mini-stat-value">🔥 <?php echo $voting_streak; ?></span>
                         <span class="ygv-mini-stat-label"><?php echo esc_html__('Dana', 'hello-elementor-child'); ?></span>
