@@ -6,7 +6,7 @@ $acc = get_stylesheet_directory() . '/inc/account/';
 require_once $acc . 'helpers.php';
 require_once $acc . 'account-hooks.php';
 require_once $acc . 'account-scripts.php';
-require_once $acc . 'ajax-login.php';
+// require_once $acc . 'ajax-login.php'; // File removed - functionality moved elsewhere
 
 $sc = $acc . 'shortcodes';
 if (is_dir($sc)) foreach (glob($sc.'/*.php') as $f) require_once $f;
