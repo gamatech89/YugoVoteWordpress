@@ -79,6 +79,9 @@ if (!empty($voting_items_ids)) {
 // ✅ PERFORMANCE: Batch fetch all pivot table data in one query
 $pivot_data_cache = [];
 if (!empty($voting_items_ids)) {
+    // Ensure all IDs are integers for security
+    $voting_items_ids = array_map('intval', $voting_items_ids);
+    
     $item_ids_placeholders = implode(',', array_fill(0, count($voting_items_ids), '%d'));
     $pivot_query = $wpdb->prepare(
         "SELECT voting_item_id, short_description, custom_image_url, url 

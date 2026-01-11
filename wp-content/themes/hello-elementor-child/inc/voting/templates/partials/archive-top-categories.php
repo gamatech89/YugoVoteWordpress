@@ -58,6 +58,10 @@ function yuv_get_category_total_votes($term_id, $list_ids_cache = null) {
     
     // ✅ PERFORMANCE: Single batch query instead of loop
     global $wpdb;
+    
+    // Ensure all IDs are integers for security
+    $list_ids_cache = array_map('intval', $list_ids_cache);
+    
     $list_ids_placeholders = implode(',', array_fill(0, count($list_ids_cache), '%d'));
     $total_votes = $wpdb->get_var($wpdb->prepare(
         "SELECT SUM(vote_value) FROM {$wpdb->prefix}voting_list_votes WHERE voting_list_id IN ($list_ids_placeholders)",
@@ -102,6 +106,10 @@ function yuv_get_top_3_lists_by_votes($term_id) {
     
     // ✅ PERFORMANCE: Batch fetch all vote counts in single query
     global $wpdb;
+    
+    // Ensure all IDs are integers for security
+    $list_ids = array_map('intval', $list_ids);
+    
     $list_ids_placeholders = implode(',', array_fill(0, count($list_ids), '%d'));
     $vote_counts_query = $wpdb->prepare(
         "SELECT voting_list_id, SUM(vote_value) as vote_count 

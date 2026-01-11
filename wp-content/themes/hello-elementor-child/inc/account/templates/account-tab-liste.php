@@ -122,6 +122,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             <?php
             // ✅ PERFORMANCE: Prefetch all terms for all lists to avoid N+1 queries
             $list_ids = wp_list_pluck($user_lists, 'ID');
+            $list_ids = array_map('intval', $list_ids); // Ensure integers for security
             update_object_term_cache($list_ids, 'voting_list');
             
             // ✅ PERFORMANCE: Batch fetch vote counts for all lists in one query
@@ -323,6 +324,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             
             // ✅ PERFORMANCE: Batch fetch all category levels in one query
             $category_ids = wp_list_pluck($parent_categories, 'term_id');
+            $category_ids = array_map('intval', $category_ids); // Ensure integers for security
             $category_ids_placeholders = implode(',', array_fill(0, count($category_ids), '%d'));
             $category_levels_query = $wpdb->prepare(
                 "SELECT category_term_id, level FROM {$t_cat} 
