@@ -18,8 +18,8 @@ function register_cpt_quiz() {
         'show_in_menu'  => true,
         'menu_position' => 6,
         'menu_icon'     => 'dashicons-welcome-learn-more',
-        'supports'      => ['title', 'thumbnail'], // ✅ Added 'thumbnail' to enable Featured Image
-        'has_archive'   => false,
+        'supports'      => ['title', 'thumbnail', 'excerpt'], // ✅ Added 'thumbnail' and 'excerpt'
+        'has_archive'   => 'kvizovi', // ✅ Enable archive at /kvizovi/
         'menu_class'    => 'cs-quiz-data-menu',
         'show_in_rest'  => true, // ✅ Required for Elementor compatibility
         'query_var'     => true,

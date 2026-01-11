@@ -95,4 +95,30 @@ if (!function_exists('yuv_exclude_tournament_from_queries')) {
     add_action('pre_get_posts', 'yuv_exclude_tournament_from_queries');
 }
 
+/**
+ * Override single voting_list template when ?fullpage=1 is in URL
+ * This allows testing the new fullpage template without changing Elementor
+ */
+if (!function_exists('yuv_fullpage_template_override')) {
+    function yuv_fullpage_template_override($template) {
+        if (is_singular('voting_list') && isset($_GET['fullpage'])) {
+            // Enqueue the fullpage CSS
+            wp_enqueue_style(
+                'voting-fullpage-css',
+                get_stylesheet_directory_uri() . '/css/voting-fullpage.css',
+                [],
+                defined('HELLO_ELEMENTOR_CHILD_VERSION') ? HELLO_ELEMENTOR_CHILD_VERSION : '1.0.0'
+            );
+            
+            // Return custom template
+            $fullpage_template = get_stylesheet_directory() . '/inc/voting/templates/voting-list/single-voting-list-fullpage.php';
+            if (file_exists($fullpage_template)) {
+                return $fullpage_template;
+            }
+        }
+        return $template;
+    }
+    add_filter('template_include', 'yuv_fullpage_template_override', 99);
+}
+
 ?>

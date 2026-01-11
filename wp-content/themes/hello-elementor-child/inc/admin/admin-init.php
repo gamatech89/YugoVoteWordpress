@@ -50,6 +50,11 @@ if (file_exists($admin_inc_path . 'level-settings.php')) {
     require_once $admin_inc_path . 'level-settings.php';
 }
 
+// Load Rewards & Achievements Settings
+if (file_exists($admin_inc_path . 'rewards-settings.php')) {
+    require_once $admin_inc_path . 'rewards-settings.php';
+}
+
 // Admin styles for quiz-related screens
 add_action('admin_enqueue_scripts', function($hook) {
     $screen = get_current_screen();

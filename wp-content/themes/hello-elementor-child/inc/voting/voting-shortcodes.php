@@ -26,9 +26,14 @@ add_shortcode('voting_list', 'voting_list_shortcode');
 
 /**
  * Shortcode: Display Voting List based on the current post ID
- * Usage: [voting_list]
+ * Usage: [voting_list_single] or [voting_list_single layout="grid|compact|classic" version="v2"]
  */
 function single_voting_list($atts) {
+    $atts = shortcode_atts([
+        'layout'  => '', // grid, compact, classic (empty = use post meta or default)
+        'version' => '', // v2 to use new template, empty for legacy
+    ], $atts, 'voting_list_single');
+    
     // Get the current post ID
     $post_id = get_the_ID();
 
@@ -39,13 +44,85 @@ function single_voting_list($atts) {
 
     // Pass the current post ID to the template
     set_query_var('voting_list_id', $post_id);
+    
+    // Pass layout preference (URL param > shortcode attr > post meta)
+    $layout = isset($_GET['layout']) ? sanitize_text_field($_GET['layout']) : $atts['layout'];
+    if ($layout) {
+        set_query_var('voting_layout_override', $layout);
+    }
 
     // Start output buffering
     ob_start();
-    get_template_part('inc/voting/templates/voting-list/voting-list-template');
+    
+    // Use v2 template if specified or if URL param set
+    $use_v2 = $atts['version'] === 'v2' || isset($_GET['v2']);
+    if ($use_v2) {
+        get_template_part('inc/voting/templates/voting-list/voting-list-template-v2');
+    } else {
+        get_template_part('inc/voting/templates/voting-list/voting-list-template');
+    }
+    
     return ob_get_clean();
 }
 add_shortcode('voting_list_single', 'single_voting_list');
+
+/**
+ * Shortcode: Display Voting List with V2 template (for testing)
+ * Usage: [voting_list_v2] or [voting_list_v2 layout="compact"]
+ */
+function voting_list_v2_shortcode($atts) {
+    $atts = shortcode_atts([
+        'layout'       => '', // grid, compact, classic
+        'show_switcher' => 'true', // Show layout switcher UI
+    ], $atts, 'voting_list_v2');
+    
+    $post_id = get_the_ID();
+    if (!$post_id) {
+        return "No post ID found.";
+    }
+
+    set_query_var('voting_list_id', $post_id);
+    
+    // Pass layout preference
+    $layout = isset($_GET['layout']) ? sanitize_text_field($_GET['layout']) : $atts['layout'];
+    if ($layout) {
+        set_query_var('voting_layout_override', $layout);
+    }
+    
+    set_query_var('show_layout_switcher', $atts['show_switcher'] === 'true');
+
+    ob_start();
+    get_template_part('inc/voting/templates/voting-list/voting-list-template-v2');
+    return ob_get_clean();
+}
+add_shortcode('voting_list_v2', 'voting_list_v2_shortcode');
+
+/**
+ * Shortcode: Full Page Voting List Template
+ * Complete redesigned page with hero, list, and floating "My Votes" panel
+ * Usage: [voting_list_fullpage]
+ */
+function voting_list_fullpage_shortcode($atts) {
+    $post_id = get_the_ID();
+    if (!$post_id) {
+        return "No post ID found.";
+    }
+
+    set_query_var('voting_list_id', $post_id);
+
+    // Enqueue the fullpage CSS
+    wp_enqueue_style(
+        'voting-fullpage-css',
+        get_stylesheet_directory_uri() . '/css/voting-fullpage.css',
+        [],
+        HELLO_ELEMENTOR_CHILD_VERSION
+    );
+
+    ob_start();
+    get_template_part('inc/voting/templates/voting-list/voting-list-fullpage');
+    return ob_get_clean();
+}
+add_shortcode('voting_list_fullpage', 'voting_list_fullpage_shortcode');
 
 function shortcode_voting_list_total_score($atts) {
     $atts = shortcode_atts(['id' => 0], $atts);
@@ -318,6 +395,32 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
 
                         $has_children = !empty($child_terms) && !is_wp_error($child_terms);
 
+                        // Get trending lists from this category
+                        $trending_lists = [];
+                        if ($has_children) {
+                            global $wpdb;
+                            $votes_table = $wpdb->prefix . 'voting_list_votes';
+                            
+                            // Get lists with most votes in this category
+                            $category_term_ids = array_merge([$term_id], array_map(fn($c) => $c->term_id, $child_terms));
+                            $placeholders = implode(',', array_fill(0, count($category_term_ids), '%d'));
+                            
+                            $top_voted_lists = $wpdb->get_results($wpdb->prepare(
+                                "SELECT p.ID, p.post_title, COUNT(v.id) as vote_count
+                                FROM {$wpdb->posts} p
+                                INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+                                LEFT JOIN {$votes_table} v ON p.ID = v.voting_list_id
+                                WHERE p.post_type = 'voting_list' 
+                                AND p.post_status = 'publish'
+                                AND tr.term_taxonomy_id IN ($placeholders)
+                                GROUP BY p.ID
+                                ORDER BY vote_count DESC, p.post_date DESC
+                                LIMIT 3",
+                                ...$category_term_ids
+                            ));
+                            $trending_lists = $top_voted_lists;
+                        }
+
                         // Provera da li je ova kategorija (ili njeno dete) aktivna
                         $is_active = ($term_id === $current_term_id);
                         if (!$is_active && $has_children && $current_term_id) {
@@ -353,20 +456,92 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                                                     </div>
                                                 <?php endif; ?>
                                                 <h3><?php echo esc_html($parent->name); ?></h3>
-                                                <a href="<?php echo esc_url($parent_link); ?>" class="cs-brand-btn">Istraži Sve &rarr;</a>
+                                                
+                                                <?php 
+                                                // Get total lists count for parent category
+                                                $total_lists = (new WP_Query([
+                                                    'post_type' => 'voting_list',
+                                                    'post_status' => 'publish',
+                                                    'posts_per_page' => -1,
+                                                    'fields' => 'ids',
+                                                    'tax_query' => [[
+                                                        'taxonomy' => 'voting_list_category',
+                                                        'field' => 'term_id',
+                                                        'terms' => $term_id,
+                                                        'include_children' => true,
+                                                    ]]
+                                                ]))->found_posts;
+                                                ?>
+                                                <div class="cs-brand-stats">
+                                                    <div class="cs-brand-stat">
+                                                        <span class="cs-brand-stat__value"><?php echo $total_lists; ?></span>
+                                                        <span class="cs-brand-stat__label">Lista</span>
+                                                    </div>
+                                                    <div class="cs-brand-stat">
+                                                        <span class="cs-brand-stat__value"><?php echo count($child_terms); ?></span>
+                                                        <span class="cs-brand-stat__label">Kategorija</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <a href="<?php echo esc_url($parent_link); ?>" class="cs-brand-btn">
+                                                    Istraži Sve
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                                </a>
                                             </div>
                                             <div class="cs-brand-curve"></div>
                                         </div>
 
                                         <div class="cs-dropdown-content">
-                                            <span class="cs-trending-label">KATEGORIJE</span>
-                                            <div class="cs-pills-grid">
-                                                <?php foreach ($child_terms as $child) : ?>
-                                                    <a href="<?php echo esc_url(get_term_link($child)); ?>" class="cs-pill-link">
-                                                        <?php echo esc_html($child->name); ?>
-                                                    </a>
-                                                <?php endforeach; ?>
+                                            <!-- Subcategories as Cards -->
+                                            <div class="cs-subcats-section">
+                                                <span class="cs-section-label">KATEGORIJE</span>
+                                                <div class="cs-subcats-grid">
+                                                    <?php foreach ($child_terms as $child) : 
+                                                        // Count lists in this subcategory
+                                                        $list_count = (new WP_Query([
+                                                            'post_type' => 'voting_list',
+                                                            'post_status' => 'publish',
+                                                            'posts_per_page' => -1,
+                                                            'fields' => 'ids',
+                                                            'tax_query' => [[
+                                                                'taxonomy' => 'voting_list_category',
+                                                                'field' => 'term_id',
+                                                                'terms' => $child->term_id,
+                                                            ]]
+                                                        ]))->found_posts;
+                                                    ?>
+                                                        <a href="<?php echo esc_url(get_term_link($child)); ?>" class="cs-subcat-card">
+                                                            <span class="cs-subcat-name"><?php echo esc_html($child->name); ?></span>
+                                                            <span class="cs-subcat-count"><?php echo $list_count; ?></span>
+                                                        </a>
+                                                    <?php endforeach; ?>
+                                                </div>
                                             </div>
+                                            
+                                            <?php if (!empty($trending_lists)) : ?>
+                                            <!-- Top Voted Lists -->
+                                            <div class="cs-trending-section">
+                                                <span class="cs-section-label">🏆 NAJVIŠE GLASOVA</span>
+                                                <div class="cs-trending-list">
+                                                    <?php foreach ($trending_lists as $tlist) : 
+                                                        $thumb = get_the_post_thumbnail_url($tlist->ID, 'thumbnail');
+                                                        $votes = intval($tlist->vote_count);
+                                                    ?>
+                                                        <a href="<?php echo get_permalink($tlist->ID); ?>" class="cs-trending-item">
+                                                            <div class="cs-trending-thumb" style="<?php echo $thumb ? 'background-image:url('.esc_url($thumb).')' : 'background:'.esc_attr($color).'20'; ?>">
+                                                                <?php if (!$thumb): ?>
+                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="<?php echo esc_attr($color); ?>"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <div class="cs-trending-info">
+                                                                <span class="cs-trending-title"><?php echo esc_html(wp_trim_words($tlist->post_title, 4)); ?></span>
+                                                                <span class="cs-trending-votes"><?php echo number_format($votes); ?> glasova</span>
+                                                            </div>
+                                                        </a>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>

@@ -7,28 +7,28 @@
 
   // Initialize expand/collapse toggle
   function initExpandToggle() {
-    const bars = document.querySelectorAll('.ygv-user-stats-bar');
-    
+    const bars = document.querySelectorAll(".ygv-user-stats-bar");
+
     bars.forEach((bar) => {
-      const toggleBtn = bar.querySelector('.ygv-stats-expand');
+      const toggleBtn = bar.querySelector(".ygv-stats-expand");
       if (!toggleBtn) return;
-      
-      toggleBtn.addEventListener('click', function(e) {
+
+      toggleBtn.addEventListener("click", function (e) {
         e.preventDefault();
-        bar.classList.toggle('is-expanded');
-        
+        bar.classList.toggle("is-expanded");
+
         // Save preference
-        const isExpanded = bar.classList.contains('is-expanded');
+        const isExpanded = bar.classList.contains("is-expanded");
         try {
-          localStorage.setItem('ygv_stats_expanded', isExpanded ? '1' : '0');
+          localStorage.setItem("ygv_stats_expanded", isExpanded ? "1" : "0");
         } catch (e) {}
       });
-      
+
       // Restore saved preference
       try {
-        const saved = localStorage.getItem('ygv_stats_expanded');
-        if (saved === '1') {
-          bar.classList.add('is-expanded');
+        const saved = localStorage.getItem("ygv_stats_expanded");
+        if (saved === "1") {
+          bar.classList.add("is-expanded");
         }
       } catch (e) {}
     });

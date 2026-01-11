@@ -46,13 +46,22 @@ function enqueue_voting_list_scripts() {
         
         // --- JavaScript Classes ---
         
-        // 1. VotingList Class
+        // 1. VotingList Class (Legacy)
         wp_enqueue_script(
             'voting-list-class',
             get_stylesheet_directory_uri() . '/js/voting/voting-list.js',
             ['jquery'],
             HELLO_ELEMENTOR_CHILD_VERSION,
             true // Load in footer
+        );
+
+        // 1b. VotingListV2 Class (New layouts)
+        wp_enqueue_script(
+            'voting-list-v2-class',
+            get_stylesheet_directory_uri() . '/js/voting/voting-list-v2.js',
+            ['jquery'],
+            HELLO_ELEMENTOR_CHILD_VERSION,
+            true
         );
 
         // 2. VotingItem Class (Depends on VotingList)
@@ -79,7 +88,7 @@ function enqueue_voting_list_scripts() {
         wp_enqueue_script(
             'voting-init',
             get_stylesheet_directory_uri() . '/js/voting/voting-init.js',
-            ['jquery', 'voting-list-class', 'voting-item-class', 'voting-search-js'],
+            ['jquery', 'voting-list-class', 'voting-list-v2-class', 'voting-item-class', 'voting-search-js'],
             HELLO_ELEMENTOR_CHILD_VERSION,
             true
         );
@@ -97,6 +106,14 @@ function enqueue_voting_list_scripts() {
             'voting-css',
             get_stylesheet_directory_uri() . '/css/voting.css',
             [],
+            HELLO_ELEMENTOR_CHILD_VERSION
+        );
+
+        // New V2 Voting Styles (additional layouts)
+        wp_enqueue_style(
+            'voting-v2-css',
+            get_stylesheet_directory_uri() . '/css/voting-v2.css',
+            ['voting-css'],
             HELLO_ELEMENTOR_CHILD_VERSION
         );
 

@@ -10,7 +10,7 @@
   --ygv-body-size: 14px;
   --ygv-label-size: 12px;
   --ygv-small-size: 11px;
-  
+
   /* Card Tokens */
   --ygv-card-radius: 16px;
   --ygv-card-radius-sm: 10px;
@@ -21,27 +21,29 @@
   --ygv-card-bg: #fff;
   --ygv-card-border: 1px solid #e2e8f0;
   --ygv-card-bg-subtle: #f8f9fb;
-  
+
   /* Button Tokens */
   --ygv-btn-radius: 10px;
   --ygv-btn-padding: 10px 14px;
-  --ygv-btn-primary-bg: #6db24a;
-  --ygv-btn-primary-hover: #5a9940;
-  
+  --ygv-btn-primary-bg: #2d3a8c;
+  --ygv-btn-primary-hover: #1e2b6b;
+
   /* Progress Bar Tokens */
   --ygv-progress-height: 8px;
   --ygv-progress-height-sm: 6px;
   --ygv-progress-radius: 4px;
   --ygv-progress-bg: #e5e7eb;
-  
+
   /* Color Tokens */
   --ygv-text-primary: #1e293b;
   --ygv-text-secondary: #64748b;
   --ygv-text-muted: #94a3b8;
   --ygv-accent-green: #6db24a;
+  --ygv-accent-blue: #2d3a8c;
   --ygv-accent-purple: #6366f1;
   --ygv-accent-orange: #f97316;
-  
+  --ygv-accent-red: #e85a4f;
+
   /* Spacing */
   --ygv-gap-xs: 4px;
   --ygv-gap-sm: 8px;
@@ -103,7 +105,11 @@
 
 /* Gradient fill variant */
 .ygv-progress-unified__fill--gradient {
-  background: linear-gradient(90deg, var(--cat-color, var(--ygv-accent-green)), var(--cat-color-end, var(--ygv-accent-green)));
+  background: linear-gradient(
+    90deg,
+    var(--cat-color, var(--ygv-accent-green)),
+    var(--cat-color-end, var(--ygv-accent-green))
+  );
 }
 
 /* ============================================
@@ -156,7 +162,8 @@
   transition: transform 0.3s ease;
 }
 
-.cs-acc-nav-mobile-trigger[aria-expanded="true"] .cs-acc-nav-mobile-trigger__chevron {
+.cs-acc-nav-mobile-trigger[aria-expanded="true"]
+  .cs-acc-nav-mobile-trigger__chevron {
   transform: rotate(180deg);
 }
 
@@ -297,13 +304,13 @@
     display: flex !important;
     visibility: visible;
   }
-  
+
   .cs-acc-nav-overlay,
   .cs-acc-nav-mobile-dropdown {
     display: block !important;
     visibility: visible;
   }
-  
+
   .cs-acc-nav {
     display: none !important;
   }
@@ -486,17 +493,17 @@
 }
 .cs-btn:hover,
 .ygv-btn:hover {
-  border-color: #6db24a;
-  color: #6db24a;
+  border-color: #2d3a8c;
+  color: #2d3a8c;
 }
 .cs-btn.primary,
 .ygv-btn-primary {
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
-  border-color: #6db24a;
+  border-color: #2d3a8c;
 }
 .ygv-btn-primary:hover {
-  background: #5a9940;
+  background: #1e2b6b;
   color: #fff;
 }
 .ygv-btn-small {
@@ -513,21 +520,21 @@
   gap: 4px;
 }
 .ygv-btn-small:hover {
-  border-color: #6db24a;
-  color: #6db24a;
+  border-color: #2d3a8c;
+  color: #2d3a8c;
 }
 /* Primary small button - needs higher specificity */
 .ygv-btn.ygv-btn-primary.ygv-btn-small,
 .ygv-btn-primary.ygv-btn-small {
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
-  border-color: #6db24a;
+  border-color: #2d3a8c;
 }
 .ygv-btn.ygv-btn-primary.ygv-btn-small:hover,
 .ygv-btn-primary.ygv-btn-small:hover {
-  background: #5a9940;
+  background: #1e2b6b;
   color: #fff;
-  border-color: #5a9940;
+  border-color: #1e2b6b;
 }
 
 /* ============================================
@@ -562,7 +569,7 @@
 
 /* Level Hero Card */
 .ygv-level-hero {
-  background: linear-gradient(135deg, #6db24a 0%, #4a9030 100%);
+  background: linear-gradient(135deg, #3d4db7 0%, #2d3a8c 100%);
   color: #fff;
   border: none;
 }
@@ -850,6 +857,323 @@
 .ygv-milestone-complete {
   color: #ea580c;
   font-weight: 600;
+}
+
+/* ============================================
+   PROFILE PAGE - STATS ROW (Coins + Streak)
+   ============================================ */
+
+.ygv-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .ygv-stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* YugoCoin Card */
+.ygv-coin-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
+  border-left: 4px solid #f59e0b;
+}
+
+.ygv-coin-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f59e0b;
+  border-radius: 50%;
+  color: white;
+}
+
+.ygv-coin-info {
+  flex: 1;
+}
+
+.ygv-coin-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #92400e;
+  margin: 0 0 4px 0;
+  font-weight: 600;
+}
+
+.ygv-coin-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.ygv-coin-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #92400e;
+  font-family: var(--secondary-font), sans-serif;
+  line-height: 1;
+}
+
+.ygv-coin-hint {
+  font-size: 11px;
+  color: #b45309;
+  margin: 6px 0 0 0;
+}
+
+/* Redesigned Streak Card */
+.ygv-streak-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--ygv-card-bg);
+  border: var(--ygv-card-border);
+  border-left: 4px solid #e85a4f;
+}
+
+.ygv-streak-card.ygv-streak-active {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: #fecaca;
+  border-left-color: #dc2626;
+}
+
+.ygv-streak-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ygv-streak-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef2f2;
+  border-radius: 12px;
+  color: #e85a4f;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-streak-icon {
+  background: #e85a4f;
+  color: white;
+  animation: none;
+}
+
+.ygv-streak-title-wrap {
+  flex: 1;
+}
+
+.ygv-streak-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ygv-text-secondary);
+  margin: 0 0 2px 0;
+  font-weight: 600;
+}
+
+.ygv-streak-day-count {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.ygv-streak-number {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #e85a4f;
+  font-family: var(--secondary-font), sans-serif;
+  line-height: 1;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-streak-number {
+  color: #dc2626;
+}
+
+.ygv-streak-max {
+  font-size: 14px;
+  color: var(--ygv-text-muted);
+}
+
+/* Streak 30-day progress */
+.ygv-streak-progress-30 {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.ygv-streak-bar {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.ygv-streak-card.ygv-streak-active .ygv-streak-bar {
+  background: #fde68a;
+}
+
+.ygv-streak-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #ea580c);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.ygv-streak-milestones {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
+.ygv-streak-milestone {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ygv-milestone-dot {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  border: 2px solid white;
+  border-radius: 50%;
+  margin-top: 1px;
+}
+
+.ygv-streak-milestone.reached .ygv-milestone-dot {
+  background: #e85a4f;
+}
+
+.ygv-milestone-label {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+.ygv-streak-milestone.reached .ygv-milestone-label {
+  color: #e85a4f;
+  font-weight: 600;
+}
+
+/* Streak rewards section */
+.ygv-streak-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ygv-next-reward {
+  flex: 1;
+}
+
+.ygv-reward-label {
+  font-size: 11px;
+  color: var(--ygv-text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ygv-reward-items {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ygv-reward-xp {
+  background: #e0e7ff;
+  color: #2d3a8c;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ygv-reward-coins {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ygv-reward-vote-bonus {
+  background: #e0e7ff;
+  color: #2d3a8c;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ygv-streak-complete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ea580c;
+  font-weight: 600;
+}
+
+.ygv-current-bonus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.ygv-bonus-tag {
+  background: #f97316;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ygv-bonus-desc {
+  font-size: 11px;
+  color: var(--ygv-text-secondary);
+}
+
+/* ============================================
+   PROFILE PAGE - CATEGORY GRID (2 Columns)
+   ============================================ */
+
+.ygv-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .ygv-category-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ygv-category-grid .ygv-category-level-item {
+  margin: 0;
 }
 
 /* Profile Info */
@@ -1342,10 +1666,10 @@
   font-weight: 500;
 }
 .ygv-reward-xp {
-  color: #6db24a;
+  color: #2d3a8c;
   font-size: 13px;
   font-weight: 600;
-  background: #ecfdf5;
+  background: #e0e7ff;
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -1457,17 +1781,17 @@
 }
 .ygv-radio-item:has(input:checked),
 .ygv-checkbox-item:has(input:checked) {
-  border-color: #6db24a;
-  background: #f0fdf4;
+  border-color: #2d3a8c;
+  background: #e0e7ff;
 }
 .ygv-radio-item:hover,
 .ygv-checkbox-item:hover {
-  border-color: #6db24a;
+  border-color: #2d3a8c;
 }
 .ygv-radio-item input,
 .ygv-checkbox-item input {
   margin-top: 3px;
-  accent-color: #6db24a;
+  accent-color: #2d3a8c;
 }
 .ygv-radio-label,
 .ygv-checkbox-label {
@@ -1554,8 +1878,8 @@
 }
 .ygv-input:focus {
   outline: none;
-  border-color: #6db24a;
-  box-shadow: 0 0 0 3px rgba(109, 178, 74, 0.1);
+  border-color: #2d3a8c;
+  box-shadow: 0 0 0 3px rgba(45, 58, 140, 0.1);
 }
 .ygv-form-hint {
   display: block;
@@ -1719,7 +2043,7 @@ select.ygv-input {
 .ygv-item-number {
   width: 28px;
   height: 28px;
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -1804,13 +2128,13 @@ select.ygv-input {
   position: relative;
 }
 .ygv-item-card:hover {
-  border-color: #6db24a;
+  border-color: #2d3a8c;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .ygv-item-card.ygv-item-selected {
-  border-color: #6db24a;
-  background: #f0fdf4;
+  border-color: #2d3a8c;
+  background: #e0e7ff;
 }
 .ygv-item-card.ygv-item-disabled {
   opacity: 0.4;
@@ -1850,7 +2174,7 @@ select.ygv-input {
   position: absolute;
   top: 4px;
   right: 4px;
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
   width: 20px;
   height: 20px;
@@ -1897,7 +2221,7 @@ select.ygv-input {
 .ygv-selected-num {
   width: 26px;
   height: 26px;
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -1990,7 +2314,7 @@ select.ygv-input {
 
 .ygv-circle-progress {
   fill: none;
-  stroke: #6db24a;
+  stroke: #2d3a8c;
   stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dasharray 0.6s ease;
@@ -2086,7 +2410,7 @@ select.ygv-input {
 }
 
 .ygv-xp-badge {
-  background: #6db24a;
+  background: #2d3a8c;
   color: #fff;
   padding: 2px 8px;
   border-radius: 10px;
@@ -2266,7 +2590,7 @@ select.ygv-input {
 
 .ygv-reward-xp {
   display: inline-block;
-  background: linear-gradient(135deg, #6db24a, #84cc16);
+  background: linear-gradient(135deg, #3d4db7, #2d3a8c);
   color: #fff;
   padding: 3px 10px;
   border-radius: 12px;

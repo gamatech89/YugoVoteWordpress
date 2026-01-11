@@ -283,11 +283,18 @@ function submit_vote() {
         $streak_info = $xp_result['streak'] ?? null;
     }
 
+    // Get updated total score for this item on this list
+    $new_item_score = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d AND voting_item_id = %d",
+        $voting_list_id, $voting_item_id
+    ));
+
     // Return success with bonus info for UI feedback
     $response = [
         'message' => 'Vote submitted.',
         'base_vote' => $base_vote_value,
         'final_vote' => $vote_value,
+        'new_total_score' => floatval($new_item_score ?: 0),
     ];
     
     if ($expert_bonus > 0) {
@@ -341,7 +348,8 @@ add_action("wp_ajax_nopriv_submit_vote", "submit_vote");
  * - '_ajax_nonce' (string) Nonce for security.
  * - 'voting_list_id' (int) ID of the voting list.
  * - 'voting_item_id' (int) ID of the item whose vote is to be removed.
- * - 'vote_value' (int) The base point value of the vote to remove (1-10, before bonus).
+ * - 'vote_value' (int) OPTIONAL - The base point value of the vote to remove (1-10, before bonus).
+ *                       If not provided, removes any vote on this item.
  *
  * @action wp_ajax_remove_vote
  * @action wp_ajax_nopriv_remove_vote (for guest users)
@@ -352,23 +360,29 @@ function remove_vote() {
 
     global $wpdb;
     $user_id = get_current_user_id();
-    $voting_list_id = isset($_POST['voting_list_id']) ? intval($_POST['voting_list_id']) : 0;
-    $voting_item_id = isset($_POST['voting_item_id']) ? intval($_POST['voting_item_id']) : 0;
-    $base_vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0; // The base vote to remove (1-10)
+    $voting_list_id = isset($_POST['voting_list_id']) ? intval($_POST['voting_list_id']) : 
+                      (isset($_POST['list_id']) ? intval($_POST['list_id']) : 0);
+    $voting_item_id = isset($_POST['voting_item_id']) ? intval($_POST['voting_item_id']) : 
+                      (isset($_POST['item_id']) ? intval($_POST['item_id']) : 0);
+    $base_vote_value = isset($_POST['vote_value']) ? intval($_POST['vote_value']) : 0; // Optional
 
-    if (!$voting_list_id || !$voting_item_id || !$base_vote_value) {
+    if (!$voting_list_id || !$voting_item_id) {
         wp_send_json_error("Invalid vote data for removal.");
         return;
     }
 
     $table = $wpdb->prefix . "voting_list_votes";
     
-    // Use base_vote_value for matching (what user selected, not the bonus-adjusted value)
+    // Build where conditions
     $where_conditions = [
         'voting_list_id'  => $voting_list_id,
         'voting_item_id'  => $voting_item_id,
-        'base_vote_value' => $base_vote_value
     ];
+    
+    // Only add base_vote_value if provided (for backwards compatibility)
+    if ($base_vote_value > 0) {
+        $where_conditions['base_vote_value'] = $base_vote_value;
+    }
 
     if ($user_id > 0) {
         $where_conditions['user_id'] = $user_id;
@@ -389,13 +403,23 @@ function remove_vote() {
         // No rows were deleted, meaning the vote didn't exist as specified.
         // This might not be an "error" from the user's perspective if they clicked twice,
         // but good to know. Could send success or a specific message.
-        wp_send_json_success("Vote not found or already removed.");
+        wp_send_json_success(["message" => "Vote not found or already removed."]);
     } else {
         // $deleted is number of rows affected (should be 1)
         if (function_exists('update_vote_score_cache')) {
             update_vote_score_cache($voting_item_id); 
         }
-        wp_send_json_success("Vote removed.");
+        
+        // Get updated score for this item on this list
+        $new_score = $wpdb->get_var($wpdb->prepare(
+            "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d AND voting_item_id = %d",
+            $voting_list_id, $voting_item_id
+        ));
+        
+        wp_send_json_success([
+            "message" => "Vote removed.",
+            "new_total_score" => floatval($new_score ?: 0)
+        ]);
     }
 }
 add_action("wp_ajax_remove_vote", "remove_vote");

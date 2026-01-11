@@ -11,7 +11,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
 // If user is already logged in, redirect them away.
 if (is_user_logged_in()) {
     // Use the constant for the account page slug
@@ -19,9 +18,13 @@ if (is_user_logged_in()) {
     exit;
 }
 
+// Enqueue unified styles
+wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], '1.0.0');
+
 get_header(); 
 ?>
 
+<div class="ygv-page ygv-auth-page">
 <main id="site-content" role="main" class="cs-custom-auth-page cs-register-page">
     <div class="cs-auth-container">
         <div class="cs-auth-form-wrapper">
@@ -91,6 +94,7 @@ get_header();
         </div>
     </div>
 </main>
+</div>
 
 <?php
 get_footer(); 

@@ -104,6 +104,42 @@ if (class_exists('YGV_Achievement_Service')) {
     $streak_bonus = min($voting_streak, 10);
 }
 
+// Get YugoCoins
+$yugocoins = function_exists('ygv_get_user_yugocoins') ? ygv_get_user_yugocoins($user_id) : (int) get_user_meta($user_id, 'yugocoins', true);
+
+// Get rewards config from admin settings
+$rewards_config = function_exists('ygv_get_rewards_config') ? ygv_get_rewards_config() : [];
+$streak_rewards = $rewards_config['streak_rewards'] ?? [
+    ['days' => 3, 'xp' => 50, 'coins' => 0, 'vote_bonus' => 1],
+    ['days' => 7, 'xp' => 100, 'coins' => 10, 'vote_bonus' => 2],
+    ['days' => 14, 'xp' => 200, 'coins' => 20, 'vote_bonus' => 4],
+    ['days' => 21, 'xp' => 250, 'coins' => 25, 'vote_bonus' => 5],
+    ['days' => 30, 'xp' => 500, 'coins' => 100, 'vote_bonus' => 10],
+];
+$streak_cycle_days = $rewards_config['streak_cycle_days'] ?? 30;
+$streak_milestones = $rewards_config['display']['streak_milestones'] ?? [3, 7, 14, 21, 30];
+$show_yugocoins = $rewards_config['display']['show_yugocoins_in_profile'] ?? true;
+$show_streak = $rewards_config['display']['show_streak_progress'] ?? true;
+
+// Get current streak tier using helper functions or fallback
+$current_tier = function_exists('ygv_get_user_streak_tier') 
+    ? ygv_get_user_streak_tier($voting_streak) 
+    : null;
+$next_tier = function_exists('ygv_get_next_streak_tier') 
+    ? ygv_get_next_streak_tier($voting_streak) 
+    : ($streak_rewards[0] ?? null);
+
+// Fallback tier calculation if functions not available
+if (!function_exists('ygv_get_user_streak_tier')) {
+    foreach ($streak_rewards as $i => $tier) {
+        if ($voting_streak >= $tier['days']) {
+            $current_tier = $tier;
+            $next_tier = isset($streak_rewards[$i + 1]) ? $streak_rewards[$i + 1] : null;
+        }
+    }
+}
+$streak_vote_bonus = $current_tier ? ($current_tier['vote_bonus'] ?? 0) : 0;
+
 // Category icons - mapiranje na Lucide icon imena
 $category_icons = [
     'Sport' => 'dribbble',
@@ -169,85 +205,104 @@ $category_icons = [
         </div>
     </div>
     
-    <!-- Voting Streak Card -->
-    <div class="ygv-card ygv-streak-card <?php echo $voting_streak >= 3 ? 'ygv-streak-active' : ''; ?>">
-        <div class="ygv-streak-content">
-            <div class="ygv-streak-icon">
-                <?php if ($voting_streak >= 30): ?>
-                    <?php ygv_icon_e('gem', 32); ?>
-                <?php elseif ($voting_streak >= 7): ?>
-                    <?php ygv_icon_e('flame', 32); ?><?php ygv_icon_e('flame', 32); ?>
-                <?php elseif ($voting_streak >= 1): ?>
-                    <?php ygv_icon_e('flame', 32); ?>
-                <?php else: ?>
-                    <?php ygv_icon_e('snowflake', 32); ?>
-                <?php endif; ?>
+    <!-- YugoCoin & Streak Cards Row -->
+    <div class="ygv-stats-row">
+        <?php if ($show_yugocoins): ?>
+        <!-- YugoCoin Card -->
+        <div class="ygv-card ygv-coin-card">
+            <div class="ygv-coin-icon">
+                <?php ygv_icon_e('coins', 32); ?>
             </div>
-            <div class="ygv-streak-info">
-                <h3 class="ygv-streak-title"><?php echo esc_html__('Glasački Streak', 'hello-elementor-child'); ?></h3>
-                <div class="ygv-streak-days">
-                    <span class="ygv-streak-number"><?php echo $voting_streak; ?></span>
-                    <span class="ygv-streak-label"><?php echo $voting_streak === 1 ? esc_html__('dan', 'hello-elementor-child') : esc_html__('dana', 'hello-elementor-child'); ?> <?php echo esc_html__('zaredom', 'hello-elementor-child'); ?></span>
+            <div class="ygv-coin-info">
+                <h3 class="ygv-coin-title"><?php echo esc_html__('YugoCoins', 'hello-elementor-child'); ?></h3>
+                <div class="ygv-coin-balance">
+                    <span class="ygv-coin-amount"><?php echo number_format($yugocoins); ?></span>
                 </div>
-                <?php if ($streak_bonus > 0): ?>
-                <div class="ygv-streak-bonus">
-                    <span class="ygv-streak-bonus-badge">+<?php echo $streak_bonus; ?> XP</span>
-                    <span class="ygv-streak-bonus-text"><?php echo esc_html__('bonus po glasu', 'hello-elementor-child'); ?></span>
-                </div>
-                <?php else: ?>
-                <div class="ygv-streak-hint">
-                    <?php echo esc_html__('Glasaj svaki dan za streak bonus!', 'hello-elementor-child'); ?>
-                </div>
-                <?php endif; ?>
-            </div>
-            <div class="ygv-streak-progress">
-                <?php 
-                // Show progress to next milestone
-                $next_milestone = 3;
-                if ($voting_streak >= 3) $next_milestone = 7;
-                if ($voting_streak >= 7) $next_milestone = 14;
-                if ($voting_streak >= 14) $next_milestone = 30;
-                if ($voting_streak >= 30) $next_milestone = 60;
-                if ($voting_streak >= 60) $next_milestone = 100;
-                
-                $milestone_start = 0;
-                if ($next_milestone == 7) $milestone_start = 3;
-                if ($next_milestone == 14) $milestone_start = 7;
-                if ($next_milestone == 30) $milestone_start = 14;
-                if ($next_milestone == 60) $milestone_start = 30;
-                if ($next_milestone == 100) $milestone_start = 60;
-                
-                $progress = min(100, (($voting_streak - $milestone_start) / ($next_milestone - $milestone_start)) * 100);
-                if ($voting_streak >= 100) $progress = 100;
-                ?>
-                <div class="ygv-milestone-progress">
-                    <div class="ygv-milestone-bar">
-                        <div class="ygv-milestone-bar-fill" style="width: <?php echo $progress; ?>%"></div>
-                    </div>
-                    <?php if ($voting_streak < 100): ?>
-                    <div class="ygv-milestone-text">
-                        <?php echo $voting_streak; ?> / <?php echo $next_milestone; ?> <?php echo esc_html__('dana', 'hello-elementor-child'); ?>
-                    </div>
-                    <?php else: ?>
-                    <div class="ygv-milestone-text ygv-milestone-complete">
-                        <?php ygv_icon_e('trophy', 20); ?> <?php echo esc_html__('Legendarni streak!', 'hello-elementor-child'); ?>
-                    </div>
-                    <?php endif; ?>
-                </div>
+                <p class="ygv-coin-hint"><?php echo esc_html__('Zarađuj kroz streak i dostignuća', 'hello-elementor-child'); ?></p>
             </div>
         </div>
+        <?php endif; ?>
+        
+        <?php if ($show_streak): ?>
+        <!-- Voting Streak Card - Redesigned -->
+        <div class="ygv-card ygv-streak-card <?php echo $voting_streak >= 3 ? 'ygv-streak-active' : ''; ?>">
+            <div class="ygv-streak-header">
+                <div class="ygv-streak-icon">
+                    <?php if ($voting_streak >= $streak_cycle_days): ?>
+                        <?php ygv_icon_e('crown', 28); ?>
+                    <?php elseif ($voting_streak >= 7): ?>
+                        <?php ygv_icon_e('flame', 28); ?>
+                    <?php elseif ($voting_streak >= 1): ?>
+                        <?php ygv_icon_e('zap', 28); ?>
+                    <?php else: ?>
+                        <?php ygv_icon_e('calendar', 28); ?>
+                    <?php endif; ?>
+                </div>
+                <div class="ygv-streak-title-wrap">
+                    <h3 class="ygv-streak-title"><?php echo esc_html__('Dnevni Streak', 'hello-elementor-child'); ?></h3>
+                    <div class="ygv-streak-day-count">
+                        <span class="ygv-streak-number"><?php echo $voting_streak; ?></span>
+                        <span class="ygv-streak-max">/ <?php echo $streak_cycle_days; ?> <?php echo esc_html__('dana', 'hello-elementor-child'); ?></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ygv-streak-progress-30">
+                <div class="ygv-streak-bar">
+                    <div class="ygv-streak-bar-fill" style="width: <?php echo min(100, ($voting_streak / $streak_cycle_days) * 100); ?>%"></div>
+                </div>
+                <div class="ygv-streak-milestones">
+                    <?php 
+                    foreach ($streak_milestones as $m): 
+                        $reached = $voting_streak >= $m;
+                    ?>
+                    <div class="ygv-streak-milestone <?php echo $reached ? 'reached' : ''; ?>" style="left: <?php echo ($m / $streak_cycle_days) * 100; ?>%">
+                        <span class="ygv-milestone-dot"></span>
+                        <span class="ygv-milestone-label"><?php echo $m; ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            
+            <div class="ygv-streak-rewards">
+                <?php if ($next_tier): ?>
+                <div class="ygv-next-reward">
+                    <span class="ygv-reward-label"><?php echo esc_html__('Sledeća nagrada (dan', 'hello-elementor-child'); ?> <?php echo $next_tier['days']; ?>):</span>
+                    <div class="ygv-reward-items">
+                        <span class="ygv-reward-xp">+<?php echo $next_tier['xp']; ?> XP</span>
+                        <?php if ($next_tier['coins'] > 0): ?>
+                        <span class="ygv-reward-coins">+<?php echo $next_tier['coins']; ?> <?php ygv_icon_e('coins', 14); ?></span>
+                        <?php endif; ?>
+                        <span class="ygv-reward-vote-bonus">+<?php echo $next_tier['vote_bonus']; ?> XP/glas</span>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="ygv-streak-complete">
+                    <?php ygv_icon_e('trophy', 20); ?>
+                    <span><?php echo esc_html__('Maksimalni streak!', 'hello-elementor-child'); ?></span>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($streak_vote_bonus > 0): ?>
+                <div class="ygv-current-bonus">
+                    <span class="ygv-bonus-tag">+<?php echo $streak_vote_bonus; ?> XP</span>
+                    <span class="ygv-bonus-desc"><?php echo esc_html__('bonus po glasu', 'hello-elementor-child'); ?></span>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     
-    <!-- Category Levels -->
+    <!-- Category Levels - 2 Column Grid -->
     <div class="ygv-card">
         <h3><?php echo esc_html__('Ekspertiza po Kategorijama', 'hello-elementor-child'); ?></h3>
         <p class="ygv-card-subtitle"><?php echo esc_html__('Tvoj nivo u svakoj kategoriji određuje bonus glasova', 'hello-elementor-child'); ?></p>
         
         <?php if (empty($cat_progress)): ?>
-            <p class="ygv-muted"><?php echo esc_html__('Još nemaš napredak u kategorijama. Rešavaj kvizove da zaradiš XP!', 'hello-elementor-child'); ?></p>
+            <p class="ygv-muted"><?php echo esc_html__('Još nemaš napredak u kategorijama. Glasaj da zaradiš XP!', 'hello-elementor-child'); ?></p>
         <?php else: ?>
-            <div class="ygv-category-levels">
-                <?php foreach ($cat_progress as $cat): 
+            <div class="ygv-category-grid"><?php foreach ($cat_progress as $cat): 
                     $cat_level = (int)$cat['level'];
                     $cat_title = ygv_get_title_for_level($cat_level, $level_config);
                     $cat_name = $cat['category_name'] ?: 'Unknown';

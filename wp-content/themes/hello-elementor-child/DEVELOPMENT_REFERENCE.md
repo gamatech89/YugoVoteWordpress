@@ -274,6 +274,24 @@ tail -f wp-content/debug.log
 
 ## 📝 Recent Major Changes
 
+### Voting List V2 Redesign (Jan 2026)
+
+- ✅ New V2 template with 3 layout options: Grid, Compact, Classic
+- ✅ Mobile-first responsive design with max-width constraint
+- ✅ Larger touch-friendly vote buttons (always visible)
+- ✅ Top 3 items highlighted with gold/silver/bronze styling
+- ✅ Layout switcher UI for testing different layouts
+- ✅ New `[voting_list_v2]` shortcode
+- ✅ VotingListV2 JavaScript class for new templates
+- ✅ Child categories section with top lists carousel
+
+### Account Tabs Redesign (Jan 2026)
+
+- ✅ Profile page UI with YugoCoins and streak display
+- ✅ 30-day streak system with tier-based rewards
+- ✅ Admin panel for streak rewards configuration
+- ✅ Brand color update (navy blue for buttons/forms)
+
 ### Deployment Setup (Jan 9, 2026)
 
 - ✅ Git deployment workflow via rsync
@@ -296,16 +314,27 @@ tail -f wp-content/debug.log
 
 ### Voting Module
 
-| Shortcode                            | Usage                  | Description                         |
-| ------------------------------------ | ---------------------- | ----------------------------------- |
-| `[voting_list id="123"]`             | Specific list          | Display voting list by ID           |
-| `[voting_list_single]`               | On single post         | Display current post as voting list |
-| `[voting_list_total_score id="123"]` | Anywhere               | Show total score for a list         |
-| `[lists_with_this_item]`             | On voting_items single | Show lists containing current item  |
-| `[voting_category_hero]`             | Category archive       | Hero section with featured lists    |
-| `[homepage_categories_slider]`       | Homepage               | Category carousel slider            |
-| `[voting_top_categories]`            | Homepage               | Top categories with rankings        |
-| `[voting_trending]`                  | Anywhere               | Trending/popular lists              |
+| Shortcode                            | Usage                  | Description                            |
+| ------------------------------------ | ---------------------- | -------------------------------------- |
+| `[voting_list id="123"]`             | Specific list          | Display voting list by ID              |
+| `[voting_list_single]`               | On single post         | Display current post as voting list    |
+| `[voting_list_single version="v2"]`  | On single post         | Display with V2 template (new layouts) |
+| `[voting_list_v2]`                   | On single post         | V2 template with layout switcher UI    |
+| `[voting_list_v2 layout="compact"]`  | On single post         | V2 with specific layout preset         |
+| `[voting_list_total_score id="123"]` | Anywhere               | Show total score for a list            |
+| `[lists_with_this_item]`             | On voting_items single | Show lists containing current item     |
+| `[voting_category_hero]`             | Category archive       | Hero section with featured lists       |
+| `[homepage_categories_slider]`       | Homepage               | Category carousel slider               |
+| `[voting_top_categories]`            | Homepage               | Top categories with rankings           |
+| `[voting_trending]`                  | Anywhere               | Trending/popular lists                 |
+
+**V2 Template Layouts:**
+
+- `grid` - Card grid (2-3 columns, mobile-first vertical cards)
+- `compact` - Compact list with always-visible voting buttons
+- `classic` - Enhanced horizontal cards (improved original style)
+
+**URL Parameters:** Add `?layout=compact` or `?v2` to any voting list page to test.
 
 ### Quiz Module
 
