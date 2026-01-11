@@ -94,7 +94,7 @@ const Templates = {
     </div>
   `,
 
-  waitScreen: (step, total, timeLeft = 3) => `
+  waitScreen: (step, total, timeLeft = 1.5) => `
     <div class="ygv-wait-screen fade-in">
       <h3>Sledeće pitanje</h3>
       <div class="ygv-countdown-circle">
@@ -555,7 +555,7 @@ class QuizController {
 
   showWaitingScreen() {
     this.quiz.updateQuestionCounter();
-    let countdownTime = 3;
+    let countdownTime = 1.5;
     this.container.innerHTML = Templates.waitScreen(
       this.quiz.currentStep + 1,
       this.quiz.quizData.length,
@@ -571,7 +571,7 @@ class QuizController {
     progressRing.style.strokeDashoffset = 0;
 
     let countdownTimer = setInterval(() => {
-      countdownTime--;
+      countdownTime -= 0.5;
       countdownDisplay.innerText = countdownTime;
 
       // ✅ Update progress ring (keeps shrinking)
@@ -582,7 +582,7 @@ class QuizController {
         clearInterval(countdownTimer);
         this.showQuestion(); // ✅ Move to next question after countdown
       }
-    }, 1000);
+    }, 500);
   }
 
   async showSummary() {
