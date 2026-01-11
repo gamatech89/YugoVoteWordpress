@@ -4268,7 +4268,8 @@ select.ygv-input {
   color: var(--ygv-text-muted, #94a3b8);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 3px;
+  margin: 0 0 2px 0;
+  line-height: 1;
 }
 
 .ygv-profile-detail__value {
