@@ -21,11 +21,10 @@ function render_question_meta_box($post) {
     $answers = get_post_meta($post->ID, '_quiz_answers', true) ?: [];
     $correct_answer = get_post_meta($post->ID, '_correct_answer', true);
 
-    // Fetch Quiz Levels for Difficulty Selection
-    $quiz_levels = get_posts([
-        'post_type' => 'quiz_levels',
-        'posts_per_page' => -1
-    ]);
+    // ✅ PERFORMANCE: Use cached quiz levels helper
+    $quiz_levels = function_exists('ygv_get_quiz_levels_cached') 
+        ? ygv_get_quiz_levels_cached() 
+        : get_posts(['post_type' => 'quiz_levels', 'posts_per_page' => -1]);
 
     wp_nonce_field('save_question_meta', 'question_meta_nonce');
 

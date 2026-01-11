@@ -53,12 +53,10 @@ if ( ! function_exists('cs_filter_questions_by_taxonomies_and_meta') ) {
         $meta_key       = '_question_difficulty';
         $selected_level = isset($_GET[$meta_key]) ? sanitize_text_field( wp_unslash($_GET[$meta_key]) ) : '';
         
-        // ✅ PERFORMANCE: Cache quiz levels for 1 hour
-        $levels = get_transient('ygv_quiz_levels_list');
-        if (false === $levels) {
-            $levels = get_posts( [ 'post_type' => 'quiz_levels', 'posts_per_page' => -1 ] );
-            set_transient('ygv_quiz_levels_list', $levels, HOUR_IN_SECONDS);
-        }
+        // ✅ PERFORMANCE: Use cached quiz levels helper
+        $levels = function_exists('ygv_get_quiz_levels_cached') 
+            ? ygv_get_quiz_levels_cached() 
+            : get_posts(['post_type' => 'quiz_levels', 'posts_per_page' => -1]);
 
         echo '<select name="' . esc_attr($meta_key) . '" id="' . esc_attr($meta_key) . '" class="postform">';
         echo '<option value="">' . esc_html__( 'Filter by Level', 'your-text-domain' ) . '</option>';

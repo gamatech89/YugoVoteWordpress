@@ -1,6 +1,24 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+/**
+ * ✅ PERFORMANCE: Get cached quiz levels list
+ * Central function to retrieve quiz levels with transient caching
+ * 
+ * @return array Array of WP_Post objects for quiz levels
+ */
+function ygv_get_quiz_levels_cached(): array {
+    $levels = get_transient('ygv_quiz_levels_list');
+    if (false === $levels) {
+        $levels = get_posts([
+            'post_type'      => 'quiz_levels',
+            'posts_per_page' => -1,
+        ]);
+        set_transient('ygv_quiz_levels_list', $levels, HOUR_IN_SECONDS);
+    }
+    return $levels;
+}
+
 /** Returns the main quiz_category term_id for a quiz (or 0 if none). */
 function ygv_get_quiz_category_term_id(int $quiz_id): int {
     $t = wp_get_object_terms($quiz_id, 'quiz_category', ['fields' => 'ids']);
