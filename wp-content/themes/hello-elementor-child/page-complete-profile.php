@@ -60,9 +60,54 @@ $current_step = isset($_GET['step']) ? intval($_GET['step']) : 1;
 $current_step = max(1, min(2, $current_step)); // Clamp between 1 and 2
 
 wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], '1.0.0');
-
-get_header(); 
 ?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php wp_head(); ?>
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; }
+        .ygv-auth-fullpage { min-height: 100vh; display: flex; flex-direction: column; }
+        .ygv-auth-back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--ygv-border, #e2e8f0);
+            border-radius: 10px;
+            color: var(--ygv-text, #1e293b);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .ygv-auth-back-btn:hover {
+            background: var(--ygv-primary, #2d3a8c);
+            color: white;
+            border-color: var(--ygv-primary, #2d3a8c);
+        }
+        .ygv-auth-back-btn svg { width: 18px; height: 18px; }
+        @media (max-width: 768px) {
+            .ygv-auth-back-btn { top: 12px; left: 12px; padding: 8px 14px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body <?php body_class('ygv-auth-fullpage-body'); ?>>
+
+<a href="<?php echo esc_url(home_url('/')); ?>" class="ygv-auth-back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Nazad
+</a>
 
 <div class="ygv-auth-page-wrapper ygv-complete-profile-wrapper">
     <!-- Left Side - Branding -->
@@ -352,4 +397,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php get_footer(); ?>
+<?php wp_footer(); ?>
+</body>
+</html>
