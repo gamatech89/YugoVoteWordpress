@@ -190,15 +190,15 @@ if ($current_user_id > 0) {
 
         <!-- Card Footer -->
         <div class="yuv-quiz-card__footer">
-            <span class="yuv-quiz-card__button" style="color: <?php echo esc_attr($category_color); ?>; background: <?php echo esc_attr($category_color); ?>1A;">
+            <button type="button" class="ygv-quiz-card__btn ygv-quiz-start-btn" data-quiz-id="<?php echo esc_attr($quiz_id); ?>">
                 <?php if ($is_completed): ?>
-                    <i class="ri-refresh-line"></i>
-                    Igraj Ponovo
+                    <svg class="ygv-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    <span>Igraj Ponovo</span>
                 <?php else: ?>
-                    <i class="ri-play-circle-line"></i>
-                    Započni Kviz
+                    <svg class="ygv-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Započni Kviz</span>
                 <?php endif; ?>
-            </span>
+            </button>
         </div>
     </a>
 </article>

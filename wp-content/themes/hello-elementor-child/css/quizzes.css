@@ -1012,6 +1012,40 @@
   border-top: 1px solid #f0f0f0;
 }
 
+.yuv-quiz-card__footer .ygv-quiz-card__btn,
+.yuv-quiz-card__footer .ygv-quiz-start-btn {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  background: #2d3a8c !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.yuv-quiz-card__footer .ygv-quiz-card__btn:hover,
+.yuv-quiz-card__footer .ygv-quiz-start-btn:hover {
+  background: #1e2a6e !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 58, 140, 0.3);
+}
+
+.yuv-quiz-card__footer .ygv-quiz-card__btn svg,
+.yuv-quiz-card__footer .ygv-quiz-start-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .yuv-quiz-card__button {
   display: flex;
   align-items: center;
