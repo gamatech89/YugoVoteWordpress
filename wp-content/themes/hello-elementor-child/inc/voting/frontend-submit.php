@@ -246,7 +246,7 @@ function yugo_create_list_shortcode() {
                     </div>
                     
                     <div class="ygv-selected-items-header">
-                        <strong><?php echo esc_html__('Izabrane Stavke', 'hello-elementor-child'); ?> (<span id="ygv-selected-count">0</span>/10)</strong>
+                        <strong><?php echo esc_html__('Izabrane Stavke', 'hello-elementor-child'); ?> (<span id="ygv-selected-count">0</span>/<span id="ygv-max-items">10</span>)</strong>
                     </div>
                     <div class="ygv-selected-items" id="ygv-selected-items">
                         <p class="ygv-empty-selection"><?php echo esc_html__('Klikni na stavke iznad da ih dodaš u listu', 'hello-elementor-child'); ?></p>
@@ -282,20 +282,27 @@ function yugo_create_list_shortcode() {
         const votingItemsInput = document.getElementById('voting_items');
         const categoryFilter = document.getElementById('ygv-item-category-filter');
         const searchInput = document.getElementById('ygv-item-search');
+        const listCategorySelect = document.getElementById('list_category');
+        const votingScaleSelect = document.getElementById('voting_scale');
         
         let allItems = [];
         let selected = [];
         
-        // Load items on page load
-        loadItems();
+        // Load items filtered by list category on page load
+        if (listCategorySelect && listCategorySelect.value) {
+            loadItems('', '', listCategorySelect.value);
+        } else {
+            loadItems();
+        }
         
-        function loadItems(categoryId = '', search = '') {
+        function loadItems(categoryId = '', search = '', listCategoryId = '') {
             availableItems.innerHTML = '<p class="ygv-muted"><?php echo esc_js(__('Učitavanje...', 'hello-elementor-child')); ?></p>';
             
             const params = new URLSearchParams({
                 action: 'ygv_get_voting_items',
                 category: categoryId,
-                search: search
+                search: search,
+                list_category: listCategoryId || (listCategorySelect ? listCategorySelect.value : '')
             });
             
             fetch('<?php echo admin_url('admin-ajax.php'); ?>?' + params)
@@ -317,13 +324,14 @@ function yugo_create_list_shortcode() {
             let html = '<div class="ygv-items-grid">';
             allItems.forEach(item => {
                 const isSelected = selected.includes(item.id);
-                const disabled = selected.length >= 10 && !isSelected;
+                const maxItems = parseInt(document.getElementById('voting_scale').value) || 10;
+                const disabled = selected.length >= maxItems && !isSelected;
                 html += `
                     <div class="ygv-item-card ${isSelected ? 'ygv-item-selected' : ''} ${disabled ? 'ygv-item-disabled' : ''}" 
                          data-id="${item.id}" data-title="${item.title}">
-                        ${item.thumbnail ? `<img src="${item.thumbnail}" alt="">` : '<div class="ygv-item-no-thumb"><?php echo esc_js(ygv_icon('image', 24)); ?></div>'}
+                        ${item.thumbnail ? `<img src="${item.thumbnail}" alt="">` : '<div class="ygv-item-no-thumb"><svg class="ygv-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>'}
                         <span class="ygv-item-title">${item.title}</span>
-                        ${isSelected ? '<span class="ygv-item-check"><?php echo esc_js(ygv_icon('check', 16)); ?></span>' : ''}
+                        ${isSelected ? '<span class="ygv-item-check"><svg class="ygv-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
                     </div>
                 `;
             });
@@ -339,11 +347,12 @@ function yugo_create_list_shortcode() {
         function toggleItem(card) {
             const id = parseInt(card.dataset.id);
             const title = card.dataset.title;
+            const maxItems = parseInt(document.getElementById('voting_scale').value) || 10;
             
             if (selected.includes(id)) {
                 // Remove
                 selected = selected.filter(i => i !== id);
-            } else if (selected.length < 10) {
+            } else if (selected.length < maxItems) {
                 // Add
                 selected.push(id);
             }
@@ -402,14 +411,46 @@ function yugo_create_list_shortcode() {
             }, 300);
         });
         
+        // When list category changes, reload items and reset selection
+        if (listCategorySelect) {
+            listCategorySelect.addEventListener('change', () => {
+                selected = [];
+                updateSelectedItems();
+                loadItems('', '', listCategorySelect.value);
+            });
+        }
+        
+        // When voting scale changes, re-render to update max items
+        if (votingScaleSelect) {
+            votingScaleSelect.addEventListener('change', () => {
+                const maxItems = parseInt(votingScaleSelect.value) || 10;
+                // Trim selection if exceeds new max
+                if (selected.length > maxItems) {
+                    selected = selected.slice(0, maxItems);
+                    updateSelectedItems();
+                }
+                renderAvailableItems();
+                updateMaxItemsLabel();
+            });
+        }
+        
+        function updateMaxItemsLabel() {
+            const maxItems = parseInt(document.getElementById('voting_scale').value) || 10;
+            const maxItemsSpan = document.getElementById('ygv-max-items');
+            if (maxItemsSpan) {
+                maxItemsSpan.textContent = maxItems;
+            }
+        }
+        
         // Form submission
         if (form && submitBtn) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                if (selected.length < 10) {
+                const maxItems = parseInt(document.getElementById('voting_scale').value) || 10;
+                if (selected.length !== maxItems) {
                     messageDiv.className = 'ygv-message ygv-error-banner';
-                    messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong><?php echo esc_js(__('Moraš izabrati tačno 10 stavki.', 'hello-elementor-child')); ?></strong>';
+                    messageDiv.innerHTML = '<span><svg class="ygv-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><strong><?php echo esc_js(__('Moraš izabrati tačno', 'hello-elementor-child')); ?> ' + maxItems + ' <?php echo esc_js(__('stavki.', 'hello-elementor-child')); ?></strong>';
                     messageDiv.style.display = 'flex';
                     return;
                 }
@@ -429,7 +470,7 @@ function yugo_create_list_shortcode() {
                 .then(data => {
                     if (data.success) {
                         messageDiv.className = 'ygv-message ygv-success-banner';
-                        messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('check-circle', 20)); ?></span><strong>' + data.data.message + '</strong>';
+                        messageDiv.innerHTML = '<span><svg class="ygv-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><strong>' + data.data.message + '</strong>';
                         messageDiv.style.display = 'flex';
                         
                         setTimeout(() => {
@@ -437,7 +478,7 @@ function yugo_create_list_shortcode() {
                         }, 2000);
                     } else {
                         messageDiv.className = 'ygv-message ygv-error-banner';
-                        messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong>' + data.data + '</strong>';
+                        messageDiv.innerHTML = '<span><svg class="ygv-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><strong>' + data.data + '</strong>';
                         messageDiv.style.display = 'flex';
                         submitBtn.disabled = false;
                         submitBtn.textContent = '<?php echo esc_js(__('Kreiraj Listu', 'hello-elementor-child')); ?>';
@@ -445,7 +486,7 @@ function yugo_create_list_shortcode() {
                 })
                 .catch(error => {
                     messageDiv.className = 'ygv-message ygv-error-banner';
-                    messageDiv.innerHTML = '<span><?php echo esc_js(ygv_icon('alert-triangle', 20)); ?></span><strong><?php echo esc_js(__('Greška pri komunikaciji sa serverom.', 'hello-elementor-child')); ?></strong>';
+                    messageDiv.innerHTML = '<span><svg class="ygv-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><strong><?php echo esc_js(__('Greška pri komunikaciji sa serverom.', 'hello-elementor-child')); ?></strong>';
                     messageDiv.style.display = 'flex';
                     submitBtn.disabled = false;
                     submitBtn.textContent = '<?php echo esc_js(__('Kreiraj Listu', 'hello-elementor-child')); ?>';
@@ -465,6 +506,7 @@ add_shortcode('yugo_create_list', 'yugo_create_list_shortcode');
 function ygv_ajax_get_voting_items() {
     $category_id = intval($_GET['category'] ?? 0);
     $search = sanitize_text_field($_GET['search'] ?? '');
+    $list_category_id = intval($_GET['list_category'] ?? 0);
     
     $args = [
         'post_type' => 'voting_items',
@@ -474,12 +516,42 @@ function ygv_ajax_get_voting_items() {
         'order' => 'ASC',
     ];
     
+    // Build tax_query
+    $tax_query = [];
+    
+    // If item category filter is set, use it directly
     if ($category_id) {
-        $args['tax_query'] = [[
+        $tax_query[] = [
             'taxonomy' => 'voting_item_category',
             'field' => 'term_id',
             'terms' => $category_id,
-        ]];
+        ];
+    }
+    // If list category is set, find matching item categories by name
+    elseif ($list_category_id) {
+        $list_term = get_term($list_category_id, 'voting_list_category');
+        if ($list_term && !is_wp_error($list_term)) {
+            // Find item category with same name (or similar)
+            $item_category = get_term_by('name', $list_term->name, 'voting_item_category');
+            if ($item_category) {
+                // Get this category and all its children
+                $term_ids = [$item_category->term_id];
+                $children = get_term_children($item_category->term_id, 'voting_item_category');
+                if (!is_wp_error($children)) {
+                    $term_ids = array_merge($term_ids, $children);
+                }
+                $tax_query[] = [
+                    'taxonomy' => 'voting_item_category',
+                    'field' => 'term_id',
+                    'terms' => $term_ids,
+                    'include_children' => true,
+                ];
+            }
+        }
+    }
+    
+    if (!empty($tax_query)) {
+        $args['tax_query'] = $tax_query;
     }
     
     if ($search) {
@@ -533,6 +605,11 @@ function ygv_ajax_create_list() {
     $voting_scale = intval($_POST['voting_scale'] ?? 10);
     $voting_items = json_decode(stripslashes($_POST['voting_items'] ?? '[]'), true);
     
+    // Validate voting scale (allowed values: 5 or 10)
+    if (!in_array($voting_scale, [5, 10])) {
+        $voting_scale = 10;
+    }
+    
     if (empty($title)) {
         wp_send_json_error(__('Naslov je obavezan.', 'hello-elementor-child'));
     }
@@ -541,9 +618,9 @@ function ygv_ajax_create_list() {
         wp_send_json_error(__('Kategorija je obavezna.', 'hello-elementor-child'));
     }
     
-    // Validate voting items
-    if (!is_array($voting_items) || count($voting_items) !== 10) {
-        wp_send_json_error(__('Moraš izabrati tačno 10 stavki.', 'hello-elementor-child'));
+    // Validate voting items - count should match voting scale
+    if (!is_array($voting_items) || count($voting_items) !== $voting_scale) {
+        wp_send_json_error(sprintf(__('Moraš izabrati tačno %d stavki.', 'hello-elementor-child'), $voting_scale));
     }
     
     // Verify all items exist
