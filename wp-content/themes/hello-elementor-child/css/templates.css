@@ -46,25 +46,6 @@
 }
 
 /* ========================================
-   RESET OVERRIDE - Fix Elementor reset.css
-   Override the pink/red button styles from
-   Elementor's reset.css (border: 1px solid #c36)
-   ======================================== */
-
-.ygv-header button,
-.ygv-header [type="button"],
-.ygv-header [type="submit"],
-.ygv-page button,
-.ygv-page [type="button"],
-.ygv-page [type="submit"] {
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
-  color: inherit;
-  padding: 0;
-}
-
-/* ========================================
    CUSTOM HEADER
    ======================================== */
 
