@@ -334,4 +334,44 @@ get_header();
     
 </div>
 
+<script>
+// Quiz start button handler for archive page
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.ygv-quiz-start-btn, .ygv-quiz-card__btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var quizId = this.getAttribute('data-quiz-id');
+            if (!quizId) {
+                console.error('Quiz ID missing from button');
+                return;
+            }
+            
+            if (!window.Quiz) {
+                console.error('Quiz class not loaded');
+                return;
+            }
+            
+            if (!window.quizSettings || !window.quizSettings.apiUrl) {
+                console.error('Quiz settings not available');
+                return;
+            }
+            
+            // Close existing quiz if any
+            if (window.currentQuiz && window.currentQuiz.closeQuiz) {
+                window.currentQuiz.closeQuiz();
+            }
+            
+            // Launch quiz
+            try {
+                window.currentQuiz = new window.Quiz(window.quizSettings.apiUrl, quizId);
+            } catch (error) {
+                console.error('Failed to launch quiz:', error);
+            }
+        });
+    });
+});
+</script>
+
 <?php get_footer(); ?>
