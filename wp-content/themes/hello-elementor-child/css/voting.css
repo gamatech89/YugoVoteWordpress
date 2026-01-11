@@ -712,7 +712,6 @@
 
 .yuv-top-categories-section {
   padding: 60px 0;
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 /* Carousel Container */
@@ -748,12 +747,12 @@
   z-index: 10;
   transition: all 0.3s;
   box-shadow: 0 4px 16px rgba(67, 85, 164, 0.3);
+  margin-top: 0;
 }
 
 .yuv-carousel-btn:hover:not(:disabled) {
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 6px 24px rgba(67, 85, 164, 0.5);
-  background: #3644b;
 }
 
 .yuv-carousel-btn:disabled {
@@ -762,11 +761,11 @@
 }
 
 .yuv-carousel-prev {
-  left: 0;
+  left: 10px;
 }
 
 .yuv-carousel-next {
-  right: 0;
+  right: 10px;
 }
 
 .yuv-carousel-btn svg {
