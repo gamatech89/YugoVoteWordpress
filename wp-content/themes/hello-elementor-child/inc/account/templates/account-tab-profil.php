@@ -372,20 +372,80 @@ $category_icons = [
         <?php endif; ?>
     </div>
     
-    <!-- Basic Profile Info -->
-    <div class="ygv-card">
-        <h3><?php echo esc_html__('Osnovni Podaci', 'hello-elementor-child'); ?></h3>
-        <div class="ygv-profile-info">
-            <p><strong><?php echo esc_html__('Ime', 'hello-elementor-child'); ?>:</strong> <?php echo esc_html($user->display_name); ?></p>
-            <p><strong><?php echo esc_html__('Email', 'hello-elementor-child'); ?>:</strong> <?php echo esc_html($user->user_email); ?></p>
-            <p><strong><?php echo esc_html__('Pol', 'hello-elementor-child'); ?>:</strong> <?php echo $gender ? esc_html($gender) : '<span class="ygv-muted">'.esc_html__('nije postavljeno', 'hello-elementor-child').'</span>'; ?></p>
-            <p><strong><?php echo esc_html__('Datum rođenja', 'hello-elementor-child'); ?>:</strong> <?php echo $dob ? esc_html($dob) : '<span class="ygv-muted">'.esc_html__('nije postavljeno', 'hello-elementor-child').'</span>'; ?></p>
-            <p><strong><?php echo esc_html__('Država', 'hello-elementor-child'); ?>:</strong> <?php echo $country ? esc_html($country) : '<span class="ygv-muted">'.esc_html__('nije postavljeno', 'hello-elementor-child').'</span>'; ?></p>
-            <p><strong><?php echo esc_html__('Interesovanja', 'hello-elementor-child'); ?>:</strong>
-                <?php echo $poi_names ? esc_html(implode(', ', $poi_names)) : '<span class="ygv-muted">'.esc_html__('nema sačuvanih', 'hello-elementor-child').'</span>'; ?>
-            </p>
+    <!-- Basic Profile Info - Redesigned -->
+    <div class="ygv-card ygv-profile-card">
+        <div class="ygv-profile-card__header">
+            <div class="ygv-profile-avatar">
+                <?php 
+                $avatar_url = get_avatar_url($user_id, ['size' => 120]);
+                $user_level = (int)$overall['overall_level'];
+                ?>
+                <div class="ygv-avatar-wrapper">
+                    <img src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($user->display_name); ?>" class="ygv-avatar-img">
+                    <span class="ygv-avatar-level"><?php echo $user_level; ?></span>
+                </div>
+            </div>
+            <div class="ygv-profile-card__name">
+                <h3><?php echo esc_html($user->display_name); ?></h3>
+                <span class="ygv-profile-card__title"><?php echo esc_html($global_title); ?></span>
+            </div>
+            <a href="<?php echo esc_url(home_url('/uredi-profil/')); ?>" class="ygv-btn ygv-btn-outline ygv-btn-sm">
+                <?php ygv_icon_e('edit', 16); ?>
+                <?php echo esc_html__('Uredi', 'hello-elementor-child'); ?>
+            </a>
         </div>
-        <p style="margin-top: 1rem;"><a class="ygv-btn" href="<?php echo esc_url($edit_url); ?>"><?php echo esc_html__('Uredi profil', 'hello-elementor-child'); ?></a></p>
+        
+        <div class="ygv-profile-card__details">
+            <div class="ygv-profile-detail">
+                <span class="ygv-profile-detail__icon"><?php ygv_icon_e('mail', 18); ?></span>
+                <span class="ygv-profile-detail__label"><?php echo esc_html__('Email', 'hello-elementor-child'); ?></span>
+                <span class="ygv-profile-detail__value"><?php echo esc_html($user->user_email); ?></span>
+            </div>
+            
+            <div class="ygv-profile-detail">
+                <span class="ygv-profile-detail__icon"><?php ygv_icon_e('user', 18); ?></span>
+                <span class="ygv-profile-detail__label"><?php echo esc_html__('Pol', 'hello-elementor-child'); ?></span>
+                <span class="ygv-profile-detail__value">
+                    <?php 
+                    $gender_labels = ['male' => 'Muški', 'female' => 'Ženski', 'other' => 'Drugo'];
+                    echo $gender ? esc_html($gender_labels[$gender] ?? $gender) : '<span class="ygv-muted">—</span>'; 
+                    ?>
+                </span>
+            </div>
+            
+            <div class="ygv-profile-detail">
+                <span class="ygv-profile-detail__icon"><?php ygv_icon_e('calendar', 18); ?></span>
+                <span class="ygv-profile-detail__label"><?php echo esc_html__('Datum rođenja', 'hello-elementor-child'); ?></span>
+                <span class="ygv-profile-detail__value">
+                    <?php 
+                    if ($dob) {
+                        $dob_formatted = date_i18n('j. F Y', strtotime($dob));
+                        echo esc_html($dob_formatted);
+                    } else {
+                        echo '<span class="ygv-muted">—</span>';
+                    }
+                    ?>
+                </span>
+            </div>
+            
+            <div class="ygv-profile-detail">
+                <span class="ygv-profile-detail__icon"><?php ygv_icon_e('map-pin', 18); ?></span>
+                <span class="ygv-profile-detail__label"><?php echo esc_html__('Država', 'hello-elementor-child'); ?></span>
+                <span class="ygv-profile-detail__value"><?php echo $country ? esc_html($country) : '<span class="ygv-muted">—</span>'; ?></span>
+            </div>
+            
+            <?php if (!empty($poi_names)): ?>
+            <div class="ygv-profile-detail ygv-profile-detail--full">
+                <span class="ygv-profile-detail__icon"><?php ygv_icon_e('heart', 18); ?></span>
+                <span class="ygv-profile-detail__label"><?php echo esc_html__('Interesovanja', 'hello-elementor-child'); ?></span>
+                <div class="ygv-profile-detail__tags">
+                    <?php foreach ($poi_names as $interest): ?>
+                        <span class="ygv-tag"><?php echo esc_html($interest); ?></span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
     </div>
     
 </div>
