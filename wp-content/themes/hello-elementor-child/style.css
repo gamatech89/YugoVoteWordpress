@@ -75,6 +75,105 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    2. GLOBAL STYLES & RESET
    ========================================================================== */
 
+/* ==========================================================================
+   SECTION HEADER UTILITIES (Use with Elementor Heading Widget)
+   Add class to Advanced > CSS Classes in Elementor
+   ========================================================================== */
+
+/* Base Section Header - Apply to container/section */
+.cs-section-header .elementor-heading-title {
+  font-family: var(--secondary-font, "Chendolle", sans-serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--text-color, #1a1a2e);
+  position: relative;
+  display: inline-block;
+}
+
+/* Dark Section - White text */
+.cs-section-dark .elementor-heading-title,
+.cs-section-header--light .elementor-heading-title {
+  color: #fff;
+}
+
+/* With Underline Accent */
+.cs-section-header--underline .elementor-heading-title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--secondary-color, #fe6555);
+  border-radius: 2px;
+}
+
+/* Centered Underline */
+.cs-section-header--underline-center .elementor-heading-title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--secondary-color, #fe6555);
+  border-radius: 2px;
+}
+
+/* With Side Line (before text) */
+.cs-section-header--line .elementor-heading-title::before {
+  content: "";
+  display: inline-block;
+  width: 40px;
+  height: 4px;
+  background: var(--primary-color, #4456a6);
+  margin-right: 16px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+/* With Icon Badge */
+.cs-section-header--badge .elementor-heading-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Gradient Text */
+.cs-section-header--gradient .elementor-heading-title {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Large Hero Title */
+.cs-section-header--hero .elementor-heading-title {
+  font-size: 3.5rem;
+  line-height: 1.1;
+}
+
+/* Small Subtitle Style */
+.cs-section-header--subtitle .elementor-heading-title {
+  font-family: var(--primary-font, "Inter", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--primary-color, #4456a6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cs-section-header .elementor-heading-title {
+    font-size: 2rem;
+  }
+  .cs-section-header--hero .elementor-heading-title {
+    font-size: 2.5rem;
+  }
+}
+
 body {
   overflow-x: hidden;
   font-family: var(--primary-font);
