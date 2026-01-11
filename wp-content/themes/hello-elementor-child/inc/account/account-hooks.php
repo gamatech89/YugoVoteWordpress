@@ -2,14 +2,29 @@
 if (!defined('ABSPATH')) exit;
 
 // Page slugs (define only once)
-defined('CUSTOM_LOGIN_PAGE_SLUG')      || define('CUSTOM_LOGIN_PAGE_SLUG', 'login');
+defined('CUSTOM_LOGIN_PAGE_SLUG')      || define('CUSTOM_LOGIN_PAGE_SLUG', 'prijava');
 defined('CUSTOM_REGISTER_PAGE_SLUG')   || define('CUSTOM_REGISTER_PAGE_SLUG', 'registracija');
 defined('CUSTOM_COMPLETE_PROFILE_PAGE_SLUG') || define('CUSTOM_COMPLETE_PROFILE_PAGE_SLUG', 'kompletiranje-naloga');
 defined('CUSTOM_ACCOUNT_PAGE_SLUG')    || define('CUSTOM_ACCOUNT_PAGE_SLUG', 'moj-nalog');
 
-/** Redirect auth errors back to custom login */
+/** Redirect auth errors back to custom login (only for non-AJAX requests) */
 add_filter('authenticate', function($user, $username, $password){
     if (!is_wp_error($user)) return $user;
+    
+    // Don't redirect for AJAX requests - let the AJAX handler return JSON
+    if (defined('DOING_AJAX') && DOING_AJAX) {
+        return $user;
+    }
+    
+    // Also check for wp_doing_ajax() and common AJAX indicators
+    if (wp_doing_ajax()) {
+        return $user;
+    }
+    
+    // Check if this is an AJAX request by headers
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        return $user;
+    }
 
     $ref = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
     $login_url = home_url('/'.CUSTOM_LOGIN_PAGE_SLUG.'/');
@@ -30,6 +45,21 @@ add_filter('login_url', function($login_url, $redirect, $force_reauth){
     if ($force_reauth) $url = add_query_arg('reauth', '1', $url);
     return $url;
 }, 10, 3);
+
+/** Override lost password URL to custom page */
+add_filter('lostpassword_url', function($lostpassword_url, $redirect){
+    $url = home_url('/zaboravljena-lozinka/');
+    if ($redirect) {
+        $url = add_query_arg('redirect_to', urlencode($redirect), $url);
+    }
+    return $url;
+}, 10, 2);
+
+/** Redirect wp-login.php?action=lostpassword to custom page */
+add_action('login_form_lostpassword', function(){
+    wp_redirect(home_url('/zaboravljena-lozinka/'));
+    exit;
+});
 
 /** After logout send to custom login with flag */
 add_filter('logout_url', function($logout_url, $redirect){

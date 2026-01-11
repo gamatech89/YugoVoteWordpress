@@ -32,7 +32,7 @@ foreach ($answers as $idx => $ans) {
                 </label>
             <?php endforeach; ?>
         </div>
-        <button type="submit" class="ygv-poll__btn">
+        <button type="submit" class="ygv-btn ygv-btn--primary ygv-btn--full ygv-poll__btn">
             <span class="ygv-poll__btn-text">Glasaj</span>
             <span class="ygv-poll__btn-loading">
                 <svg class="ygv-spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg>

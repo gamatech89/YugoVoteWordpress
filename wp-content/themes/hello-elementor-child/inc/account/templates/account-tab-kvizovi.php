@@ -289,7 +289,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                         $num_questions = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
                         $thumbnail = get_the_post_thumbnail_url($quiz_id, 'thumbnail');
                     ?>
-                    <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>" class="ygv-quiz-mini-card" style="--quiz-color: <?php echo esc_attr($category_color); ?>">
+                    <div class="ygv-quiz-mini-card yuv-quiz-card-link" data-quiz-id="<?php echo $quiz_id; ?>" style="--quiz-color: <?php echo esc_attr($category_color); ?>">
                         <?php if ($thumbnail): ?>
                         <div class="ygv-quiz-mini-thumb" style="background-image: url('<?php echo esc_url($thumbnail); ?>')"></div>
                         <?php else: ?>
@@ -305,7 +305,7 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                         <span class="ygv-quiz-mini-play">
                             <?php ygv_icon_e('play', 16); ?>
                         </span>
-                    </a>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -319,59 +319,66 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
                     $awarded_xp = (int)$quiz['awarded_xp'];
                     $last_attempt = $quiz['last_attempt_at'];
                     
-                    // Get difficulty
-                    $difficulty = get_post_meta($quiz_id, '_quiz_difficulty', true) ?: 'medium';
-                    $difficulty_labels = [
-                        'easy' => __('Lako', 'hello-elementor-child'),
-                        'medium' => __('Srednje', 'hello-elementor-child'),
-                        'hard' => __('Teško', 'hello-elementor-child'),
-                    ];
-                    $difficulty_label = $difficulty_labels[$difficulty] ?? $difficulty;
+                    // Get category info
+                    $category_name = $quiz['category_names'] ?? 'Opšte';
+                    $category_color = function_exists('ygv_get_quiz_category_color') 
+                        ? ygv_get_quiz_category_color($quiz_id) 
+                        : '#6366f1';
                     
                     // Time ago
                     $time_ago = human_time_diff(strtotime($last_attempt), current_time('timestamp'));
                     
-                    // Score color class
+                    // Score class
                     $score_class = 'ygv-score-low';
-                    if ($best_percent >= 80) $score_class = 'ygv-score-high';
-                    elseif ($best_percent >= 50) $score_class = 'ygv-score-medium';
+                    $score_bg = '#ef4444';
+                    if ($best_percent >= 80) {
+                        $score_class = 'ygv-score-high';
+                        $score_bg = '#10b981';
+                    } elseif ($best_percent >= 50) {
+                        $score_class = 'ygv-score-medium';
+                        $score_bg = '#f59e0b';
+                    }
                 ?>
                 <div class="ygv-quiz-history-item">
-                    <div class="ygv-quiz-history-score <?php echo esc_attr($score_class); ?>">
+                    <div class="ygv-quiz-history-score" style="background: <?php echo esc_attr($score_bg); ?>;">
                         <span class="ygv-quiz-score-percent"><?php echo $best_percent; ?>%</span>
                         <?php if ($best_percent >= 100): ?>
-                            <span class="ygv-quiz-perfect"><?php ygv_icon_e('trophy', 16); ?></span>
+                            <?php ygv_icon_e('trophy', 14); ?>
                         <?php endif; ?>
                     </div>
                     <div class="ygv-quiz-history-content">
-                        <h4 class="ygv-quiz-history-title">
-                            <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>">
+                        <div class="ygv-quiz-history-top">
+                            <h4 class="ygv-quiz-history-title">
                                 <?php echo esc_html($quiz['quiz_title'] ?? 'Quiz #'.$quiz_id); ?>
-                            </a>
-                        </h4>
-                        <?php if (!empty($quiz['category_names'])): ?>
-                            <span class="ygv-quiz-history-category"><?php echo esc_html($quiz['category_names']); ?></span>
-                        <?php endif; ?>
-                        <div class="ygv-quiz-history-meta">
-                            <span class="ygv-quiz-meta-difficulty ygv-difficulty-<?php echo esc_attr($difficulty); ?>">
-                                <?php echo esc_html($difficulty_label); ?>
+                            </h4>
+                            <span class="ygv-quiz-history-category" style="background: <?php echo esc_attr($category_color); ?>20; color: <?php echo esc_attr($category_color); ?>;">
+                                <?php echo esc_html($category_name); ?>
                             </span>
-                            <span class="ygv-quiz-meta-attempts" title="<?php echo esc_attr__('Broj pokušaja', 'hello-elementor-child'); ?>">
-                                <?php ygv_icon_e('refresh', 14); ?> <?php echo $attempts; ?>x
+                        </div>
+                        <div class="ygv-quiz-history-stats">
+                            <span class="ygv-quiz-history-stat">
+                                <?php ygv_icon_e('hash', 12); ?>
+                                <?php echo number_format($awarded_xp); ?>
                             </span>
-                            <span class="ygv-quiz-meta-xp" title="<?php echo esc_attr__('Zarađen XP', 'hello-elementor-child'); ?>">
-                                <?php ygv_icon_e('star', 14); ?> <?php echo number_format($awarded_xp); ?> XP
+                            <span class="ygv-quiz-history-stat">
+                                <?php ygv_icon_e('refresh', 12); ?>
+                                <?php echo $attempts; ?>x
                             </span>
-                            <span class="ygv-quiz-meta-time"><?php echo esc_html($time_ago); ?> <?php echo esc_html__('pre', 'hello-elementor-child'); ?></span>
+                            <span class="ygv-quiz-history-stat ygv-quiz-history-xp">
+                                <?php ygv_icon_e('star', 12); ?>
+                                <?php echo number_format($awarded_xp); ?> XP
+                            </span>
+                            <span class="ygv-quiz-history-stat ygv-quiz-history-time">
+                                <?php echo esc_html($time_ago); ?> pre
+                            </span>
                         </div>
                     </div>
-                    <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>" class="ygv-quiz-history-action" title="<?php echo esc_attr__('Ponovo reši', 'hello-elementor-child'); ?>">
-                        <?php if ($best_percent < 100): ?>
-                            <?php ygv_icon_e('refresh', 20); ?>
-                        <?php else: ?>
-                            <?php ygv_icon_e('check-circle', 20); ?>
-                        <?php endif; ?>
-                    </a>
+                    <button type="button" 
+                            class="ygv-quiz-history-play yuv-quiz-card-link" 
+                            data-quiz-id="<?php echo $quiz_id; ?>"
+                            title="<?php echo $best_percent < 100 ? esc_attr__('Igraj ponovo', 'hello-elementor-child') : esc_attr__('Odigrano', 'hello-elementor-child'); ?>">
+                        <?php ygv_icon_e($best_percent < 100 ? 'refresh' : 'check-circle', 20); ?>
+                    </button>
                 </div>
                 <?php endforeach; ?>
             </div>

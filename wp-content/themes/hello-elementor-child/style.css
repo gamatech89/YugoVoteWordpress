@@ -1885,9 +1885,96 @@ a {
   display: none !important;
 }
 
+/* --- Global Button Utilities --- */
+.ygv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.ygv-btn--primary {
+  background: linear-gradient(
+    135deg,
+    var(--ygv-accent-color, #4456a6) 0%,
+    #667eea 100%
+  );
+  box-shadow: 0 4px 15px rgba(68, 86, 166, 0.3);
+}
+
+.ygv-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(68, 86, 166, 0.4);
+}
+
+.ygv-btn--primary:active {
+  transform: translateY(0);
+}
+
+.ygv-btn--accent {
+  background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
+  box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+}
+
+.ygv-btn--accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+}
+
+.ygv-btn--full {
+  width: 100%;
+}
+
+.ygv-btn--lg {
+  padding: 18px 32px;
+  font-size: 17px;
+  border-radius: 14px;
+}
+
+.ygv-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Button shine effect on hover */
+.ygv-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.ygv-btn:hover::before {
+  left: 100%;
+}
+
 /* --- Spinner Animation --- */
 @keyframes ygv-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .ygv-spinner {
   width: 18px;
@@ -1952,7 +2039,7 @@ a {
 }
 
 .ygv-poll__option-radio::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1983,35 +2070,10 @@ a {
   transition: color 0.2s ease;
 }
 
-/* Vote Button */
+/* Vote Button - Uses utility classes .ygv-btn .ygv-btn--primary */
 .ygv-poll__btn {
-  width: 100%;
-  padding: 14px 24px;
-  border: none;
-  border-radius: 50px;
-  background: var(--ygv-accent-color, #4456a6);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.ygv-poll__btn:hover {
-  background: var(--ygv-accent-hover, #3a4a8a);
-  transform: translateY(-1px);
-}
-
-.ygv-poll__btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
+  letter-spacing: 1px;
 }
 
 .ygv-poll__btn-loading {
@@ -2093,81 +2155,123 @@ a {
   color: #888;
 }
 
-/* --- 2. DAILY POLL (Homepage Widget) --- */
+/* --- 2. DAILY POLL (Homepage Widget) - Split Layout --- */
 .ygv-daily-poll {
-  background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+  display: flex;
+  background: #fff;
   border-radius: 20px;
   border: 1px solid var(--ygv-border-color, #e5e7eb);
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(68, 86, 166, 0.08);
 }
 
-.ygv-daily-poll__header {
-  background: linear-gradient(135deg, var(--ygv-accent-color, #4456a6), #667eea);
-  padding: 20px 24px;
+/* Left Side - Image & Badge */
+.ygv-daily-poll__left {
+  flex: 0 0 400px;
+  background: linear-gradient(
+    135deg,
+    var(--ygv-accent-color, #4456a6),
+    #667eea
+  );
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
 }
 
-.ygv-daily-poll__header::before {
-  content: '';
+.ygv-daily-poll__left::before {
+  content: "";
   position: absolute;
   top: -50%;
-  right: -30%;
+  right: -50%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.ygv-daily-poll__left::after {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  left: -20%;
   width: 200px;
   height: 200px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
+}
+
+.ygv-daily-poll__image {
+  flex: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  min-height: 200px;
+}
+
+.ygv-daily-poll__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ygv-daily-poll__image--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ygv-daily-poll__info {
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .ygv-daily-poll__badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  position: relative;
-  z-index: 1;
-}
-
-.ygv-daily-poll__image {
-  margin-top: 16px;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-}
-
-.ygv-daily-poll__image img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  display: block;
-}
-
-.ygv-daily-poll__content {
-  padding: 24px;
-}
-
-.ygv-daily-poll__title {
-  margin: 0 0 12px 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--ygv-text-dark, #1a1a2e);
-  line-height: 1.3;
+  backdrop-filter: blur(10px);
 }
 
 .ygv-daily-poll__desc {
-  margin: 0 0 20px 0;
-  color: #666;
+  margin: 16px 0 0 0;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+/* Right Side - Poll Form */
+.ygv-daily-poll__right {
+  flex: 1;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ygv-daily-poll__title {
+  margin: 0 0 24px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ygv-text-dark, #1a1a2e);
+  line-height: 1.35;
+}
+
+.ygv-daily-poll__widget {
+  flex: 1;
 }
 
 .ygv-daily-poll__widget .ygv-poll {
@@ -2178,6 +2282,30 @@ a {
 
 .ygv-daily-poll__widget .ygv-poll__question {
   display: none;
+}
+
+/* Responsive - Stack on mobile */
+@media (max-width: 900px) {
+  .ygv-daily-poll {
+    flex-direction: column;
+  }
+
+  .ygv-daily-poll__left {
+    flex: none;
+    padding: 24px;
+  }
+
+  .ygv-daily-poll__image {
+    min-height: 180px;
+  }
+
+  .ygv-daily-poll__right {
+    padding: 24px;
+  }
+
+  .ygv-daily-poll__title {
+    font-size: 1.2rem;
+  }
 }
 
 /* --- 3. ARCHIVE PAGE --- */
@@ -2229,7 +2357,7 @@ a {
 
 .ygv-poll-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
 .ygv-poll-card__header {
@@ -2324,11 +2452,11 @@ a {
   .ygv-poll-archive__grid {
     grid-template-columns: 1fr;
   }
-  
+
   .ygv-poll-archive__title {
     font-size: 1.5rem;
   }
-  
+
   .ygv-daily-poll__title {
     font-size: 1.1rem;
   }
@@ -2349,7 +2477,7 @@ a {
   color: #fff;
   font-size: 0.9rem;
   font-weight: 500;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   z-index: 9999;
   opacity: 0;
   transition: all 0.3s ease;
@@ -2379,7 +2507,7 @@ a {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -2418,4 +2546,3 @@ a {
 .ygv-section--archive .ygv-poll-archive__header {
   margin-bottom: 30px;
 }
-

@@ -97,116 +97,152 @@ get_header();
     
     <!-- ========== CATEGORY FILTERS ========== -->
     <?php if (!empty($quiz_categories)): ?>
-    <section style="padding: 0 20px; margin-top: -40px; position: relative; z-index: 10;">
-        <div class="ygv-container" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-            <a href="<?php echo remove_query_arg('cat'); ?>" 
-               class="ygv-filter-btn <?php echo empty($active_category) ? 'active' : ''; ?>">
-                Sve kategorije
-            </a>
-            <?php foreach ($quiz_categories as $cat):
-                $cat_color = get_term_meta($cat->term_id, 'category_color', true) ?: '#6366f1';
-            ?>
-            <a href="<?php echo add_query_arg('cat', $cat->slug); ?>" 
-               class="ygv-filter-btn <?php echo $active_category === $cat->slug ? 'active' : ''; ?>"
-               style="<?php echo $active_category === $cat->slug ? "background: {$cat_color}; border-color: {$cat_color};" : ''; ?>">
-                <?php echo esc_html($cat->name); ?>
-                <span style="opacity: 0.7; margin-left: 4px;">(<?php echo $cat->count; ?>)</span>
-            </a>
-            <?php endforeach; ?>
+    <section class="ygv-quiz-filters">
+        <div class="ygv-container">
+            <div class="ygv-filter-row">
+                <div class="ygv-filter-buttons">
+                    <a href="<?php echo remove_query_arg('cat'); ?>" 
+                       class="ygv-filter-btn <?php echo empty($active_category) ? 'active' : ''; ?>">
+                        <?php ygv_icon_e('grid', 16); ?>
+                        Svi Kvizovi
+                    </a>
+                    <?php foreach ($quiz_categories as $cat):
+                        // Use unified color helper for filter pills too
+                        $cat_color = function_exists('ygv_get_unified_category_color') 
+                            ? ygv_get_unified_category_color($cat->term_id) 
+                            : '#6366f1';
+                    ?>
+                    <a href="<?php echo add_query_arg('cat', $cat->slug); ?>" 
+                       class="ygv-filter-btn <?php echo $active_category === $cat->slug ? 'active' : ''; ?>"
+                       style="<?php echo $active_category === $cat->slug ? "background: {$cat_color}; border-color: {$cat_color};" : ''; ?>">
+                        <?php echo esc_html($cat->name); ?>
+                        <span class="ygv-filter-count"><?php echo $cat->count; ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                <div class="ygv-sort-wrapper">
+                    <label for="ygv-sort"><?php ygv_icon_e('sort', 16); ?> Sortiraj:</label>
+                    <select id="ygv-sort" class="ygv-sort-select">
+                        <option value="latest">Najnovije</option>
+                        <option value="popular">Popularni</option>
+                        <option value="az">A-Z</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </section>
     <?php endif; ?>
     
     <!-- ========== QUIZ GRID ========== -->
     <?php if ($quizzes_query->have_posts()): ?>
-    <section style="padding: 40px 20px 60px;">
-        <div class="ygv-quiz-grid">
-            <?php while ($quizzes_query->have_posts()): $quizzes_query->the_post();
-                $quiz_id = get_the_ID();
-                
-                // Quiz meta
-                $num_questions = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
-                $time_per_question = get_post_meta($quiz_id, '_time_per_question', true) ?: 10;
-                $quiz_difficulty_id = get_post_meta($quiz_id, '_quiz_difficulty', true);
-                $quiz_difficulty = '';
-                if ($quiz_difficulty_id) {
-                    $difficulty_post = get_post($quiz_difficulty_id);
-                    if ($difficulty_post) $quiz_difficulty = $difficulty_post->post_title;
-                }
-                
-                // Category
-                $terms = get_the_terms($quiz_id, 'quiz_category');
-                $cat_name = 'Opšte';
-                $cat_color = '#6366f1';
-                if ($terms && !is_wp_error($terms)) {
-                    $cat_name = $terms[0]->name;
-                    $cat_color = get_term_meta($terms[0]->term_id, 'category_color', true) ?: '#6366f1';
-                }
-                
-                // Time
-                $total_time = ceil(($num_questions * $time_per_question) / 60);
-                
-                // User progress
-                $best_percent = 0;
-                $attempts = 0;
-                $is_completed = false;
-                if ($current_user_id) {
-                    global $wpdb;
-                    $progress_table = $wpdb->prefix . 'ygv_user_quiz_progress';
-                    $progress = $wpdb->get_row($wpdb->prepare(
-                        "SELECT best_percent, attempts FROM {$progress_table} WHERE user_id = %d AND quiz_id = %d",
-                        $current_user_id, $quiz_id
-                    ));
-                    if ($progress) {
-                        $best_percent = intval($progress->best_percent);
-                        $attempts = intval($progress->attempts);
-                        $is_completed = $attempts > 0;
+    <section class="ygv-quiz-section">
+        <div class="ygv-container">
+            <div class="ygv-quiz-grid">
+                <?php while ($quizzes_query->have_posts()): $quizzes_query->the_post();
+                    $quiz_id = get_the_ID();
+                    
+                    // Quiz meta
+                    $num_questions = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
+                    $time_per_question = get_post_meta($quiz_id, '_time_per_question', true) ?: 10;
+                    $quiz_difficulty_id = get_post_meta($quiz_id, '_quiz_difficulty', true);
+                    $quiz_difficulty = '';
+                    $quiz_difficulty_slug = 'beginner';
+                    if ($quiz_difficulty_id) {
+                        $difficulty_post = get_post($quiz_difficulty_id);
+                        if ($difficulty_post) {
+                            $quiz_difficulty = $difficulty_post->post_title;
+                            $quiz_difficulty_slug = $difficulty_post->post_name;
+                        }
                     }
-                }
-            ?>
-            <article class="ygv-quiz-card" data-quiz-id="<?php echo $quiz_id; ?>">
-                <a href="<?php the_permalink(); ?>" style="text-decoration: none; color: inherit;">
+                    
+                    // Category - use unified color helper
+                    $terms = get_the_terms($quiz_id, 'quiz_category');
+                    $cat_name = 'GENERAL';
+                    $cat_color = '#6366f1';
+                    if ($terms && !is_wp_error($terms)) {
+                        $cat_name = strtoupper($terms[0]->name);
+                        // Use ygv_get_quiz_category_color for proper color mapping
+                        $cat_color = function_exists('ygv_get_quiz_category_color') 
+                            ? ygv_get_quiz_category_color($quiz_id) 
+                            : '#6366f1';
+                    }
+                    
+                    // Time
+                    $total_time = ceil(($num_questions * $time_per_question) / 60);
+                    
+                    // User progress
+                    $best_percent = 0;
+                    $attempts = 0;
+                    $is_completed = false;
+                    if ($current_user_id) {
+                        global $wpdb;
+                        $progress_table = $wpdb->prefix . 'ygv_user_quiz_progress';
+                        $progress = $wpdb->get_row($wpdb->prepare(
+                            "SELECT best_percent, attempts FROM {$progress_table} WHERE user_id = %d AND quiz_id = %d",
+                            $current_user_id, $quiz_id
+                        ));
+                        if ($progress) {
+                            $best_percent = intval($progress->best_percent);
+                            $attempts = intval($progress->attempts);
+                            $is_completed = $attempts > 0;
+                        }
+                    }
+                    
+                    // Difficulty colors
+                    $diff_colors = [
+                        'beginner' => '#10b981',
+                        'easy' => '#10b981',
+                        'lako' => '#10b981',
+                        'intermediate' => '#f59e0b',
+                        'medium' => '#f59e0b',
+                        'srednje' => '#f59e0b',
+                        'expert' => '#ef4444',
+                        'hard' => '#ef4444',
+                        'teško' => '#ef4444',
+                    ];
+                    $diff_color = $diff_colors[strtolower($quiz_difficulty_slug)] ?? '#6366f1';
+                    
+                    // Status badge
+                    $status_badge = '';
+                    $status_class = '';
+                    if ($is_completed && $best_percent >= 80) {
+                        $status_badge = '✓ Odličan rezultat';
+                        $status_class = 'ygv-status-excellent';
+                    } elseif ($is_completed) {
+                        $status_badge = '✓ Odigrano';
+                        $status_class = 'ygv-status-played';
+                    } else {
+                        $status_badge = '☆ Nije igrano';
+                        $status_class = 'ygv-status-new';
+                    }
+                ?>
+                <article class="ygv-quiz-card" style="--card-color: <?php echo esc_attr($cat_color); ?>;">
                     <div class="ygv-quiz-card__image">
                         <?php if (has_post_thumbnail()): ?>
                             <?php the_post_thumbnail('medium_large'); ?>
                         <?php else: ?>
-                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, <?php echo esc_attr($cat_color); ?> 0%, #1e2a5e 100%); display: flex; align-items: center; justify-content: center;">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
+                            <div class="ygv-quiz-card__placeholder" style="background: linear-gradient(135deg, <?php echo esc_attr($cat_color); ?> 0%, #1e2a5e 100%);">
+                                <?php ygv_icon_e('brain', 48); ?>
                             </div>
                         <?php endif; ?>
                         
-                        <!-- Category Badge -->
-                        <span style="position: absolute; top: 12px; left: 12px; padding: 4px 12px; background: <?php echo esc_attr($cat_color); ?>; color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 4px;">
+                        <!-- Category Badge (top left) -->
+                        <span class="ygv-quiz-card__category" style="background: <?php echo esc_attr($cat_color); ?>;">
                             <?php echo esc_html($cat_name); ?>
                         </span>
                         
-                        <!-- Difficulty Badge -->
-                        <?php if ($quiz_difficulty): 
-                            $diff_class = strtolower($quiz_difficulty);
-                            $diff_colors = [
-                                'lako' => '#10b981',
-                                'easy' => '#10b981',
-                                'srednje' => '#f59e0b',
-                                'medium' => '#f59e0b',
-                                'teško' => '#ef4444',
-                                'hard' => '#ef4444',
-                            ];
-                            $diff_color = $diff_colors[$diff_class] ?? '#6366f1';
-                        ?>
-                        <span class="ygv-quiz-card__difficulty" style="background: <?php echo esc_attr($diff_color); ?>;">
-                            <?php echo esc_html($quiz_difficulty); ?>
+                        <!-- Status Badge (top right) -->
+                        <span class="ygv-quiz-card__status <?php echo esc_attr($status_class); ?>">
+                            <?php echo esc_html($status_badge); ?>
                         </span>
-                        <?php endif; ?>
                         
-                        <!-- Completed Indicator -->
                         <?php if ($is_completed): ?>
-                        <div style="position: absolute; bottom: 12px; left: 12px; padding: 6px 12px; background: rgba(16, 185, 129, 0.9); color: white; font-size: 12px; font-weight: 600; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                            <?php echo $best_percent; ?>%
+                        <!-- Progress overlay for completed quizzes -->
+                        <div class="ygv-quiz-card__overlay">
+                            <div class="ygv-quiz-card__checkmark">
+                                <?php ygv_icon_e('check', 32); ?>
+                            </div>
+                            <span class="ygv-quiz-card__percent"><?php echo $best_percent; ?>%</span>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -216,24 +252,42 @@ get_header();
                         
                         <div class="ygv-quiz-card__meta">
                             <span class="ygv-quiz-card__meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 10h5V5H4v5zm6 9h5v-5h-5v5zm-6 0h5v-5H4v5zm0-6h5v-5H4v5zm6 0h5v-5h-5v5zm6-4v5h5v-5h-5zm-6-4v5h5V5h-5zm6 4h5V5h-5v4zm0 9h5v-5h-5v5z"/></svg>
+                                <?php ygv_icon_e('file-list', 14); ?>
                                 <?php echo $num_questions; ?> pitanja
                             </span>
-                            <span class="ygv-quiz-card__meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/></svg>
-                                ~<?php echo $total_time; ?> min
-                            </span>
-                            <?php if ($attempts > 0): ?>
-                            <span class="ygv-quiz-card__meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                                <?php echo $attempts; ?>x odigrano
+                            <?php if ($quiz_difficulty): ?>
+                            <span class="ygv-quiz-card__meta-item ygv-quiz-card__difficulty" style="color: <?php echo esc_attr($diff_color); ?>;">
+                                <?php ygv_icon_e('star', 14); ?>
+                                <?php echo esc_html($quiz_difficulty); ?>
                             </span>
                             <?php endif; ?>
                         </div>
+                        
+                        <?php if ($is_completed): ?>
+                        <div class="ygv-quiz-card__result">
+                            <span class="ygv-quiz-card__score-badge" style="color: <?php echo $best_percent >= 80 ? '#10b981' : ($best_percent >= 50 ? '#f59e0b' : '#ef4444'); ?>;">
+                                <?php echo $best_percent; ?>% <small>NAJBOLJI REZULTAT</small>
+                            </span>
+                            <span class="ygv-quiz-card__attempts"><?php ygv_icon_e('refresh', 12); ?> <?php echo $attempts; ?>x pokušaja</span>
+                        </div>
+                        <?php else: ?>
+                        <div class="ygv-quiz-card__new-badge">
+                            <?php ygv_icon_e('sparkles', 14); ?>
+                            Novi kviz za tebe!
+                        </div>
+                        <?php endif; ?>
+                        
+                        <button type="button" 
+                                class="ygv-quiz-card__btn yuv-quiz-card-link" 
+                                data-quiz-id="<?php echo $quiz_id; ?>"
+                                style="--btn-color: <?php echo esc_attr($cat_color); ?>;">
+                            <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
+                            <?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?>
+                        </button>
                     </div>
-                </a>
-            </article>
-            <?php endwhile; ?>
+                </article>
+                <?php endwhile; ?>
+            </div>
         </div>
         
         <?php

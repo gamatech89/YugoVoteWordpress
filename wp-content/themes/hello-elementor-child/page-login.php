@@ -148,7 +148,8 @@ wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templat
                 $attempted_username = isset($_GET['username']) ? sanitize_user(wp_unslash($_GET['username'])) : '';
                 ?>
                 
-                <form id="ygv-login-form" class="ygv-auth-form" action="<?php echo esc_url(wp_login_url()); ?>" method="post">
+                <form id="ygv-login-form" class="ygv-auth-form" method="post">
+                    <input type="hidden" name="yugo_login_nonce" value="<?php echo wp_create_nonce('yugo_login_nonce'); ?>">
                     <div class="ygv-auth-field">
                         <label for="user_login">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>

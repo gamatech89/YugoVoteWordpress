@@ -104,7 +104,7 @@ return '<div class="cs-card">'.sprintf(
 ).'</div>';
     }
 
-    $tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'kvizovi';
+    $tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'profil';
     
     // Hidden tabs that don't show in nav (like create-list form)
     $hidden_tabs = ['kreiraj-listu'];
@@ -114,7 +114,7 @@ return '<div class="cs-card">'.sprintf(
 
     $base = get_stylesheet_directory() . '/inc/account/templates/';
     $file = $base . 'account-tab-' . $tab . '.php';
-    if (!file_exists($file)) $file = $base . 'account-tab-kvizovi.php';
+    if (!file_exists($file)) $file = $base . 'account-tab-profil.php';
 
     ob_start();
     echo $nav;

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // =========================================================================
 // Please ensure these slugs match the actual slugs of your WordPress pages.
 
-define('CUSTOM_LOGIN_PAGE_SLUG', 'login');          
+define('CUSTOM_LOGIN_PAGE_SLUG', 'prijava');          
 define('CUSTOM_REGISTER_PAGE_SLUG', 'registracija');  
 define('CUSTOM_COMPLETE_PROFILE_PAGE_SLUG', 'kompletiranje-naloga'); 
 define('CUSTOM_ACCOUNT_PAGE_SLUG', 'moj-nalog');             

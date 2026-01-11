@@ -2194,7 +2194,11 @@
 }
 
 .ygv-quiz-mini-thumb--placeholder {
-  background: linear-gradient(135deg, var(--quiz-color, #2d3a8c) 0%, color-mix(in srgb, var(--quiz-color, #2d3a8c), #fff 30%) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--quiz-color, #2d3a8c) 0%,
+    color-mix(in srgb, var(--quiz-color, #2d3a8c), #fff 30%) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2258,12 +2262,12 @@
   .ygv-quiz-mini-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .ygv-quiz-welcome-text {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .ygv-level-hero-content {
     flex-direction: column;
     text-align: center;
