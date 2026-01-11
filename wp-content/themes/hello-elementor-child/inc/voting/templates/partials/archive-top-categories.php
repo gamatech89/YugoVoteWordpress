@@ -23,48 +23,53 @@ if (empty($parent_categories) || is_wp_error($parent_categories)) {
 
 /**
  * Calculate total votes for entire category (using get_total_score_for_voting_list)
+ * ✅ PERFORMANCE: Optimized to batch all database queries
  */
-function yuv_get_category_total_votes($term_id) {
-    // Get all lists in this category (including children)
-    $args = [
-        'post_type'      => 'voting_list',
-        'post_status'    => 'publish',
-        'posts_per_page' => -1,
-        'fields'         => 'ids',
-        'meta_query'     => [
-            [
-                'key'     => '_is_tournament_match',
-                'compare' => 'NOT EXISTS',
+function yuv_get_category_total_votes($term_id, $list_ids_cache = null) {
+    // Use cached list IDs if provided
+    if ($list_ids_cache === null) {
+        $args = [
+            'post_type'      => 'voting_list',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => [
+                [
+                    'key'     => '_is_tournament_match',
+                    'compare' => 'NOT EXISTS',
+                ],
             ],
-        ],
-        'tax_query'      => [
-            [
-                'taxonomy'         => 'voting_list_category',
-                'field'            => 'term_id',
-                'terms'            => $term_id,
-                'include_children' => true,
+            'tax_query'      => [
+                [
+                    'taxonomy'         => 'voting_list_category',
+                    'field'            => 'term_id',
+                    'terms'            => $term_id,
+                    'include_children' => true,
+                ],
             ],
-        ],
-    ];
-    
-    $list_ids = get_posts($args);
-    $total_votes = 0;
-    
-    foreach ($list_ids as $list_id) {
-        // Use the same function as trending section
-        if (function_exists('get_total_score_for_voting_list')) {
-            $total_votes += (int) get_total_score_for_voting_list($list_id);
-        } else {
-            // Fallback to meta
-            $total_votes += (int) get_post_meta($list_id, 'total_score', true);
-        }
+        ];
+        
+        $list_ids_cache = get_posts($args);
     }
     
-    return $total_votes;
+    if (empty($list_ids_cache)) {
+        return 0;
+    }
+    
+    // ✅ PERFORMANCE: Single batch query instead of loop
+    global $wpdb;
+    $list_ids_placeholders = implode(',', array_fill(0, count($list_ids_cache), '%d'));
+    $total_votes = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(vote_value) FROM {$wpdb->prefix}voting_list_votes WHERE voting_list_id IN ($list_ids_placeholders)",
+        ...$list_ids_cache
+    ));
+    
+    return $total_votes ? (int) $total_votes : 0;
 }
 
 /**
  * Get top 3 lists by actual vote count (manual sorting)
+ * ✅ PERFORMANCE: Optimized to use single batch query
  */
 function yuv_get_top_3_lists_by_votes($term_id) {
     // Get ALL lists in category (including children)
@@ -95,16 +100,24 @@ function yuv_get_top_3_lists_by_votes($term_id) {
         return [];
     }
     
+    // ✅ PERFORMANCE: Batch fetch all vote counts in single query
+    global $wpdb;
+    $list_ids_placeholders = implode(',', array_fill(0, count($list_ids), '%d'));
+    $vote_counts_query = $wpdb->prepare(
+        "SELECT voting_list_id, SUM(vote_value) as vote_count 
+         FROM {$wpdb->prefix}voting_list_votes 
+         WHERE voting_list_id IN ($list_ids_placeholders) 
+         GROUP BY voting_list_id",
+        ...$list_ids
+    );
+    $vote_counts_results = $wpdb->get_results($vote_counts_query, OBJECT_K);
+    
     // Build array with votes
     $lists_with_votes = [];
     foreach ($list_ids as $list_id) {
-        $vote_count = 0;
-        
-        if (function_exists('get_total_score_for_voting_list')) {
-            $vote_count = (int) get_total_score_for_voting_list($list_id);
-        } else {
-            $vote_count = (int) get_post_meta($list_id, 'total_score', true);
-        }
+        $vote_count = isset($vote_counts_results[$list_id]) 
+            ? (int) $vote_counts_results[$list_id]->vote_count 
+            : 0;
         
         $lists_with_votes[] = [
             'id'    => $list_id,
@@ -134,7 +147,12 @@ function yuv_get_top_3_lists_by_votes($term_id) {
             </button>
             
             <div class="yuv-carousel-track">
-            <?php foreach ($parent_categories as $term): 
+            <?php 
+            // ✅ PERFORMANCE: Prefetch all term meta to avoid N+1 queries
+            $parent_category_ids = wp_list_pluck($parent_categories, 'term_id');
+            update_meta_cache('term', $parent_category_ids);
+            
+            foreach ($parent_categories as $term): 
                 $term_id = $term->term_id;
                 $term_slug = $term->slug;
                 $term_name = $term->name;

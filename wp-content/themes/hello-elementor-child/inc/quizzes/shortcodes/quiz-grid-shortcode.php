@@ -48,6 +48,11 @@ function yuv_quiz_grid_shortcode($atts) {
             
             <!-- Category Tabs -->
             <?php if (!empty($categories)): ?>
+                <?php
+                // ✅ PERFORMANCE: Prefetch all term meta to avoid N+1 queries
+                $category_ids = wp_list_pluck($categories, 'term_id');
+                update_meta_cache('term', $category_ids);
+                ?>
                 <div class="yuv-quiz-filters">
                     <button class="yuv-filter-btn active" data-filter="all">
                         <i class="ri-layout-grid-line"></i>

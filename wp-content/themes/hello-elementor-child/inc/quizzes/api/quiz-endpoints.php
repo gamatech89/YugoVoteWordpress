@@ -91,6 +91,12 @@ function get_quiz_data(WP_REST_Request $request) {
 
     // Prepare response with full question details
     $response_questions = [];
+    
+    // ✅ PERFORMANCE: Prefetch all question meta to avoid N+1 queries
+    if (!empty($questions)) {
+        update_meta_cache('post', $questions);
+    }
+    
     foreach ($questions as $question_id) {
         $question_difficulty_id = get_post_meta($question_id, '_question_difficulty', true);
         $question_difficulty = "";

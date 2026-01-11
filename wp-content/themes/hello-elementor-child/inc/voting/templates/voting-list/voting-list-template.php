@@ -70,8 +70,26 @@ $args = [
 
 $query = new WP_Query($args);
 
-
-
+// ✅ PERFORMANCE: Prefetch all post meta and terms to avoid N+1 queries
+if ($query->have_posts()) {
+    update_meta_cache('post', $voting_items_ids);
+    update_object_term_cache($voting_items_ids, 'voting_items');
+    
+    // ✅ PERFORMANCE: Batch fetch all pivot table data in one query
+    $pivot_data_cache = [];
+    if (!empty($voting_items_ids)) {
+        $item_ids_placeholders = implode(',', array_fill(0, count($voting_items_ids), '%d'));
+        $pivot_query = $wpdb->prepare(
+            "SELECT voting_item_id, short_description, custom_image_url, url 
+             FROM $table_name 
+             WHERE voting_list_id = %d AND voting_item_id IN ($item_ids_placeholders)",
+            $voting_list_id,
+            ...$voting_items_ids
+        );
+        $pivot_results = $wpdb->get_results($pivot_query, OBJECT_K);
+        $pivot_data_cache = $pivot_results;
+    }
+}
 
 if ($query->have_posts()) :
        
@@ -88,13 +106,8 @@ if ($query->have_posts()) :
         $category    = !empty($categories) && !is_wp_error($categories) ? $categories[0]->name : 'Uncategorized';
         $ranking     = array_search($item_id, $voting_items_ids) + 1;
 
-        // Check if this item has custom data in the pivot table
-       $pivot_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT short_description, custom_image_url, url 
-        FROM $table_name 
-        WHERE voting_list_id = %d AND voting_item_id = %d",
-        $voting_list_id, $item_id
-    ), ARRAY_A);
+        // ✅ PERFORMANCE: Use pre-fetched pivot data
+        $pivot_data = isset($pivot_data_cache[$item_id]) ? (array) $pivot_data_cache[$item_id] : null;
 
         // Use pivot table data if available, otherwise fallback to default
         $short_desc = !empty($pivot_data) && !empty($pivot_data['short_description']) ? $pivot_data['short_description'] : $default_short_desc;

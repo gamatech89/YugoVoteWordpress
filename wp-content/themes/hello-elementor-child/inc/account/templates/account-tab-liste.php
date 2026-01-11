@@ -119,6 +119,23 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 <p><?php echo esc_html__('Kada dostigneš potreban nivo, moći ćeš da kreiraš svoje Top 10 liste.', 'hello-elementor-child'); ?></p>
             </div>
         <?php else: ?>
+            <?php
+            // ✅ PERFORMANCE: Prefetch all terms for all lists to avoid N+1 queries
+            $list_ids = wp_list_pluck($user_lists, 'ID');
+            update_object_term_cache($list_ids, 'voting_list');
+            
+            // ✅ PERFORMANCE: Batch fetch vote counts for all lists in one query
+            global $wpdb;
+            $list_ids_placeholders = implode(',', array_fill(0, count($list_ids), '%d'));
+            $vote_counts_query = $wpdb->prepare(
+                "SELECT voting_list_id, COUNT(*) as vote_count 
+                 FROM {$wpdb->prefix}voting_list_votes 
+                 WHERE voting_list_id IN ($list_ids_placeholders) 
+                 GROUP BY voting_list_id",
+                ...$list_ids
+            );
+            $vote_counts_results = $wpdb->get_results($vote_counts_query, OBJECT_K);
+            ?>
             <div class="ygv-lists-grid">
                 <?php foreach ($user_lists as $list): 
                     $categories = wp_get_object_terms($list->ID, 'voting_list_category', ['fields' => 'names']);
@@ -132,12 +149,8 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                     $status_label = $status_labels[$status] ?? $status;
                     $status_class = 'ygv-status-' . $status;
                     
-                    // Get vote count
-                    global $wpdb;
-                    $vote_count = $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(*) FROM {$wpdb->prefix}voting_list_votes WHERE voting_list_id = %d",
-                        $list->ID
-                    ));
+                    // ✅ PERFORMANCE: Use pre-fetched vote count
+                    $vote_count = isset($vote_counts_results[$list->ID]) ? $vote_counts_results[$list->ID]->vote_count : 0;
                     
                     // Get thumbnail
                     $thumbnail = get_the_post_thumbnail_url($list->ID, 'medium');
@@ -240,6 +253,14 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 </a>
             </div>
         <?php else: ?>
+            <?php
+            // ✅ PERFORMANCE: Prefetch terms for voted lists
+            $voted_list_ids = array_column($voted_lists, 'post');
+            $voted_list_ids = wp_list_pluck($voted_list_ids, 'ID');
+            if (!empty($voted_list_ids)) {
+                update_object_term_cache($voted_list_ids, 'voting_list');
+            }
+            ?>
             <div class="ygv-voting-history-list">
                 <?php foreach ($voted_lists as $item): 
                     $list = $item['post'];
@@ -300,13 +321,22 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
             $required_level = $level_config['list_creation_category_level'] ?? 10;
             
+            // ✅ PERFORMANCE: Batch fetch all category levels in one query
+            $category_ids = wp_list_pluck($parent_categories, 'term_id');
+            $category_ids_placeholders = implode(',', array_fill(0, count($category_ids), '%d'));
+            $category_levels_query = $wpdb->prepare(
+                "SELECT category_term_id, level FROM {$t_cat} 
+                 WHERE user_id = %d AND category_term_id IN ($category_ids_placeholders)",
+                $user_id,
+                ...$category_ids
+            );
+            $category_levels_results = $wpdb->get_results($category_levels_query, OBJECT_K);
+            
             foreach ($parent_categories as $category): 
-                // Get user's level in this category
-                $user_cat_level = (int) $wpdb->get_var($wpdb->prepare(
-                    "SELECT level FROM {$t_cat} WHERE user_id = %d AND category_term_id = %d",
-                    $user_id,
-                    $category->term_id
-                )) ?: 1;
+                // ✅ PERFORMANCE: Use pre-fetched category level
+                $user_cat_level = isset($category_levels_results[$category->term_id]) 
+                    ? (int) $category_levels_results[$category->term_id]->level 
+                    : 1;
                 
                 $can_create_in_cat = $user_cat_level >= $required_level;
             ?>

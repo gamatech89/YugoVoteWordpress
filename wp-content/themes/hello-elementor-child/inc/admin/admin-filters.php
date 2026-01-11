@@ -52,7 +52,13 @@ if ( ! function_exists('cs_filter_questions_by_taxonomies_and_meta') ) {
         // Meta (level) filter
         $meta_key       = '_question_difficulty';
         $selected_level = isset($_GET[$meta_key]) ? sanitize_text_field( wp_unslash($_GET[$meta_key]) ) : '';
-        $levels         = get_posts( [ 'post_type' => 'quiz_levels', 'posts_per_page' => -1 ] );
+        
+        // ✅ PERFORMANCE: Cache quiz levels for 1 hour
+        $levels = get_transient('ygv_quiz_levels_list');
+        if (false === $levels) {
+            $levels = get_posts( [ 'post_type' => 'quiz_levels', 'posts_per_page' => -1 ] );
+            set_transient('ygv_quiz_levels_list', $levels, HOUR_IN_SECONDS);
+        }
 
         echo '<select name="' . esc_attr($meta_key) . '" id="' . esc_attr($meta_key) . '" class="postform">';
         echo '<option value="">' . esc_html__( 'Filter by Level', 'your-text-domain' ) . '</option>';
@@ -212,6 +218,17 @@ if ( ! function_exists('cs_save_quick_edit_featured_status') ) {
     }
 }
 add_action( 'save_post', 'cs_save_quick_edit_featured_status' );
+
+// ✅ PERFORMANCE: Clear quiz levels cache when a quiz level is saved or deleted
+if (!function_exists('ygv_clear_quiz_levels_cache')) {
+    function ygv_clear_quiz_levels_cache($post_id) {
+        if (get_post_type($post_id) === 'quiz_levels') {
+            delete_transient('ygv_quiz_levels_list');
+        }
+    }
+}
+add_action('save_post', 'ygv_clear_quiz_levels_cache');
+add_action('delete_post', 'ygv_clear_quiz_levels_cache');
 
 
 /* --------------------------------------------------------------------------
