@@ -94,9 +94,9 @@ $unique_items_voted = (int) $wpdb->get_var($wpdb->prepare(
     $user_id
 ));
 
-// Get highest single vote value
-$highest_vote = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT MAX(vote_value) FROM {$wpdb->prefix}voting_list_votes WHERE user_id = %d",
+// Get total points (sum of all vote values)
+$total_points = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT COALESCE(SUM(vote_value), 0) FROM {$wpdb->prefix}voting_list_votes WHERE user_id = %d",
     $user_id
 ));
 
@@ -305,10 +305,10 @@ if (!empty($voting_days)) {
                         <span class="ygv-mini-stat-value"><?php echo number_format($unique_items_voted); ?></span>
                         <span class="ygv-mini-stat-label"><?php echo esc_html__('Stavki', 'hello-elementor-child'); ?></span>
                     </div>
-                    <?php if ($highest_vote > 0): ?>
+                    <?php if ($total_points > 0): ?>
                     <div class="ygv-mini-stat">
-                        <span class="ygv-mini-stat-value"><?php echo $highest_vote; ?></span>
-                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Max glas', 'hello-elementor-child'); ?></span>
+                        <span class="ygv-mini-stat-value"><?php echo number_format($total_points); ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Poena', 'hello-elementor-child'); ?></span>
                     </div>
                     <?php endif; ?>
                     <?php if ($voting_streak >= 2): ?>
@@ -356,15 +356,17 @@ if (!empty($voting_days)) {
         <?php if ($total_votes > 0): ?>
         <div class="ygv-stats-motivation">
             <?php
-            // Generate fun message based on stats
-            if ($total_votes >= 100) {
-                $message = __('🏆 Super glasač! Tvoji glasovi oblikuju liste.', 'hello-elementor-child');
-            } elseif ($total_votes >= 50) {
-                $message = __('💪 Odlično napreduješ! Još malo do 100 glasova.', 'hello-elementor-child');
-            } elseif ($total_votes >= 20) {
+            // Generate fun message based on total points (votes are 1-10 each)
+            if ($total_points >= 5000) {
+                $message = __('🏆 Legendarni glasač! Tvoji glasovi oblikuju liste.', 'hello-elementor-child');
+            } elseif ($total_points >= 2000) {
+                $message = __('💪 Pravi ekspert! Još malo do 5000 poena.', 'hello-elementor-child');
+            } elseif ($total_points >= 500) {
                 $message = __('🌟 Aktivni glasač! Nastavi da rangiraš favorite.', 'hello-elementor-child');
-            } else {
+            } elseif ($total_points >= 100) {
                 $message = __('🚀 Dobar početak! Istraži više lista i glasaj.', 'hello-elementor-child');
+            } else {
+                $message = __('👋 Dobrodošao! Glasaj na listama i skupljaj poene.', 'hello-elementor-child');
             }
             ?>
             <span><?php echo esc_html($message); ?></span>
