@@ -2390,3 +2390,32 @@ a {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* --- Ankete Page Layout --- */
+.ygv-page--ankete {
+  padding: 40px 0 80px;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.ygv-page--ankete .ygv-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.ygv-page--ankete .ygv-daily-poll {
+  margin-bottom: 60px;
+}
+
+.ygv-section--archive {
+  margin-top: 40px;
+}
+
+.ygv-section--archive .ygv-poll-archive {
+  padding: 0;
+}
+
+.ygv-section--archive .ygv-poll-archive__header {
+  margin-bottom: 30px;
+}
+
