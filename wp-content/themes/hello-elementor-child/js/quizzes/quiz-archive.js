@@ -113,31 +113,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Attach listeners to quiz cards
   function attachQuizCardListeners() {
-    document.querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn").forEach((link) => {
-      if (link.dataset.listenerAttached) return;
-      link.dataset.listenerAttached = "true";
+    document
+      .querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn")
+      .forEach((link) => {
+        if (link.dataset.listenerAttached) return;
+        link.dataset.listenerAttached = "true";
 
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        const quizId = this.getAttribute("data-quiz-id");
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const quizId = this.getAttribute("data-quiz-id");
 
-        if (!quizId || !window.Quiz || !window.quizSettings) {
-          console.error("Quiz launch error: Missing dependencies");
-          return;
-        }
+          if (!quizId || !window.Quiz || !window.quizSettings) {
+            console.error("Quiz launch error: Missing dependencies");
+            return;
+          }
 
-        // Close any existing quiz
-        if (window.currentQuiz?.closeQuiz) {
-          window.currentQuiz.closeQuiz();
-        }
+          // Close any existing quiz
+          if (window.currentQuiz?.closeQuiz) {
+            window.currentQuiz.closeQuiz();
+          }
 
-        // Launch new quiz
-        window.currentQuiz = new window.Quiz(
-          window.quizSettings.apiUrl,
-          quizId
-        );
+          // Launch new quiz
+          window.currentQuiz = new window.Quiz(
+            window.quizSettings.apiUrl,
+            quizId
+          );
+        });
       });
-    });
   }
 
   // Event: Category Filter Click

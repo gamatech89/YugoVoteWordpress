@@ -69,46 +69,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Handle quiz card clicks (launch quiz modal)
   function attachQuizCardListeners() {
-    document.querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn").forEach((link) => {
-      // Skip if already has listener
-      if (link.dataset.listenerAttached) return;
-      link.dataset.listenerAttached = "true";
+    document
+      .querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn")
+      .forEach((link) => {
+        // Skip if already has listener
+        if (link.dataset.listenerAttached) return;
+        link.dataset.listenerAttached = "true";
 
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        const quizId = this.getAttribute("data-quiz-id");
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const quizId = this.getAttribute("data-quiz-id");
 
-        if (!quizId) {
-          console.error("Quiz ID missing from card");
-          return;
-        }
+          if (!quizId) {
+            console.error("Quiz ID missing from card");
+            return;
+          }
 
-        if (!window.Quiz) {
-          console.error("Quiz class not loaded yet");
-          return;
-        }
+          if (!window.Quiz) {
+            console.error("Quiz class not loaded yet");
+            return;
+          }
 
-        if (!window.quizSettings || !window.quizSettings.apiUrl) {
-          console.error("quizSettings not available");
-          return;
-        }
+          if (!window.quizSettings || !window.quizSettings.apiUrl) {
+            console.error("quizSettings not available");
+            return;
+          }
 
-        // Close any existing quiz
-        if (window.currentQuiz?.closeQuiz) {
-          window.currentQuiz.closeQuiz();
-        }
+          // Close any existing quiz
+          if (window.currentQuiz?.closeQuiz) {
+            window.currentQuiz.closeQuiz();
+          }
 
-        // Launch new quiz
-        try {
-          window.currentQuiz = new window.Quiz(
-            window.quizSettings.apiUrl,
-            quizId
-          );
-        } catch (error) {
-          console.error("Failed to launch quiz:", error);
-        }
+          // Launch new quiz
+          try {
+            window.currentQuiz = new window.Quiz(
+              window.quizSettings.apiUrl,
+              quizId
+            );
+          } catch (error) {
+            console.error("Failed to launch quiz:", error);
+          }
+        });
       });
-    });
   }
 
   // Initial attachment

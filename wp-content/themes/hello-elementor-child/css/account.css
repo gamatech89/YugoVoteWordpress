@@ -4128,7 +4128,7 @@ select.ygv-input {
   border: var(--ygv-card-border, 1px solid #e2e8f0);
   border-radius: var(--ygv-card-radius, 16px);
   padding: var(--ygv-card-padding, 24px);
-  box-shadow: var(--ygv-card-shadow, 0 1px 3px rgba(0,0,0,0.04));
+  box-shadow: var(--ygv-card-shadow, 0 1px 3px rgba(0, 0, 0, 0.04));
 }
 
 .ygv-profile-card__header {
@@ -4164,7 +4164,11 @@ select.ygv-input {
   right: -4px;
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, var(--ygv-accent-blue, #2d3a8c) 0%, #4f46e5 100%);
+  background: linear-gradient(
+    135deg,
+    var(--ygv-accent-blue, #2d3a8c) 0%,
+    #4f46e5 100%
+  );
   color: white;
   border-radius: 50%;
   display: flex;
@@ -4194,7 +4198,11 @@ select.ygv-input {
 .ygv-profile-card__title {
   display: inline-block;
   padding: 4px 10px;
-  background: linear-gradient(135deg, rgba(45, 58, 140, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(45, 58, 140, 0.1) 0%,
+    rgba(99, 102, 241, 0.1) 100%
+  );
   color: var(--ygv-accent-blue, #2d3a8c);
   border-radius: 20px;
   font-size: 12px;
@@ -4304,31 +4312,31 @@ select.ygv-input {
   .ygv-profile-card__header {
     flex-wrap: wrap;
   }
-  
+
   .ygv-profile-card__name {
     flex: 1 1 calc(100% - 100px);
   }
-  
+
   .ygv-profile-card__header .ygv-btn-outline {
     width: 100%;
     justify-content: center;
     margin-top: 12px;
   }
-  
+
   .ygv-profile-card__details {
     grid-template-columns: 1fr;
   }
-  
+
   .ygv-avatar-wrapper {
     width: 64px;
     height: 64px;
   }
-  
+
   .ygv-avatar-img {
     width: 64px;
     height: 64px;
   }
-  
+
   .ygv-avatar-level {
     width: 24px;
     height: 24px;
