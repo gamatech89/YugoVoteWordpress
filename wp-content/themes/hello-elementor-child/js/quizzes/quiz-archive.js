@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Attach listeners to quiz cards
   function attachQuizCardListeners() {
-    document.querySelectorAll(".yuv-quiz-card-link").forEach((link) => {
+    document.querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn").forEach((link) => {
       if (link.dataset.listenerAttached) return;
       link.dataset.listenerAttached = "true";
 

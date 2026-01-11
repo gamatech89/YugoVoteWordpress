@@ -2808,8 +2808,11 @@ button.ygv-header__search-trigger:hover,
 }
 
 /* Quiz Card Button - matches account page style */
-.ygv-quiz-card__btn {
-  display: inline-flex;
+.ygv-quiz-card__btn,
+button.ygv-quiz-card__btn,
+.ygv-quiz-start-btn {
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -2824,9 +2827,12 @@ button.ygv-header__search-trigger:hover,
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
+  height: auto !important;
 }
 
-.ygv-quiz-card__btn:hover {
+.ygv-quiz-card__btn:hover,
+button.ygv-quiz-card__btn:hover,
+.ygv-quiz-start-btn:hover {
   background: var(--ygv-btn-primary-hover, #1e2a6e);
   color: #fff;
   transform: translateY(-1px);
@@ -2834,11 +2840,17 @@ button.ygv-header__search-trigger:hover,
 }
 
 .ygv-quiz-card__btn svg,
-.ygv-quiz-card__btn .ygv-icon {
+.ygv-quiz-card__btn .ygv-icon,
+.ygv-quiz-start-btn svg,
+.ygv-quiz-start-btn .ygv-icon {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  display: inline-flex !important;
+}
+
+.ygv-quiz-card__btn span,
+.ygv-quiz-start-btn span {
+  display: inline;
 }
 
 /* ========================================

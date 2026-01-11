@@ -278,10 +278,10 @@ get_header();
                         <?php endif; ?>
                         
                         <button type="button" 
-                                class="ygv-quiz-card__btn yuv-quiz-card-link" 
+                                class="ygv-quiz-card__btn ygv-quiz-start-btn" 
                                 data-quiz-id="<?php echo $quiz_id; ?>">
                             <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
-                            <?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?>
+                            <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
                         </button>
                     </div>
                 </article>

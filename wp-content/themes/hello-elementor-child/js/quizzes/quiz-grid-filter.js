@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Handle quiz card clicks (launch quiz modal)
   function attachQuizCardListeners() {
-    document.querySelectorAll(".yuv-quiz-card-link").forEach((link) => {
+    document.querySelectorAll(".yuv-quiz-card-link, .ygv-quiz-start-btn").forEach((link) => {
       // Skip if already has listener
       if (link.dataset.listenerAttached) return;
       link.dataset.listenerAttached = "true";
