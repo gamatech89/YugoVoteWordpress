@@ -4222,8 +4222,8 @@ select.ygv-input {
 
 .ygv-profile-detail {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
 }
 
 .ygv-profile-detail--full {
@@ -4237,9 +4237,9 @@ select.ygv-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  border-radius: 8px;
-  color: var(--ygv-text-secondary, #64748b);
+  background: rgba(45, 58, 140, 0.08);
+  border-radius: 10px;
+  color: var(--ygv-accent-blue, #2d3a8c);
 }
 
 .ygv-profile-detail__icon svg {
@@ -4250,16 +4250,16 @@ select.ygv-input {
 .ygv-profile-detail__label {
   display: block;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ygv-text-muted, #94a3b8);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .ygv-profile-detail__value {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--ygv-text-primary, #1e293b);
 }
@@ -4277,12 +4277,12 @@ select.ygv-input {
 
 .ygv-tag {
   display: inline-block;
-  padding: 4px 10px;
-  background: #f1f5f9;
-  color: var(--ygv-text-secondary, #64748b);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 6px 14px;
+  background: rgba(45, 58, 140, 0.08);
+  color: var(--ygv-accent-blue, #2d3a8c);
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {
