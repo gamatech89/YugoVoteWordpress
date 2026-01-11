@@ -255,8 +255,8 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
         <?php else: ?>
             <?php
             // ✅ PERFORMANCE: Prefetch terms for voted lists
-            $voted_list_ids = array_column($voted_lists, 'post');
-            $voted_list_ids = wp_list_pluck($voted_list_ids, 'ID');
+            $voted_list_posts = array_column($voted_lists, 'post');
+            $voted_list_ids = wp_list_pluck($voted_list_posts, 'ID');
             if (!empty($voted_list_ids)) {
                 update_object_term_cache($voted_list_ids, 'voting_list');
             }
