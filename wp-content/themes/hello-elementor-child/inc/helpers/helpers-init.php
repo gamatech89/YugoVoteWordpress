@@ -33,3 +33,8 @@ if (file_exists($base . 'category-colors-helper.php')) {
 if (file_exists($base . 'utilities.php')) {
     require_once $base . 'utilities.php';
 }
+
+// Live search AJAX handler
+if (file_exists($base . 'live-search.php')) {
+    require_once $base . 'live-search.php';
+}

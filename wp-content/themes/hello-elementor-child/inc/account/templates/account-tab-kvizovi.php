@@ -29,6 +29,57 @@ $quiz_progress = $wpdb->get_results($wpdb->prepare(
     $user_id
 ), ARRAY_A);
 
+// Get recommended quizzes (based on user's top categories, or random if no history)
+$recommended_quizzes = [];
+$completed_quiz_ids = !empty($quiz_progress) ? wp_list_pluck($quiz_progress, 'quiz_id') : [];
+
+// Get user's top categories
+$user_top_categories = $wpdb->get_col($wpdb->prepare(
+    "SELECT category_term_id FROM {$t_cat} WHERE user_id = %d ORDER BY xp DESC LIMIT 3",
+    $user_id
+));
+
+// Build quiz query args
+$quiz_args = [
+    'post_type' => 'quiz',
+    'post_status' => 'publish',
+    'posts_per_page' => 4,
+    'orderby' => 'rand',
+];
+
+// Exclude completed quizzes
+if (!empty($completed_quiz_ids)) {
+    $quiz_args['post__not_in'] = $completed_quiz_ids;
+}
+
+// If user has category progress, prioritize those categories
+if (!empty($user_top_categories)) {
+    $quiz_args['tax_query'] = [
+        [
+            'taxonomy' => 'quiz_category',
+            'field' => 'term_id',
+            'terms' => $user_top_categories,
+        ],
+    ];
+}
+
+$recommended_query = new WP_Query($quiz_args);
+$recommended_quizzes = $recommended_query->posts;
+
+// If not enough quizzes from user's categories, fill with random ones
+if (count($recommended_quizzes) < 4) {
+    $exclude_ids = array_merge($completed_quiz_ids, wp_list_pluck($recommended_quizzes, 'ID'));
+    $fill_args = [
+        'post_type' => 'quiz',
+        'post_status' => 'publish',
+        'posts_per_page' => 4 - count($recommended_quizzes),
+        'orderby' => 'rand',
+        'post__not_in' => $exclude_ids,
+    ];
+    $fill_query = new WP_Query($fill_args);
+    $recommended_quizzes = array_merge($recommended_quizzes, $fill_query->posts);
+}
+
 // Calculate stats
 $total_quizzes = count($quiz_progress);
 $total_attempts = array_sum(array_column($quiz_progress, 'attempts'));
@@ -204,20 +255,61 @@ $level_config = function_exists('ygv_get_level_config') ? ygv_get_level_config()
     <div class="ygv-card">
         <div class="ygv-card-header">
             <h3><?php ygv_icon_e('history', 20); ?> <?php echo esc_html__('Istorija Kvizova', 'hello-elementor-child'); ?></h3>
-            <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary ygv-btn-small">
+            <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-link-btn">
                 <?php echo esc_html__('Istraži Kvizove', 'hello-elementor-child'); ?>
+                <?php ygv_icon_e('arrow-right', 16); ?>
             </a>
         </div>
         
         <?php if (empty($quiz_progress)): ?>
-            <div class="ygv-empty-state">
-                <span class="ygv-empty-icon"><?php ygv_icon_e('brain', 48); ?></span>
-                <h4><?php echo esc_html__('Još nisi rešio/la nijedan kviz', 'hello-elementor-child'); ?></h4>
-                <p><?php echo esc_html__('Rešavaj kvizove da zaradiš XP i napreduj u kategorijama!', 'hello-elementor-child'); ?></p>
-                <a href="<?php echo esc_url(home_url('/kvizovi/')); ?>" class="ygv-btn ygv-btn-primary">
-                    <?php echo esc_html__('Počni sa Kvizovima', 'hello-elementor-child'); ?>
-                </a>
+            <!-- Empty State - Show Recommended Quizzes Instead -->
+            <div class="ygv-quiz-welcome">
+                <div class="ygv-quiz-welcome-text">
+                    <span class="ygv-welcome-icon"><?php ygv_icon_e('brain', 32); ?></span>
+                    <div>
+                        <h4><?php echo esc_html__('Još nisi rešio/la nijedan kviz', 'hello-elementor-child'); ?></h4>
+                        <p><?php echo esc_html__('Rešavaj kvizove da zaradiš XP i napreduj u kategorijama!', 'hello-elementor-child'); ?></p>
+                    </div>
+                </div>
             </div>
+            
+            <?php if (!empty($recommended_quizzes)): ?>
+            <div class="ygv-recommended-quizzes">
+                <h4 class="ygv-section-title"><?php echo esc_html__('Preporučeni kvizovi za tebe', 'hello-elementor-child'); ?></h4>
+                <div class="ygv-quiz-mini-grid">
+                    <?php foreach ($recommended_quizzes as $quiz): 
+                        $quiz_id = $quiz->ID;
+                        $quiz_title = $quiz->post_title;
+                        $category_color = function_exists('ygv_get_quiz_category_color') 
+                            ? ygv_get_quiz_category_color($quiz_id) 
+                            : '#2d3a8c';
+                        $category_name = function_exists('ygv_get_quiz_category_name') 
+                            ? ygv_get_quiz_category_name($quiz_id) 
+                            : 'Opšte';
+                        $num_questions = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
+                        $thumbnail = get_the_post_thumbnail_url($quiz_id, 'thumbnail');
+                    ?>
+                    <a href="<?php echo esc_url(get_permalink($quiz_id)); ?>" class="ygv-quiz-mini-card" style="--quiz-color: <?php echo esc_attr($category_color); ?>">
+                        <?php if ($thumbnail): ?>
+                        <div class="ygv-quiz-mini-thumb" style="background-image: url('<?php echo esc_url($thumbnail); ?>')"></div>
+                        <?php else: ?>
+                        <div class="ygv-quiz-mini-thumb ygv-quiz-mini-thumb--placeholder">
+                            <?php ygv_icon_e('brain', 24); ?>
+                        </div>
+                        <?php endif; ?>
+                        <div class="ygv-quiz-mini-content">
+                            <span class="ygv-quiz-mini-category"><?php echo esc_html($category_name); ?></span>
+                            <h5 class="ygv-quiz-mini-title"><?php echo esc_html($quiz_title); ?></h5>
+                            <span class="ygv-quiz-mini-meta"><?php echo $num_questions; ?> pitanja</span>
+                        </div>
+                        <span class="ygv-quiz-mini-play">
+                            <?php ygv_icon_e('play', 16); ?>
+                        </span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         <?php else: ?>
             <div class="ygv-quiz-history-list">
                 <?php foreach ($quiz_progress as $quiz): 

@@ -8,6 +8,7 @@
 ## 🎯 Session Goals
 
 Fix gamification feedback system in voting lists:
+
 1. XP/level-up notifications not showing when voting
 2. Vote bonus not displayed for high-level users
 3. Missing global stats bar
@@ -21,7 +22,8 @@ Fix gamification feedback system in voting lists:
 
 **Problem:** After voting, the +XP toast was not appearing or barely visible.
 
-**Solution:** 
+**Solution:**
+
 - Updated JavaScript in `voting-list-fullpage.php` to use correct API response fields:
   - `xp_awarded` instead of `xp_earned`
   - `expert_bonus` instead of `bonus_applied`
@@ -35,6 +37,7 @@ Fix gamification feedback system in voting lists:
 **Problem:** Users at higher levels (Fan, Superfan, Legend) earn bonus votes but had no visual indicator.
 
 **Solution:**
+
 - Added a badge in the voting list header box showing:
   - User's current level in that category
   - The vote bonus they earn (e.g., "+1 bonus")
@@ -49,12 +52,14 @@ Fix gamification feedback system in voting lists:
 **Problem:** Stats bar was only visible on voting pages, users wanted it everywhere.
 
 **Solution:**
+
 - Added global stats bar to `header-custom.php` (appears after `</header>`)
 - Shows for logged-in users on all non-Elementor pages
 - Uses existing `[user_stats_bar]` shortcode
 - Positioned with sticky CSS below header
 
 **Files:**
+
 - [header-custom.php](wp-content/themes/hello-elementor-child/template-parts/header/header-custom.php)
 - [templates.css](wp-content/themes/hello-elementor-child/css/templates.css)
 
@@ -63,6 +68,7 @@ Fix gamification feedback system in voting lists:
 **Problem:** Level-up popup was showing "Ukupno" instead of the actual category name.
 
 **Solution:**
+
 - The API was already returning correct category info
 - JavaScript now properly extracts and displays category name from `level_ups` array
 
@@ -73,6 +79,7 @@ Fix gamification feedback system in voting lists:
 **Cause:** Helper functions were accidentally duplicated in `helpers.php` when they already existed in `level-settings.php`.
 
 **Solution:**
+
 - Removed duplicate function definitions from `helpers.php`
 - Functions remain in `level-settings.php` where they belong
 
@@ -81,6 +88,7 @@ Fix gamification feedback system in voting lists:
 ### 6. **API Improvements**
 
 **`voting-endpoints.php` changes:**
+
 - `submit_vote` now returns `new_total_score` for immediate UI update
 - `remove_vote` now accepts flexible parameters (vote_value optional)
 - `remove_vote` returns `new_total_score` for UI sync
@@ -108,26 +116,26 @@ Fix gamification feedback system in voting lists:
 
 ## 📁 Files Modified
 
-| File | Change |
-|------|--------|
-| `inc/voting/templates/voting-list/voting-list-fullpage.php` | XP toast fix, bonus badge |
-| `inc/voting/api/voting-endpoints.php` | Return `new_total_score` |
-| `inc/voting/helpers.php` | Removed duplicate functions |
-| `inc/voting/voting-hooks.php` | Added fullpage template override |
-| `inc/voting/voting-scripts.php` | Added V2 class enqueue |
-| `inc/voting/voting-shortcodes.php` | Added fullpage shortcode |
-| `template-parts/header/header-custom.php` | Global stats bar |
-| `css/templates.css` | Global stats bar styling |
-| `js/voting/voting-init.js` | V2 container support |
-| `js/account/ygv-account.js` | Code formatting |
-| `js/account/user-stats-bar.js` | Code formatting |
-| `inc/admin/admin-init.php` | Load rewards-settings |
-| `inc/quizzes/cpts/cpt-quiz.php` | Add excerpt, archive |
-| `page-login.php` | Use templates.css |
-| `page-register.php` | Use templates.css |
-| `page-complete-profile.php` | Use templates.css |
-| `taxonomy-voting_list_category.php` | Use fullpage template |
-| `style.css` | Mega menu enhancements, formatting |
+| File                                                        | Change                             |
+| ----------------------------------------------------------- | ---------------------------------- |
+| `inc/voting/templates/voting-list/voting-list-fullpage.php` | XP toast fix, bonus badge          |
+| `inc/voting/api/voting-endpoints.php`                       | Return `new_total_score`           |
+| `inc/voting/helpers.php`                                    | Removed duplicate functions        |
+| `inc/voting/voting-hooks.php`                               | Added fullpage template override   |
+| `inc/voting/voting-scripts.php`                             | Added V2 class enqueue             |
+| `inc/voting/voting-shortcodes.php`                          | Added fullpage shortcode           |
+| `template-parts/header/header-custom.php`                   | Global stats bar                   |
+| `css/templates.css`                                         | Global stats bar styling           |
+| `js/voting/voting-init.js`                                  | V2 container support               |
+| `js/account/ygv-account.js`                                 | Code formatting                    |
+| `js/account/user-stats-bar.js`                              | Code formatting                    |
+| `inc/admin/admin-init.php`                                  | Load rewards-settings              |
+| `inc/quizzes/cpts/cpt-quiz.php`                             | Add excerpt, archive               |
+| `page-login.php`                                            | Use templates.css                  |
+| `page-register.php`                                         | Use templates.css                  |
+| `page-complete-profile.php`                                 | Use templates.css                  |
+| `taxonomy-voting_list_category.php`                         | Use fullpage template              |
+| `style.css`                                                 | Mega menu enhancements, formatting |
 
 ---
 
@@ -138,6 +146,7 @@ Fix gamification feedback system in voting lists:
 **Expected Bonus:** +1 vote per vote
 
 ### To Test:
+
 1. Log in as testuser
 2. Go to any voting list in Culture Club category
 3. Vote on an item

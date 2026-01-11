@@ -1686,7 +1686,11 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(109, 178, 74, 0.08) 0%, rgba(109, 178, 74, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(109, 178, 74, 0.08) 0%,
+    rgba(109, 178, 74, 0.02) 100%
+  );
   border: 1px solid rgba(109, 178, 74, 0.2);
   border-left: 4px solid var(--cat-color, var(--ygv-accent-green));
   border-radius: 10px;
@@ -1739,11 +1743,11 @@
     flex-direction: column;
     align-items: center;
   }
-  
+
   .ygv-stats-legend {
     width: 100%;
   }
-  
+
   .ygv-mini-stats-row {
     justify-content: center;
   }
@@ -1906,16 +1910,16 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  
+
   .ygv-cat-mascot-card {
     padding: 14px 10px;
   }
-  
+
   .ygv-cat-mascot-img {
     width: 56px;
     height: 56px;
   }
-  
+
   .ygv-cat-mascot-name {
     font-size: 12px;
   }
@@ -2074,10 +2078,192 @@
 }
 
 /* ============================================
+   LINK BUTTON (Text with arrow)
+   ============================================ */
+
+.ygv-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3a8c;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.ygv-link-btn:hover {
+  color: #1e2b6b;
+}
+
+.ygv-link-btn svg {
+  transition: transform 0.2s;
+}
+
+.ygv-link-btn:hover svg {
+  transform: translateX(3px);
+}
+
+/* ============================================
+   QUIZ WELCOME / EMPTY STATE (Redesigned)
+   ============================================ */
+
+.ygv-quiz-welcome {
+  padding: 16px 0 20px;
+  border-bottom: 1px solid #e6e7eb;
+  margin-bottom: 20px;
+}
+
+.ygv-quiz-welcome-text {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ygv-welcome-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-radius: 12px;
+  color: #2d3a8c;
+  flex-shrink: 0;
+}
+
+.ygv-quiz-welcome-text h4 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.ygv-quiz-welcome-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ============================================
+   RECOMMENDED QUIZZES MINI GRID
+   ============================================ */
+
+.ygv-recommended-quizzes {
+  padding-top: 4px;
+}
+
+.ygv-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px;
+}
+
+.ygv-quiz-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.ygv-quiz-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fb;
+  border: 1px solid #e6e7eb;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.ygv-quiz-mini-card:hover {
+  border-color: var(--quiz-color, #2d3a8c);
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ygv-quiz-mini-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.ygv-quiz-mini-thumb--placeholder {
+  background: linear-gradient(135deg, var(--quiz-color, #2d3a8c) 0%, color-mix(in srgb, var(--quiz-color, #2d3a8c), #fff 30%) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.ygv-quiz-mini-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ygv-quiz-mini-category {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--quiz-color, #2d3a8c);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.ygv-quiz-mini-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ygv-quiz-mini-meta {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.ygv-quiz-mini-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--quiz-color, #2d3a8c);
+  border-radius: 50%;
+  color: white;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s;
+}
+
+.ygv-quiz-mini-card:hover .ygv-quiz-mini-play {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 
 @media (max-width: 640px) {
+  .ygv-quiz-mini-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ygv-quiz-welcome-text {
+    flex-direction: column;
+    text-align: center;
+  }
+  
   .ygv-level-hero-content {
     flex-direction: column;
     text-align: center;
@@ -3874,4 +4060,43 @@ select.ygv-input {
     flex-direction: column !important;
     gap: 6px !important;
   }
+}
+
+/* ============================================
+   HOVER COLOR CONSISTENCY FIX
+   Ensure all interactive elements use primary 
+   blue color (#2d3a8c) on hover, not red
+   ============================================ */
+
+/* Account page header nav hover */
+.ygv-account-page .cs-menu-link:hover,
+.ygv-account-page .cs-menu-item:hover .cs-menu-link {
+  color: var(--ygv-primary, #2d3a8c) !important;
+}
+
+/* Stats bar and interactive elements */
+.ygv-account-page .ygv-stats-item:hover,
+.ygv-account-page .ygv-user-stats-bar a:hover,
+.ygv-account-page .ygv-stats-bar-inner a:hover {
+  color: var(--ygv-primary, #2d3a8c) !important;
+}
+
+/* Override any secondary (red) hover colors */
+.ygv-account-page .cs-voting-card__option-button:hover {
+  background: var(--ygv-primary, #2d3a8c) !important;
+  border-color: var(--ygv-primary, #2d3a8c) !important;
+}
+
+/* Ensure search button hover is primary blue */
+.ygv-header__search-trigger:hover,
+.ygv-account-page .ygv-header__search-trigger:hover {
+  background: var(--ygv-primary, #2d3a8c) !important;
+  border-color: var(--ygv-primary, #2d3a8c) !important;
+  color: white !important;
+}
+
+/* Override Elementor category colors for account area */
+.ygv-account-page a:hover:not(.ygv-btn):not(.ygv-link-btn):not(.cs-menu-link),
+.ygv-account-page button:hover:not(.ygv-btn):not(.ygv-btn-primary) {
+  color: var(--ygv-primary, #2d3a8c);
 }

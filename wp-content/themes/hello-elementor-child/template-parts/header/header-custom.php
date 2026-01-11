@@ -9,7 +9,7 @@
 if (!defined('ABSPATH')) exit;
 
 $is_logged_in = is_user_logged_in();
-$login_url = home_url('/prijava/');
+$login_url = home_url('/login/');
 $account_url = home_url('/moj-nalog/');
 
 // Get user data if logged in
@@ -255,6 +255,21 @@ $categories = get_terms([
                     </svg>
                 </button>
             </form>
+            <!-- Live Search Results -->
+            <div class="ygv-search-results" style="display: none;">
+                <div class="ygv-search-results__loader" style="display: none;">
+                    <div class="ygv-search-spinner"></div>
+                    <span>Tražim...</span>
+                </div>
+                <ul class="ygv-search-results__list"></ul>
+                <div class="ygv-search-results__empty" style="display: none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <p>Nema rezultata za "<span class="ygv-search-term"></span>"</p>
+                </div>
+            </div>
         </div>
     </div>
 </header>
@@ -266,6 +281,15 @@ $categories = get_terms([
     const searchOverlay = document.querySelector('.ygv-search-overlay');
     const searchClose = document.querySelector('.ygv-search-overlay__close');
     const searchInput = document.querySelector('.ygv-search-overlay__input');
+    const searchCategory = document.querySelector('.ygv-search-overlay__select');
+    const searchResults = document.querySelector('.ygv-search-results');
+    const searchResultsList = document.querySelector('.ygv-search-results__list');
+    const searchLoader = document.querySelector('.ygv-search-results__loader');
+    const searchEmpty = document.querySelector('.ygv-search-results__empty');
+    const searchTerm = document.querySelector('.ygv-search-term');
+    
+    let searchTimeout = null;
+    const SEARCH_DELAY = 300; // ms delay before searching
     
     if (searchTrigger && searchOverlay) {
         searchTrigger.addEventListener('click', function() {
@@ -290,6 +314,94 @@ $categories = get_terms([
             searchOverlay.classList.remove('is-active');
             searchOverlay.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
+            // Clear results when closing
+            searchResults.style.display = 'none';
+            searchResultsList.innerHTML = '';
+        }
+        
+        // Live search functionality
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            // Hide results if query is too short
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            // Show loader
+            searchResults.style.display = 'block';
+            searchLoader.style.display = 'flex';
+            searchEmpty.style.display = 'none';
+            searchResultsList.style.display = 'none';
+            
+            // Debounce the search
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, SEARCH_DELAY);
+        });
+        
+        function performSearch(query) {
+            const category = searchCategory ? searchCategory.value : '';
+            
+            const formData = new FormData();
+            formData.append('action', 'ygv_live_search');
+            formData.append('search', query);
+            formData.append('category', category);
+            formData.append('nonce', '<?php echo wp_create_nonce('ygv_live_search'); ?>');
+            
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                searchLoader.style.display = 'none';
+                
+                if (data.success && data.data.length > 0) {
+                    renderResults(data.data);
+                } else {
+                    searchResultsList.style.display = 'none';
+                    searchEmpty.style.display = 'flex';
+                    searchTerm.textContent = query;
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                searchLoader.style.display = 'none';
+                searchEmpty.style.display = 'flex';
+                searchTerm.textContent = query;
+            });
+        }
+        
+        function renderResults(results) {
+            searchResultsList.innerHTML = '';
+            searchResultsList.style.display = 'block';
+            searchEmpty.style.display = 'none';
+            
+            results.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'ygv-search-result-item';
+                li.innerHTML = `
+                    <a href="${item.url}" class="ygv-search-result-link">
+                        <div class="ygv-search-result-image">
+                            ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title}">` : '<div class="ygv-search-result-placeholder"></div>'}
+                        </div>
+                        <div class="ygv-search-result-info">
+                            ${item.category ? `<span class="ygv-search-result-cat" style="--cat-color: ${item.cat_color || '#283363'}">${item.category}</span>` : ''}
+                            <h4>${item.title}</h4>
+                            ${item.items_count ? `<span class="ygv-search-result-meta">${item.items_count} stavki</span>` : ''}
+                        </div>
+                        <svg class="ygv-search-result-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                `;
+                searchResultsList.appendChild(li);
+            });
         }
     }
     

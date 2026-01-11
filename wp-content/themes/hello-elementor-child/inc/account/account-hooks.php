@@ -78,27 +78,50 @@ add_action('init', function(){
     wp_safe_redirect(home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/?new_registration=true')); exit;
 });
 
-/** Handle complete-profile form */
+/** Handle complete-profile form - Multi-step */
 add_action('init', function(){
-    if (!isset($_POST['cs_custom_complete_profile_form'], $_POST['custom_complete_profile_nonce'])) return;
+    // Handle Step 1 (Basic Info)
+    if (isset($_POST['profile_step']) && $_POST['profile_step'] === '1' && isset($_POST['profile_step1_nonce'])) {
+        if (!is_user_logged_in()) { wp_safe_redirect(home_url('/'.CUSTOM_LOGIN_PAGE_SLUG.'/')); exit; }
+        $user_id = get_current_user_id();
+        
+        if (!wp_verify_nonce($_POST['profile_step1_nonce'], 'custom_complete_profile_step1')) {
+            wp_safe_redirect(add_query_arg('profile_error','nonce_failure', home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
+        }
+
+        $gender = isset($_POST['user_gender']) ? sanitize_text_field($_POST['user_gender']) : '';
+        $d = (int)($_POST['user_dob_day'] ?? 0);
+        $m = (int)($_POST['user_dob_month'] ?? 0);
+        $y = (int)($_POST['user_dob_year'] ?? 0);
+        $country = isset($_POST['user_country']) ? sanitize_text_field($_POST['user_country']) : '';
+        $referral = isset($_POST['user_referral']) ? sanitize_text_field($_POST['user_referral']) : '';
+
+        // Save step 1 data
+        $gender ? update_user_meta($user_id, '_user_gender', $gender) : null;
+        if ($d && $m && $y) {
+            update_user_meta($user_id, '_user_dob_day', $d);
+            update_user_meta($user_id, '_user_dob_month', $m);
+            update_user_meta($user_id, '_user_dob_year', $y);
+            update_user_meta($user_id, '_user_dob', sprintf('%04d-%02d-%02d',$y,$m,$d));
+        }
+        $country ? update_user_meta($user_id, '_user_country', $country) : null;
+        $referral ? update_user_meta($user_id, '_user_referral_source', $referral) : null;
+
+        // Redirect to step 2
+        wp_safe_redirect(add_query_arg('step', '2', home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
+    }
+    
+    // Handle Step 2 (Interests) - Final submission
+    if (!isset($_POST['cs_custom_complete_profile_form'], $_POST['profile_step2_nonce'])) return;
     if (!is_user_logged_in()) { wp_safe_redirect(home_url('/'.CUSTOM_LOGIN_PAGE_SLUG.'/')); exit; }
     $user_id = get_current_user_id();
-    if (!wp_verify_nonce($_POST['custom_complete_profile_nonce'], 'custom_complete_profile_action')) {
-        wp_safe_redirect(add_query_arg('profile_error','nonce_failure', home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
+    if (!wp_verify_nonce($_POST['profile_step2_nonce'], 'custom_complete_profile_step2')) {
+        wp_safe_redirect(add_query_arg(['profile_error'=>'nonce_failure', 'step'=>'2'], home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
     }
 
-    $gender = isset($_POST['user_gender']) ? sanitize_text_field($_POST['user_gender']) : '';
-    $d = (int)($_POST['user_dob_day'] ?? 0);
-    $m = (int)($_POST['user_dob_month'] ?? 0);
-    $y = (int)($_POST['user_dob_year'] ?? 0);
-    $country = isset($_POST['user_country']) ? sanitize_text_field($_POST['user_country']) : '';
     $poi = isset($_POST['points_of_interest']) && is_array($_POST['points_of_interest']) ? array_map('intval', $_POST['points_of_interest']) : [];
 
     $errors = new WP_Error();
-    $allowed_genders = ['male','female','other','prefer_not_to_say'];
-    if ($gender && !in_array($gender, $allowed_genders, true)) $errors->add('gender_invalid', __('Greška: Odaberite ispravan pol.', 'hello-elementor-child'));
-    if (($d||$m||$y) && (!($d&&$m&&$y) || !checkdate($m,$d,$y))) $errors->add('dob_invalid', __('Greška: Unesite ispravan datum rođenja.', 'hello-elementor-child'));
-    if (strlen($country) > 100) $errors->add('country_too_long', __('Greška: Naziv države je predugačak.', 'hello-elementor-child'));
     if ($poi) {
         foreach ($poi as $term_id) {
             if (!term_exists((int)$term_id, 'voting_list_category')) { $errors->add('interest_invalid', __('Greška: Izabrana je nevažeća interesna kategorija.', 'hello-elementor-child')); break; }
@@ -107,15 +130,9 @@ add_action('init', function(){
 
     if ($errors->has_errors()) {
         set_transient('complete_profile_errors_'.md5($_SERVER['REMOTE_ADDR'].$user_id), $errors->get_error_messages(), MINUTE_IN_SECONDS*5);
-        wp_safe_redirect(add_query_arg('profile_update','failed', home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
+        wp_safe_redirect(add_query_arg(['profile_update'=>'failed', 'step'=>'2'], home_url('/'.CUSTOM_COMPLETE_PROFILE_PAGE_SLUG.'/'))); exit;
     }
 
-    $gender ? update_user_meta($user_id, '_user_gender', $gender) : delete_user_meta($user_id, '_user_gender');
-
-    if ($d && $m && $y) update_user_meta($user_id, '_user_dob', sprintf('%04d-%02d-%02d',$y,$m,$d));
-    else delete_user_meta($user_id, '_user_dob');
-
-    $country ? update_user_meta($user_id, '_user_country', $country) : delete_user_meta($user_id, '_user_country');
     $poi ? update_user_meta($user_id, '_user_points_of_interest', $poi) : delete_user_meta($user_id, '_user_points_of_interest');
 
     wp_safe_redirect(add_query_arg('profile_completed','true', home_url('/'.CUSTOM_ACCOUNT_PAGE_SLUG.'/'))); exit;

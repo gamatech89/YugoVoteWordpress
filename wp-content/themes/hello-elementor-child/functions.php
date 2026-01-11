@@ -28,22 +28,21 @@ require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 // Enqueue main styles
 function hello_elementor_child_enqueue_scripts() {
     
-
     wp_enqueue_style(
         'category-colors',
         get_stylesheet_directory_uri() . '/css/category-colors.css',
-        ['hello-elementor-theme-style'],
+        [],
         HELLO_ELEMENTOR_CHILD_VERSION
     );
 
     wp_enqueue_style(
         'hello-elementor-child-style',
         get_stylesheet_directory_uri() . '/style.css',
-        ['hello-elementor-theme-style'],
+        [],
         HELLO_ELEMENTOR_CHILD_VERSION
     );
 
-	    wp_enqueue_script(
+	wp_enqueue_script(
         'hello-elementor-main-script',
         get_stylesheet_directory_uri() . '/js/app.js',
         ['jquery'],
@@ -53,7 +52,6 @@ function hello_elementor_child_enqueue_scripts() {
 
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts');
-
 
 // Load Custom Features
 require_once get_stylesheet_directory() . '/inc/init.php';
