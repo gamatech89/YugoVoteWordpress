@@ -1231,13 +1231,27 @@
   display: block;
   margin-bottom: 16px;
 }
+.ygv-empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: rgba(45, 58, 140, 0.08);
+  border-radius: 50%;
+  color: var(--ygv-accent-blue, #2d3a8c);
+}
 .ygv-empty-state h4 {
   margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
   color: #374151;
 }
 .ygv-empty-state p {
-  margin: 0;
+  margin: 0 0 20px;
   color: #6b7280;
+  font-size: 14px;
 }
 
 /* Lists Grid */

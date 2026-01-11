@@ -2815,7 +2815,7 @@ button.ygv-header__search-trigger:hover,
   gap: 8px;
   width: 100%;
   padding: 12px 20px;
-  background: var(--btn-color, var(--ygv-primary));
+  background: var(--ygv-btn-primary-bg, #2d3a8c);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -2827,14 +2827,18 @@ button.ygv-header__search-trigger:hover,
 }
 
 .ygv-quiz-card__btn:hover {
-  filter: brightness(0.9);
+  background: var(--ygv-btn-primary-hover, #1e2a6e);
   color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 58, 140, 0.3);
 }
 
-.ygv-quiz-card__btn svg {
+.ygv-quiz-card__btn svg,
+.ygv-quiz-card__btn .ygv-icon {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
+  display: inline-flex !important;
 }
 
 /* ========================================

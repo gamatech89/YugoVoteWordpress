@@ -279,8 +279,7 @@ get_header();
                         
                         <button type="button" 
                                 class="ygv-quiz-card__btn yuv-quiz-card-link" 
-                                data-quiz-id="<?php echo $quiz_id; ?>"
-                                style="--btn-color: <?php echo esc_attr($cat_color); ?>;">
+                                data-quiz-id="<?php echo $quiz_id; ?>">
                             <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
                             <?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?>
                         </button>
