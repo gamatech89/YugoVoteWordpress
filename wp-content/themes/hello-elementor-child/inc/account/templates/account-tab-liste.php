@@ -74,16 +74,22 @@ $total_votes = (int) $wpdb->get_var($wpdb->prepare(
 
 $total_lists_voted = count($voted_list_data);
 
-// Get votes by category
+// Get votes by category - aggregate to parent categories
+// If a list has a child category, we look up its parent; if it's already a parent, we use it directly
 $votes_by_category = $wpdb->get_results($wpdb->prepare(
-    "SELECT t.name as category_name, t.term_id, COUNT(v.id) as vote_count
+    "SELECT 
+        COALESCE(parent_t.name, t.name) as category_name, 
+        COALESCE(parent_tt.term_id, tt.term_id) as term_id, 
+        COUNT(v.id) as vote_count
      FROM {$wpdb->prefix}voting_list_votes v
      JOIN {$wpdb->prefix}posts p ON v.voting_list_id = p.ID
      JOIN {$wpdb->prefix}term_relationships tr ON p.ID = tr.object_id
      JOIN {$wpdb->prefix}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
      JOIN {$wpdb->prefix}terms t ON tt.term_id = t.term_id
-     WHERE v.user_id = %d AND tt.taxonomy = 'voting_list_category' AND tt.parent = 0
-     GROUP BY t.term_id
+     LEFT JOIN {$wpdb->prefix}term_taxonomy parent_tt ON tt.parent = parent_tt.term_id AND parent_tt.taxonomy = 'voting_list_category'
+     LEFT JOIN {$wpdb->prefix}terms parent_t ON parent_tt.term_id = parent_t.term_id
+     WHERE v.user_id = %d AND tt.taxonomy = 'voting_list_category'
+     GROUP BY COALESCE(parent_tt.term_id, tt.term_id)
      ORDER BY vote_count DESC",
     $user_id
 ), ARRAY_A);
