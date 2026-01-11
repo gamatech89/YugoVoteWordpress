@@ -13,7 +13,7 @@ function cs_has_user_voted_poll($poll_id) {
 
 // AJAX
 function cs_handle_poll_vote_ajax() {
-    check_ajax_referer('cs_poll_vote_nonce', 'nonce'); // Novi nonce specifičan za polls
+    check_ajax_referer('cs_poll_vote_nonce', 'nonce');
 
     $poll_id = intval($_POST['poll_id']);
     $answer_idx = intval($_POST['answer_index']);
@@ -43,7 +43,24 @@ function cs_handle_poll_vote_ajax() {
             update_user_meta($u_id, '_cs_voted_polls', array_unique($voted));
         }
 
-        wp_send_json_success(['message' => 'Glas upisan!']);
+        // Pripremi rezultate za AJAX odgovor (bez reload-a)
+        $results = [];
+        foreach ($answers as $idx => $ans) {
+            $v = intval($ans['votes']);
+            $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+            $results[] = [
+                'index' => $idx,
+                'text' => esc_html($ans['text']),
+                'votes' => $v,
+                'percent' => $p
+            ];
+        }
+
+        wp_send_json_success([
+            'message' => 'Glas upisan!',
+            'results' => $results,
+            'total' => $total
+        ]);
     }
 
     wp_send_json_error(['message' => 'Greška u podacima.']);

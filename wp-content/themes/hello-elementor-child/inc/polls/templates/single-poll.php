@@ -1,73 +1,71 @@
 <?php
 if (!defined('ABSPATH')) exit;
 // Promenljive dostupne ovde: $poll_id, $question, $answers, $total, $has_voted
+
+// Pripremi JSON podatke za rezultate (koristi se za AJAX update bez reload-a)
+$results_data = [];
+foreach ($answers as $idx => $ans) {
+    $v = intval($ans['votes']);
+    $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+    $results_data[$idx] = [
+        'text' => esc_html($ans['text']),
+        'votes' => $v,
+        'percent' => $p
+    ];
+}
 ?>
-<div class="cs-poll-box <?php echo $has_voted ? 'voted' : ''; ?>" data-id="<?php echo $poll_id; ?>">
-    <h4 class="cs-poll-question"><?php echo esc_html($question); ?></h4>
+<div class="ygv-poll <?php echo $has_voted ? 'ygv-poll--voted' : ''; ?>" 
+     data-poll-id="<?php echo esc_attr($poll_id); ?>"
+     data-nonce="<?php echo esc_attr(wp_create_nonce('cs_poll_vote_nonce')); ?>"
+     data-ajax-url="<?php echo esc_attr(admin_url('admin-ajax.php')); ?>">
     
-    <?php if (!$has_voted) : ?>
-        <form class="cs-poll-form">
+    <h4 class="ygv-poll__question"><?php echo esc_html($question); ?></h4>
+    
+    <!-- Form View -->
+    <form class="ygv-poll__form <?php echo $has_voted ? 'ygv-hidden' : ''; ?>">
+        <div class="ygv-poll__options">
             <?php foreach ($answers as $idx => $ans) : ?>
-                <label class="cs-poll-option">
-                    <input type="radio" name="poll_choice" value="<?php echo $idx; ?>">
-                    <span class="cs-poll-opt-text"><?php echo esc_html($ans['text']); ?></span>
+                <label class="ygv-poll__option" data-index="<?php echo $idx; ?>">
+                    <input type="radio" name="poll_choice_<?php echo $poll_id; ?>" value="<?php echo $idx; ?>">
+                    <span class="ygv-poll__option-radio"></span>
+                    <span class="ygv-poll__option-text"><?php echo esc_html($ans['text']); ?></span>
                 </label>
             <?php endforeach; ?>
-            <button type="submit" class="cs-btn-vote">Glasaj</button>
-        </form>
-    <?php else : ?>
-        <div class="cs-poll-results">
-            <?php foreach ($answers as $ans) : 
-                $v = intval($ans['votes']);
-                $p = ($total > 0) ? round(($v / $total) * 100) : 0;
-            ?>
-                <div class="cs-poll-result-item">
-                    <div class="cs-poll-res-info">
-                        <span class="cs-res-label"><?php echo esc_html($ans['text']); ?></span>
-                        <span class="cs-res-val"><?php echo $p; ?>%</span>
-                    </div>
-                    <div class="cs-poll-bar-bg">
-                        <div class="cs-poll-bar-fill" style="width:<?php echo $p; ?>%"></div>
-                    </div>
-                    <div class="cs-poll-votes-count"><?php echo $v; ?> glasova</div>
-                </div>
-            <?php endforeach; ?>
-            <div class="cs-poll-meta">Ukupno glasova: <?php echo $total; ?></div>
         </div>
-    <?php endif; ?>
-</div>
-
-<script>
-jQuery(document).ready(function($) {
-    $(document).off('submit', '.cs-poll-form').on('submit', '.cs-poll-form', function(e) {
-        e.preventDefault();
-        var form = $(this);
-        var box = form.closest('.cs-poll-box');
-        var choice = form.find('input:checked').val();
-        var btn = form.find('.cs-btn-vote');
+        <button type="submit" class="ygv-poll__btn">
+            <span class="ygv-poll__btn-text">Glasaj</span>
+            <span class="ygv-poll__btn-loading">
+                <svg class="ygv-spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg>
+            </span>
+        </button>
+    </form>
+    
+    <!-- Results View -->
+    <div class="ygv-poll__results <?php echo !$has_voted ? 'ygv-hidden' : ''; ?>">
+        <?php foreach ($answers as $idx => $ans) : 
+            $v = intval($ans['votes']);
+            $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+        ?>
+            <div class="ygv-poll__result" data-index="<?php echo $idx; ?>">
+                <div class="ygv-poll__result-header">
+                    <span class="ygv-poll__result-text"><?php echo esc_html($ans['text']); ?></span>
+                    <span class="ygv-poll__result-percent"><?php echo $p; ?>%</span>
+                </div>
+                <div class="ygv-poll__result-bar">
+                    <div class="ygv-poll__result-fill" style="width: <?php echo $p; ?>%"></div>
+                </div>
+                <span class="ygv-poll__result-votes"><?php echo $v; ?> glasova</span>
+            </div>
+        <?php endforeach; ?>
         
-        if(!choice) { alert('Izaberite opciju pre glasanja!'); return; }
-
-        btn.prop('disabled', true).text('Glasanje...');
-
-        $.ajax({
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            type: 'POST',
-            data: {
-                action: 'cs_vote_poll',
-                poll_id: box.data('id'),
-                answer_index: choice,
-                nonce: '<?php echo wp_create_nonce('cs_poll_vote_nonce'); ?>'
-            },
-            success: function(res) {
-                if(res.success) {
-                    location.reload(); 
-                } else {
-                    alert(res.data.message);
-                    btn.prop('disabled', false).text('Glasaj');
-                }
-            }
-        });
-    });
-});
-</script>
+        <div class="ygv-poll__total">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span>Ukupno: <strong class="ygv-poll__total-count"><?php echo $total; ?></strong> glasova</span>
+        </div>
+    </div>
+</div>
