@@ -95,7 +95,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
         <div class="ygv-card-header">
             <h3><?php echo esc_html__('Moje Liste', 'hello-elementor-child'); ?></h3>
             <?php if ($can_create['can_create']): ?>
-                <a href="<?php echo esc_url(ygv_account_page_url(['tab' => 'kreiraj-listu'])); ?>" class="ygv-btn ygv-btn-primary">
+                <a href="<?php echo esc_url(ygv_account_page_url(['tab' => 'kreiraj-listu'])); ?>" class="ygv-btn ygv-btn-primary ygv-btn-auto">
                     + <?php echo esc_html__('Kreiraj Novu Listu', 'hello-elementor-child'); ?>
                 </a>
             <?php endif; ?>
@@ -198,45 +198,84 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
     <div class="ygv-card ygv-voting-stats-card">
         <h3><?php ygv_icon_e('chart-bar', 20); ?> <?php echo esc_html__('Statistika Glasanja', 'hello-elementor-child'); ?></h3>
         
-        <div class="ygv-voting-stats-grid">
-            <div class="ygv-stat-box">
-                <span class="ygv-stat-number"><?php echo number_format($total_votes); ?></span>
-                <span class="ygv-stat-label"><?php echo esc_html__('Ukupno Glasova', 'hello-elementor-child'); ?></span>
-            </div>
-            <div class="ygv-stat-box">
-                <span class="ygv-stat-number"><?php echo number_format($total_lists_voted); ?></span>
-                <span class="ygv-stat-label"><?php echo esc_html__('Lista Glasano', 'hello-elementor-child'); ?></span>
-            </div>
-        </div>
+        <?php 
+        // Build chart data for SVG donut
+        $chart_data = [];
+        $chart_total = 0;
+        if (!empty($votes_by_category)) {
+            foreach ($votes_by_category as $cat) {
+                $cat_term = get_term_by('name', $cat['category_name'], 'voting_list_category');
+                $cat_color = $cat_term && function_exists('ygv_get_category_color_by_term_id') 
+                    ? ygv_get_category_color_by_term_id($cat_term->term_id) 
+                    : '#4f46e5';
+                $chart_data[] = [
+                    'name' => $cat['category_name'],
+                    'count' => (int) $cat['vote_count'],
+                    'color' => $cat_color
+                ];
+                $chart_total += (int) $cat['vote_count'];
+            }
+        }
+        ?>
         
-        <?php if (!empty($votes_by_category)): ?>
-        <div class="ygv-votes-by-category">
-            <h4><?php echo esc_html__('Glasovi po Kategoriji', 'hello-elementor-child'); ?></h4>
-            <div class="ygv-category-vote-bars">
-                <?php 
-                $max_votes = max(array_column($votes_by_category, 'vote_count'));
-                foreach ($votes_by_category as $cat): 
-                    $percent = $max_votes > 0 ? ($cat['vote_count'] / $max_votes) * 100 : 0;
-                    
-                    // Get category color by name (find term first)
-                    $cat_term = get_term_by('name', $cat['category_name'], 'voting_list_category');
-                    $cat_color = $cat_term && function_exists('ygv_get_category_color_by_term_id') 
-                        ? ygv_get_category_color_by_term_id($cat_term->term_id) 
-                        : '#4f46e5';
-                ?>
-                <div class="ygv-category-vote-item" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
-                    <div class="ygv-cat-vote-header">
-                        <span class="ygv-cat-vote-name"><?php echo esc_html($cat['category_name']); ?></span>
-                        <span class="ygv-cat-vote-count" style="color: var(--cat-color);"><?php echo number_format($cat['vote_count']); ?></span>
-                    </div>
-                    <div class="ygv-progress-unified ygv-progress-unified--sm">
-                        <div class="ygv-progress-unified__fill" style="width: <?php echo $percent; ?>%;"></div>
-                    </div>
+        <div class="ygv-stats-donut-layout">
+            <!-- Donut Chart -->
+            <?php if (!empty($chart_data)): ?>
+            <div class="ygv-donut-container">
+                <svg viewBox="0 0 100 100" class="ygv-donut-chart">
+                    <?php
+                    $cumulative = 0;
+                    $radius = 35;
+                    $circumference = 2 * M_PI * $radius;
+                    foreach ($chart_data as $segment):
+                        $percent = $chart_total > 0 ? ($segment['count'] / $chart_total) * 100 : 0;
+                        $dash = ($percent / 100) * $circumference;
+                        $gap = $circumference - $dash;
+                        $offset = -($cumulative / 100) * $circumference + ($circumference / 4); // Start from top
+                    ?>
+                    <circle 
+                        cx="50" cy="50" r="<?php echo $radius; ?>"
+                        fill="none"
+                        stroke="<?php echo esc_attr($segment['color']); ?>"
+                        stroke-width="12"
+                        stroke-dasharray="<?php echo $dash; ?> <?php echo $gap; ?>"
+                        stroke-dashoffset="<?php echo $offset; ?>"
+                        class="ygv-donut-segment"
+                    />
+                    <?php 
+                        $cumulative += $percent;
+                    endforeach; 
+                    ?>
+                </svg>
+                <div class="ygv-donut-center">
+                    <span class="ygv-donut-number"><?php echo number_format($chart_total); ?></span>
+                    <span class="ygv-donut-label"><?php echo esc_html__('Glasova', 'hello-elementor-child'); ?></span>
                 </div>
-                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+            
+            <!-- Stats & Legend -->
+            <div class="ygv-stats-legend">
+                <div class="ygv-stat-box ygv-stat-box--compact">
+                    <span class="ygv-stat-number"><?php echo number_format($total_lists_voted); ?></span>
+                    <span class="ygv-stat-label"><?php echo esc_html__('Lista Glasano', 'hello-elementor-child'); ?></span>
+                </div>
+                
+                <?php if (!empty($chart_data)): ?>
+                <div class="ygv-donut-legend">
+                    <?php foreach ($chart_data as $item): 
+                        $percent = $chart_total > 0 ? round(($item['count'] / $chart_total) * 100) : 0;
+                    ?>
+                    <div class="ygv-legend-item">
+                        <span class="ygv-legend-dot" style="background: <?php echo esc_attr($item['color']); ?>"></span>
+                        <span class="ygv-legend-name"><?php echo esc_html($item['name']); ?></span>
+                        <span class="ygv-legend-value"><?php echo number_format($item['count']); ?> <small>(<?php echo $percent; ?>%)</small></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
-        <?php endif; ?>
     </div>
     
     <!-- Voting History -->
@@ -262,8 +301,14 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 update_object_term_cache($voted_list_ids, 'voting_list');
             }
             ?>
-            <div class="ygv-voting-history-list">
-                <?php foreach ($voted_lists as $item): 
+            <div class="ygv-voting-history-list" id="voting-history-container">
+                <?php 
+                $items_per_page = 10;
+                $total_items = count($voted_lists);
+                $show_more = $total_items > $items_per_page;
+                $display_items = array_slice($voted_lists, 0, $items_per_page);
+                
+                foreach ($display_items as $item): 
                     $list = $item['post'];
                     $user_votes = $item['vote_count'];
                     $last_vote = $item['last_vote'];
@@ -303,9 +348,68 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
                 <?php endforeach; ?>
             </div>
             
-            <?php if (count($voted_lists) >= 50): ?>
-            <p class="ygv-show-more-hint"><?php echo esc_html__('Prikazano poslednjih 50 lista', 'hello-elementor-child'); ?></p>
+            <?php if ($show_more): ?>
+            <button type="button" class="ygv-btn ygv-btn-secondary ygv-btn-block ygv-load-more-btn" 
+                    data-loaded="<?php echo $items_per_page; ?>" 
+                    data-total="<?php echo $total_items; ?>"
+                    onclick="ygvLoadMoreHistory(this)">
+                <?php printf(esc_html__('Prikaži još (%d preostalo)', 'hello-elementor-child'), $total_items - $items_per_page); ?>
+            </button>
+            <script>
+            function ygvLoadMoreHistory(btn) {
+                const container = document.getElementById('voting-history-container');
+                const hiddenItems = container.querySelectorAll('.ygv-history-item.ygv-hidden');
+                let shown = 0;
+                hiddenItems.forEach(item => {
+                    if (shown < 10) {
+                        item.classList.remove('ygv-hidden');
+                        shown++;
+                    }
+                });
+                const remaining = container.querySelectorAll('.ygv-history-item.ygv-hidden').length;
+                if (remaining === 0) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.textContent = 'Prikaži još (' + remaining + ' preostalo)';
+                }
+            }
+            </script>
             <?php endif; ?>
+            
+            <!-- Hidden items for lazy load -->
+            <?php 
+            $hidden_items = array_slice($voted_lists, $items_per_page);
+            foreach ($hidden_items as $item): 
+                $list = $item['post'];
+                $user_votes = $item['vote_count'];
+                $last_vote = $item['last_vote'];
+                $categories = wp_get_object_terms($list->ID, 'voting_list_category', ['fields' => 'names']);
+                $category_name = !empty($categories) ? $categories[0] : '';
+                $thumbnail = get_the_post_thumbnail_url($list->ID, 'thumbnail');
+                if (!$thumbnail) $thumbnail = get_stylesheet_directory_uri() . '/assets/images/list-placeholder.jpg';
+                $time_ago = human_time_diff(strtotime($last_vote), current_time('timestamp'));
+            ?>
+            <div class="ygv-history-item ygv-hidden">
+                <div class="ygv-history-thumb" style="background-image: url('<?php echo esc_url($thumbnail); ?>')"></div>
+                <div class="ygv-history-content">
+                    <h4 class="ygv-history-title">
+                        <a href="<?php echo esc_url(get_permalink($list->ID)); ?>"><?php echo esc_html($list->post_title); ?></a>
+                    </h4>
+                    <?php if ($category_name): ?>
+                        <span class="ygv-history-category"><?php echo esc_html($category_name); ?></span>
+                    <?php endif; ?>
+                    <div class="ygv-history-meta">
+                        <span class="ygv-history-votes">
+                            <?php ygv_icon_e('check', 14); ?> <?php echo $user_votes; ?> <?php echo $user_votes === 1 ? 'glas' : 'glasova'; ?>
+                        </span>
+                        <span class="ygv-history-date"><?php echo esc_html($time_ago); ?> pre</span>
+                    </div>
+                </div>
+                <a href="<?php echo esc_url(get_permalink($list->ID)); ?>" class="ygv-history-action">
+                    <?php ygv_icon_e('arrow-right', 18); ?>
+                </a>
+            </div>
+            <?php endforeach; ?>
         <?php endif; ?>
     </div>
     
@@ -313,9 +417,9 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
     <?php if ($can_create['can_create'] && !empty($parent_categories)): ?>
     <div class="ygv-card">
         <h3><?php echo esc_html__('Kategorije za Kreiranje', 'hello-elementor-child'); ?></h3>
-        <p class="ygv-card-subtitle"><?php echo esc_html__('Kategorije u kojima možeš kreirati liste (potreban nivo 10)', 'hello-elementor-child'); ?></p>
+        <p class="ygv-card-subtitle"><?php echo esc_html__('Otključaj nivo 10 u kategoriji da kreiraš liste', 'hello-elementor-child'); ?></p>
         
-        <div class="ygv-category-create-list">
+        <div class="ygv-category-mascot-grid">
             <?php 
             global $wpdb;
             $t_cat = $wpdb->prefix . 'ygv_user_category_progress';
@@ -324,7 +428,7 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             
             // ✅ PERFORMANCE: Batch fetch all category levels in one query
             $category_ids = wp_list_pluck($parent_categories, 'term_id');
-            $category_ids = array_map('intval', $category_ids); // Ensure integers for security
+            $category_ids = array_map('intval', $category_ids);
             $category_ids_placeholders = implode(',', array_fill(0, count($category_ids), '%d'));
             $category_levels_query = $wpdb->prepare(
                 "SELECT category_term_id, level FROM {$t_cat} 
@@ -335,22 +439,45 @@ $votes_by_category = $wpdb->get_results($wpdb->prepare(
             $category_levels_results = $wpdb->get_results($category_levels_query, OBJECT_K);
             
             foreach ($parent_categories as $category): 
-                // ✅ PERFORMANCE: Use pre-fetched category level
                 $user_cat_level = isset($category_levels_results[$category->term_id]) 
                     ? (int) $category_levels_results[$category->term_id]->level 
                     : 1;
                 
                 $can_create_in_cat = $user_cat_level >= $required_level;
+                
+                // Get category color and mascot
+                $cat_color = function_exists('ygv_get_category_color_by_term_id') 
+                    ? ygv_get_category_color_by_term_id($category->term_id) 
+                    : '#4f46e5';
+                $mascot_url = get_term_meta($category->term_id, 'category_mascot', true);
+                if (!$mascot_url) {
+                    $mascot_url = get_stylesheet_directory_uri() . '/assets/images/mascot-default.png';
+                }
+                
+                $progress = min(100, ($user_cat_level / $required_level) * 100);
             ?>
-            <div class="ygv-cat-create-item <?php echo $can_create_in_cat ? 'ygv-unlocked' : 'ygv-locked'; ?>">
-                <span class="ygv-cat-create-name"><?php echo esc_html($category->name); ?></span>
-                <span class="ygv-cat-create-level">
+            <div class="ygv-cat-mascot-card <?php echo $can_create_in_cat ? 'ygv-unlocked' : 'ygv-locked'; ?>" style="--cat-color: <?php echo esc_attr($cat_color); ?>;">
+                <div class="ygv-cat-mascot-img">
+                    <img src="<?php echo esc_url($mascot_url); ?>" alt="<?php echo esc_attr($category->name); ?>" loading="lazy">
                     <?php if ($can_create_in_cat): ?>
-                        <?php ygv_icon_e('check-circle', 16); ?> <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
-                    <?php else: ?>
-                        <?php ygv_icon_e('lock', 16); ?> <?php printf(esc_html__('Nivo %d/%d', 'hello-elementor-child'), $user_cat_level, $required_level); ?>
+                    <span class="ygv-cat-mascot-badge"><?php ygv_icon_e('check', 14); ?></span>
                     <?php endif; ?>
-                </span>
+                </div>
+                <div class="ygv-cat-mascot-info">
+                    <span class="ygv-cat-mascot-name"><?php echo esc_html($category->name); ?></span>
+                    <?php if ($can_create_in_cat): ?>
+                        <span class="ygv-cat-mascot-status ygv-status-unlocked">
+                            <?php echo esc_html__('Otključano', 'hello-elementor-child'); ?>
+                        </span>
+                    <?php else: ?>
+                        <div class="ygv-cat-mascot-progress">
+                            <div class="ygv-progress-mini">
+                                <div class="ygv-progress-mini-fill" style="width: <?php echo $progress; ?>%;"></div>
+                            </div>
+                            <span class="ygv-cat-mascot-lvl">Lvl <?php echo $user_cat_level; ?>/<?php echo $required_level; ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
