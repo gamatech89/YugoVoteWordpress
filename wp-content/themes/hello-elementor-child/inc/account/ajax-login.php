@@ -78,12 +78,17 @@ function yugo_ajax_login_handler() {
         exit;
     }
 
-    // Login successful
-    $account_slug = defined('CUSTOM_ACCOUNT_PAGE_SLUG') ? CUSTOM_ACCOUNT_PAGE_SLUG : 'moj-nalog';
-    
-    $redirect_url = isset($_POST['redirect_to']) && !empty($_POST['redirect_to']) 
-        ? esc_url_raw($_POST['redirect_to']) 
-        : home_url('/' . $account_slug . '/');
+    // Login successful — determine redirect based on role
+    if (isset($_POST['redirect_to']) && !empty($_POST['redirect_to'])) {
+        $redirect_url = esc_url_raw($_POST['redirect_to']);
+    } elseif (user_can($user, 'manage_options')) {
+        // Administrators go to wp-admin
+        $redirect_url = admin_url();
+    } else {
+        // Regular users go to account page
+        $account_slug = defined('CUSTOM_ACCOUNT_PAGE_SLUG') ? CUSTOM_ACCOUNT_PAGE_SLUG : 'moj-nalog';
+        $redirect_url = home_url('/' . $account_slug . '/');
+    }
 
     wp_send_json_success([
         'message' => 'Uspešna prijava! Preusmeravanje...',
