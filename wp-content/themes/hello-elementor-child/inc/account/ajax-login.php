@@ -79,11 +79,12 @@ function yugo_ajax_login_handler() {
     }
 
     // Login successful — determine redirect based on role
-    if (isset($_POST['redirect_to']) && !empty($_POST['redirect_to'])) {
-        $redirect_url = esc_url_raw($_POST['redirect_to']);
-    } elseif (user_can($user, 'manage_options')) {
-        // Administrators go to wp-admin
+    // Admin check FIRST (the form has a hidden redirect_to field hardcoded to /moj-nalog/)
+    if (user_can($user, 'manage_options')) {
+        // Administrators always go to wp-admin
         $redirect_url = admin_url();
+    } elseif (isset($_POST['redirect_to']) && !empty($_POST['redirect_to'])) {
+        $redirect_url = esc_url_raw($_POST['redirect_to']);
     } else {
         // Regular users go to account page
         $account_slug = defined('CUSTOM_ACCOUNT_PAGE_SLUG') ? CUSTOM_ACCOUNT_PAGE_SLUG : 'moj-nalog';
