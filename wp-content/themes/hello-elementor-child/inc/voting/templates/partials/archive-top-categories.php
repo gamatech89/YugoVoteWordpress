@@ -25,6 +25,7 @@ if (empty($parent_categories) || is_wp_error($parent_categories)) {
  * Calculate total votes for entire category (using get_total_score_for_voting_list)
  * ✅ PERFORMANCE: Optimized to batch all database queries
  */
+if (!function_exists('yuv_get_category_total_votes')) {
 function yuv_get_category_total_votes($term_id, $list_ids_cache = null) {
     // Use cached list IDs if provided
     if ($list_ids_cache === null) {
@@ -70,11 +71,13 @@ function yuv_get_category_total_votes($term_id, $list_ids_cache = null) {
     
     return $total_votes ? (int) $total_votes : 0;
 }
+} // end function_exists guard
 
 /**
  * Get top 3 lists by actual vote count (manual sorting)
  * ✅ PERFORMANCE: Optimized to use single batch query
  */
+if (!function_exists('yuv_get_top_3_lists_by_votes')) {
 function yuv_get_top_3_lists_by_votes($term_id) {
     // Get ALL lists in category (including children)
     $args = [
@@ -141,6 +144,7 @@ function yuv_get_top_3_lists_by_votes($term_id) {
     // Return top 3
     return array_slice($lists_with_votes, 0, 3);
 }
+} // end function_exists guard
 ?>
 
 <section class="yuv-top-categories-section">

@@ -343,6 +343,12 @@ if (!function_exists('shortcode_assigned_child_list_categories')) { // Renamed
 
 if (!function_exists('cs_voting_mega_menu_shortcode')) {
     function cs_voting_mega_menu_shortcode() {
+        // Try cached menu first (invalidated on vote changes)
+        $cached = get_transient('ygv_mega_menu_html');
+        if ($cached !== false) {
+            return $cached;
+        }
+
         $parent_terms = get_terms([
             'taxonomy'   => 'voting_list_category',
             'parent'     => 0,
@@ -431,6 +437,21 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                                 }
                             }
                         }
+                        
+                        // Use wp_count_posts equivalent via taxonomy count
+                        $total_lists = 0;
+                        if ($has_children) {
+                            $all_child_ids = array_merge([$term_id], wp_list_pluck($child_terms, 'term_id'));
+                            foreach ($all_child_ids as $tid) {
+                                $t = get_term($tid, 'voting_list_category');
+                                if ($t && !is_wp_error($t)) {
+                                    $total_lists += $t->count;
+                                }
+                            }
+                        } else {
+                            $t = get_term($term_id, 'voting_list_category');
+                            $total_lists = ($t && !is_wp_error($t)) ? $t->count : 0;
+                        }
                         ?>
 
                         <li class="cs-menu-item <?php echo $has_children ? 'has-mega-menu' : ''; ?> <?php echo $is_active ? 'current-menu-item' : ''; ?>" 
@@ -457,21 +478,6 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                                                 <?php endif; ?>
                                                 <h3><?php echo esc_html($parent->name); ?></h3>
                                                 
-                                                <?php 
-                                                // Get total lists count for parent category
-                                                $total_lists = (new WP_Query([
-                                                    'post_type' => 'voting_list',
-                                                    'post_status' => 'publish',
-                                                    'posts_per_page' => -1,
-                                                    'fields' => 'ids',
-                                                    'tax_query' => [[
-                                                        'taxonomy' => 'voting_list_category',
-                                                        'field' => 'term_id',
-                                                        'terms' => $term_id,
-                                                        'include_children' => true,
-                                                    ]]
-                                                ]))->found_posts;
-                                                ?>
                                                 <div class="cs-brand-stats">
                                                     <div class="cs-brand-stat">
                                                         <span class="cs-brand-stat__value"><?php echo $total_lists; ?></span>
@@ -497,18 +503,8 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                                                 <span class="cs-section-label">KATEGORIJE</span>
                                                 <div class="cs-subcats-grid">
                                                     <?php foreach ($child_terms as $child) : 
-                                                        // Count lists in this subcategory
-                                                        $list_count = (new WP_Query([
-                                                            'post_type' => 'voting_list',
-                                                            'post_status' => 'publish',
-                                                            'posts_per_page' => -1,
-                                                            'fields' => 'ids',
-                                                            'tax_query' => [[
-                                                                'taxonomy' => 'voting_list_category',
-                                                                'field' => 'term_id',
-                                                                'terms' => $child->term_id,
-                                                            ]]
-                                                        ]))->found_posts;
+                                                        // Use term count instead of expensive WP_Query
+                                                        $list_count = $child->count;
                                                     ?>
                                                         <a href="<?php echo esc_url(get_term_link($child)); ?>" class="cs-subcat-card">
                                                             <span class="cs-subcat-name"><?php echo esc_html($child->name); ?></span>
@@ -575,7 +571,12 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
         });
         </script>
         <?php
-        return ob_get_clean();
+        $output = ob_get_clean();
+        
+        // Cache for 15 minutes (invalidated on vote changes)
+        set_transient('ygv_mega_menu_html', $output, 15 * MINUTE_IN_SECONDS);
+        
+        return $output;
     }
     add_shortcode('voting_mega_menu', 'cs_voting_mega_menu_shortcode');
 }
@@ -621,12 +622,22 @@ if (!function_exists('cs_voting_trending_shortcode')) {
             'count' => 9, // Preporuka: 9 za pun grid (1 velika + 8 malih)
         ], $atts);
 
-        // 1. Uzmi ID-eve svih objavljenih lista
+        // Use batch-fetched scores (single query + transient)
+        // instead of calling get_total_score_for_voting_list() 491 times
+        $all_scores = function_exists('ygv_get_all_list_scores') 
+            ? ygv_get_all_list_scores() 
+            : [];
+
+        if (empty($all_scores)) {
+            return '';
+        }
+
+        // Get non-tournament list IDs
         $all_lists_args = [
             'post_type'      => 'voting_list',
             'post_status'    => 'publish',
-            'posts_per_page' => -1, // Uzmi sve da bismo našli stvarne pobednike
-            'fields'         => 'ids', // Trebaju nam samo ID-evi radi brzine
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
             'meta_query'     => [
                 [
                     'key'     => '_is_tournament_match',
@@ -636,33 +647,26 @@ if (!function_exists('cs_voting_trending_shortcode')) {
         ];
 
         $all_list_ids = get_posts($all_lists_args);
-
         if (empty($all_list_ids)) return '';
 
-        // 2. Izračunaj skor za svaku listu i napravi niz [id => score]
+        // Filter scores to only non-tournament lists
         $list_scores = [];
         foreach ($all_list_ids as $list_id) {
-            // Koristimo tvoju pouzdanu funkciju za brojanje
-            $score = function_exists('get_total_score_for_voting_list') 
-                ? get_total_score_for_voting_list($list_id) 
-                : 0;
-            
-            $list_scores[$list_id] = (int)$score;
+            $list_scores[$list_id] = $all_scores[$list_id] ?? 0;
         }
 
-        // 3. Sortiraj niz od najvećeg ka najmanjem
+        // Sort by score descending
         arsort($list_scores);
 
-        // 4. Uzmi top X ID-eva
+        // Take top X
         $top_ids = array_slice(array_keys($list_scores), 0, $atts['count']);
 
         if (empty($top_ids)) return '';
 
-        // 5. Napravi novi Query samo za te top liste (da bi template radio normalno)
         $final_args = [
             'post_type' => 'voting_list',
             'post__in'  => $top_ids,
-            'orderby'   => 'post__in', // Održava redosled koji smo mi odredili (po glasovima)
+            'orderby'   => 'post__in',
         ];
 
         $query = new WP_Query($final_args);

@@ -125,7 +125,4 @@ add_filter('ygv_tokens_default_regen_interval_minutes', function ($v) { return 6
 
 
 
-// Debug hook to confirm initializer ran
-if (defined('WP_DEBUG') && WP_DEBUG) {
-    add_action('init', function(){ error_log('YGV Quizzes: initializer loaded'); }, 1);
-}
+

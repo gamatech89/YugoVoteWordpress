@@ -264,6 +264,12 @@ function submit_vote() {
     if (function_exists('update_vote_score_cache')) {
         update_vote_score_cache($voting_item_id);
     }
+    // Invalidate list-level score cache
+    if (function_exists('ygv_invalidate_list_score_cache')) {
+        ygv_invalidate_list_score_cache($voting_list_id);
+    }
+    delete_transient('ygv_all_list_scores');
+    delete_transient('ygv_mega_menu_html');
     
     // Award XP for voting (logged-in users only)
     $xp_awarded = 0;
@@ -409,6 +415,12 @@ function remove_vote() {
         if (function_exists('update_vote_score_cache')) {
             update_vote_score_cache($voting_item_id); 
         }
+        // Invalidate list-level score cache
+        if (function_exists('ygv_invalidate_list_score_cache')) {
+            ygv_invalidate_list_score_cache($voting_list_id);
+        }
+        delete_transient('ygv_all_list_scores');
+        delete_transient('ygv_mega_menu_html');
         
         // Get updated score for this item on this list
         $new_score = $wpdb->get_var($wpdb->prepare(

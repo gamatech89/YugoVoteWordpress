@@ -112,6 +112,12 @@ function get_total_score_for_voting_list($list_id) {
 
     if (get_post_type($list_id) !== 'voting_list') return 0;
 
+    // Try cached score first (stored in postmeta)
+    $cached = get_post_meta($list_id, '_list_vote_score_cache', true);
+    if ($cached !== '' && $cached !== false) {
+        return intval($cached);
+    }
+
     $table = $wpdb->prefix . "voting_list_votes";
 
     $total_score = $wpdb->get_var($wpdb->prepare(
@@ -119,7 +125,53 @@ function get_total_score_for_voting_list($list_id) {
         $list_id
     ));
 
-    return intval($total_score);
+    $score = intval($total_score);
+    update_post_meta($list_id, '_list_vote_score_cache', $score);
+
+    return $score;
+}
+
+/**
+ * Invalidate the cached score for a voting list.
+ * Call this after a vote is submitted or removed.
+ *
+ * @param int $list_id ID of the voting list.
+ */
+function ygv_invalidate_list_score_cache($list_id) {
+    delete_post_meta($list_id, '_list_vote_score_cache');
+}
+
+/**
+ * Batch-fetch vote scores for ALL published voting lists in a single query.
+ * Returns array of [list_id => score]. Uses transient caching (5 min TTL).
+ *
+ * @return array
+ */
+function ygv_get_all_list_scores() {
+    $cached = get_transient('ygv_all_list_scores');
+    if ($cached !== false) {
+        return $cached;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'voting_list_votes';
+
+    $results = $wpdb->get_results(
+        "SELECT voting_list_id, SUM(vote_value) as total_score 
+         FROM {$table} 
+         GROUP BY voting_list_id",
+        OBJECT
+    );
+
+    $scores = [];
+    if ($results) {
+        foreach ($results as $row) {
+            $scores[(int)$row->voting_list_id] = (int)$row->total_score;
+        }
+    }
+
+    set_transient('ygv_all_list_scores', $scores, 5 * MINUTE_IN_SECONDS);
+    return $scores;
 }
 
 /**
