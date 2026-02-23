@@ -79,17 +79,19 @@ function yugo_ajax_login_handler() {
     }
 
     // Login successful — determine redirect based on role
-    // Admin check FIRST (the form has a hidden redirect_to field hardcoded to /moj-nalog/)
-    if (user_can($user, 'manage_options')) {
-        // Administrators always go to wp-admin
+    $is_admin = user_can($user, 'manage_options');
+    error_log('YUGO_LOGIN_DEBUG: user=' . $user->user_login . ' is_admin=' . ($is_admin ? 'YES' : 'NO') . ' roles=' . implode(',', $user->roles));
+
+    if ($is_admin) {
         $redirect_url = admin_url();
     } elseif (isset($_POST['redirect_to']) && !empty($_POST['redirect_to'])) {
         $redirect_url = esc_url_raw($_POST['redirect_to']);
     } else {
-        // Regular users go to account page
         $account_slug = defined('CUSTOM_ACCOUNT_PAGE_SLUG') ? CUSTOM_ACCOUNT_PAGE_SLUG : 'moj-nalog';
         $redirect_url = home_url('/' . $account_slug . '/');
     }
+
+    error_log('YUGO_LOGIN_DEBUG: redirect_url=' . $redirect_url);
 
     wp_send_json_success([
         'message' => 'Uspešna prijava! Preusmeravanje...',
