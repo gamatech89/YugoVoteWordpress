@@ -2,6 +2,8 @@
 if (!defined('ABSPATH')) exit;
 
 // Page slugs (define only once)
+/** Disable admin email confirmation prompt (prevents redirect loop with custom login) */
+add_filter('admin_email_check_interval', '__return_false');
 defined('CUSTOM_LOGIN_PAGE_SLUG')      || define('CUSTOM_LOGIN_PAGE_SLUG', 'prijava');
 defined('CUSTOM_REGISTER_PAGE_SLUG')   || define('CUSTOM_REGISTER_PAGE_SLUG', 'registracija');
 defined('CUSTOM_COMPLETE_PROFILE_PAGE_SLUG') || define('CUSTOM_COMPLETE_PROFILE_PAGE_SLUG', 'kompletiranje-naloga');
