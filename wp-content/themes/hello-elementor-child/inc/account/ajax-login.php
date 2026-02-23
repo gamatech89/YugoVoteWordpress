@@ -104,12 +104,9 @@ function yugo_ajax_login_handler() {
 add_action('wp_enqueue_scripts', 'yugo_enqueue_login_scripts');
 
 function yugo_enqueue_login_scripts() {
-    $login_slug = defined('CUSTOM_LOGIN_PAGE_SLUG') ? CUSTOM_LOGIN_PAGE_SLUG : 'prijava';
-    
-    // Only on login page
-    if (!is_page($login_slug)) {
-        return;
-    }
+    // login.js disabled: form now posts directly to wp-login.php
+    // The login_redirect filter in account-hooks.php handles admin vs non-admin redirect
+    return;
 
     wp_enqueue_script(
         'yugo-login',
