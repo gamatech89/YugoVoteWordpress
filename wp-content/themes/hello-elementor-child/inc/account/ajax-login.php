@@ -51,7 +51,7 @@ function yugo_ajax_login_handler() {
         'remember'      => $remember,
     ];
 
-    $user = wp_signon($creds, false);
+    $user = wp_signon($creds, is_ssl());
 
     if (is_wp_error($user)) {
         $error_code = $user->get_error_code();
@@ -79,10 +79,7 @@ function yugo_ajax_login_handler() {
     }
 
     // Login successful — determine redirect based on role
-    $is_admin = user_can($user, 'manage_options');
-    error_log('YUGO_LOGIN_DEBUG: user=' . $user->user_login . ' is_admin=' . ($is_admin ? 'YES' : 'NO') . ' roles=' . implode(',', $user->roles));
-
-    if ($is_admin) {
+    if (user_can($user, 'manage_options')) {
         $redirect_url = admin_url();
     } elseif (isset($_POST['redirect_to']) && !empty($_POST['redirect_to'])) {
         $redirect_url = esc_url_raw($_POST['redirect_to']);
@@ -90,8 +87,6 @@ function yugo_ajax_login_handler() {
         $account_slug = defined('CUSTOM_ACCOUNT_PAGE_SLUG') ? CUSTOM_ACCOUNT_PAGE_SLUG : 'moj-nalog';
         $redirect_url = home_url('/' . $account_slug . '/');
     }
-
-    error_log('YUGO_LOGIN_DEBUG: redirect_url=' . $redirect_url);
 
     wp_send_json_success([
         'message' => 'Uspešna prijava! Preusmeravanje...',
