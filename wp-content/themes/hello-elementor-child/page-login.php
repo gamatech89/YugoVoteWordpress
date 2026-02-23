@@ -16,7 +16,13 @@ if (!defined('ABSPATH')) {
 
 // If user is already logged in, redirect them away from the login page.
 if (is_user_logged_in()) {
-    wp_redirect(home_url('/' . CUSTOM_ACCOUNT_PAGE_SLUG . '/')); 
+    if (current_user_can('manage_options')) {
+        wp_redirect(admin_url());
+    } elseif (!empty($_GET['redirect_to'])) {
+        wp_redirect(esc_url_raw(wp_unslash($_GET['redirect_to'])));
+    } else {
+        wp_redirect(home_url('/' . CUSTOM_ACCOUNT_PAGE_SLUG . '/'));
+    }
     exit;
 }
 
