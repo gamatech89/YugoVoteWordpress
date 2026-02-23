@@ -17,14 +17,8 @@
  */
 
 if (is_user_logged_in()) {
-    // Admins always go to wp-admin, regular users to account page
-    if (current_user_can('manage_options')) {
-        $redirect_url = admin_url();
-    } elseif (!empty($_GET['redirect_to'])) {
-        $redirect_url = esc_url_raw(wp_unslash($_GET['redirect_to']));
-    } else {
-        $redirect_url = home_url('/' . CUSTOM_ACCOUNT_PAGE_SLUG . '/');
-    }
+    // Redirect logged-in users to account page.
+    $redirect_url = home_url('/' . CUSTOM_ACCOUNT_PAGE_SLUG . '/');
     wp_redirect($redirect_url);
     exit;
 }
