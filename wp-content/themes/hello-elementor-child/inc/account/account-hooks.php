@@ -46,6 +46,14 @@ add_filter('login_url', function($login_url, $redirect, $force_reauth){
     return $url;
 }, 10, 3);
 
+/** Redirect admins to wp-admin after login (covers standard wp-login.php flow) */
+add_filter('login_redirect', function($redirect_to, $requested_redirect_to, $user) {
+    if (!is_wp_error($user) && user_can($user, 'manage_options')) {
+        return admin_url();
+    }
+    return $redirect_to;
+}, 10, 3);
+
 /** Override lost password URL to custom page */
 add_filter('lostpassword_url', function($lostpassword_url, $redirect){
     $url = home_url('/zaboravljena-lozinka/');
