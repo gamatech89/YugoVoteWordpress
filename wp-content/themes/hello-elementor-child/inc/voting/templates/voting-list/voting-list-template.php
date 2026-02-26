@@ -115,7 +115,7 @@ if ($query->have_posts()) :
         // Use pivot table data if available, otherwise fallback to default
         $short_desc = !empty($pivot_data) && !empty($pivot_data['short_description']) ? $pivot_data['short_description'] : $default_short_desc;
         $image      = !empty($pivot_data) && !empty($pivot_data['custom_image_url']) ? $pivot_data['custom_image_url'] : $default_image;
-        $video_url = $pivot_data['url'] ?? get_post_meta($item_id, '_item_url', true);
+        $video_url = !empty($pivot_data) && !empty($pivot_data['url']) ? $pivot_data['url'] : get_post_meta($item_id, '_item_url', true);
 
 
         // Render voting card

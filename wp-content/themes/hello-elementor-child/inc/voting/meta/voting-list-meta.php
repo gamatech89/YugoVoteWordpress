@@ -118,6 +118,11 @@ function save_voting_list_data($post_id) {
     if (array_key_exists('voting_items', $_POST)) {
         $selected_items = json_decode(stripslashes($_POST['voting_items']), true);
         update_post_meta($post_id, '_voting_items', $selected_items);
+
+        // Auto-sync: ensure every item has a pivot table row
+        if (!empty($selected_items) && is_array($selected_items)) {
+            yuv_sync_pivot_rows($post_id, $selected_items);
+        }
     }
 
     if (isset($_POST['voting_scale'])) {
@@ -130,3 +135,43 @@ function save_voting_list_data($post_id) {
     }
 }
 add_action('save_post', 'save_voting_list_data');
+
+/**
+ * Ensure every item in a voting list has a corresponding row in the pivot table.
+ * Only inserts missing rows — never overwrites existing custom data.
+ * Also copies the item's WP featured image URL into custom_image_url if available.
+ *
+ * @param int   $list_id  The voting list post ID.
+ * @param array $item_ids Array of voting item post IDs.
+ */
+function yuv_sync_pivot_rows($list_id, $item_ids) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'voting_list_item_relations';
+
+    // Get existing pivot item IDs for this list in one query
+    $existing = $wpdb->get_col($wpdb->prepare(
+        "SELECT voting_item_id FROM $table WHERE voting_list_id = %d",
+        $list_id
+    ));
+    $existing = array_map('intval', $existing);
+
+    // Find items that need pivot rows
+    $missing = array_diff(array_map('intval', $item_ids), $existing);
+
+    if (empty($missing)) {
+        return;
+    }
+
+    // Insert missing rows with the item's featured image as custom_image_url
+    foreach ($missing as $item_id) {
+        $image_url = get_the_post_thumbnail_url($item_id, 'medium');
+
+        $wpdb->insert($table, [
+            'voting_list_id'  => $list_id,
+            'voting_item_id'  => $item_id,
+            'custom_image_url' => $image_url ?: null,
+            'created_at'      => current_time('mysql', 1),
+            'updated_at'      => current_time('mysql', 1),
+        ]);
+    }
+}

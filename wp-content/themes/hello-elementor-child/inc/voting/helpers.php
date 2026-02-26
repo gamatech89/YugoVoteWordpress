@@ -1,6 +1,7 @@
 <?php
 
-function update_vote_score_cache($item_id) {
+function update_vote_score_cache($item_id)
+{
     global $wpdb;
     $table = $wpdb->prefix . 'voting_list_votes';
 
@@ -28,10 +29,12 @@ function update_vote_score_cache($item_id) {
  * @return array        Array of WP_Post objects.
  */
 
-function get_hero_posts_for_category($term_id, $limit = 4) {
+function get_hero_posts_for_category($term_id, $limit = 4)
+{
     $term = get_term($term_id, 'voting_list_category');
 
-    if (!$term) return [];
+    if (!$term)
+        return [];
 
     $term_ids = [];
 
@@ -39,14 +42,15 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
         // Parent category — get all children
         $children = get_terms([
             'taxonomy' => 'voting_list_category',
-            'parent'   => $term_id,
+            'parent' => $term_id,
             'hide_empty' => false
         ]);
 
         foreach ($children as $child) {
             $term_ids[] = $child->term_id;
         }
-    } else {
+    }
+    else {
         // Child category — use only itself
         $term_ids[] = $term_id;
     }
@@ -56,21 +60,16 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
         'post_type' => 'voting_list',
         'posts_per_page' => $limit,
         'meta_query' => [
-            'relation' => 'AND',
             [
                 'key' => '_is_featured',
                 'value' => '1',
             ],
-            [
-                'key' => '_is_tournament_match',
-                'compare' => 'NOT EXISTS',
-            ],
         ],
         'tax_query' => [[
-            'taxonomy' => 'voting_list_category',
-            'field'    => 'term_id',
-            'terms'    => $term_ids
-        ]]
+                'taxonomy' => 'voting_list_category',
+                'field' => 'term_id',
+                'terms' => $term_ids
+            ]]
     ]);
 
     // If not enough featured posts, fallback to latest
@@ -82,17 +81,11 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
             'post_type' => 'voting_list',
             'posts_per_page' => $needed,
             'post__not_in' => $exclude_ids,
-            'meta_query' => [
-                [
-                    'key' => '_is_tournament_match',
-                    'compare' => 'NOT EXISTS',
-                ],
-            ],
             'tax_query' => [[
-                'taxonomy' => 'voting_list_category',
-                'field'    => 'term_id',
-                'terms'    => $term_ids
-            ]]
+                    'taxonomy' => 'voting_list_category',
+                    'field' => 'term_id',
+                    'terms' => $term_ids
+                ]]
         ]);
 
         $featured = array_merge($featured, $fallback);
@@ -107,10 +100,12 @@ function get_hero_posts_for_category($term_id, $limit = 4) {
  * @param int $list_id  ID of the voting_list post.
  * @return int           Total score across all votes.
  */
-function get_total_score_for_voting_list($list_id) {
+function get_total_score_for_voting_list($list_id)
+{
     global $wpdb;
 
-    if (get_post_type($list_id) !== 'voting_list') return 0;
+    if (get_post_type($list_id) !== 'voting_list')
+        return 0;
 
     // Try cached score first (stored in postmeta)
     $cached = get_post_meta($list_id, '_list_vote_score_cache', true);
@@ -137,7 +132,8 @@ function get_total_score_for_voting_list($list_id) {
  *
  * @param int $list_id ID of the voting list.
  */
-function ygv_invalidate_list_score_cache($list_id) {
+function ygv_invalidate_list_score_cache($list_id)
+{
     delete_post_meta($list_id, '_list_vote_score_cache');
 }
 
@@ -147,7 +143,8 @@ function ygv_invalidate_list_score_cache($list_id) {
  *
  * @return array
  */
-function ygv_get_all_list_scores() {
+function ygv_get_all_list_scores()
+{
     $cached = get_transient('ygv_all_list_scores');
     if ($cached !== false) {
         return $cached;
@@ -180,16 +177,17 @@ function ygv_get_all_list_scores() {
  * @param int $term_id  ID of the voting_list_category term.
  * @return int           Number of matching posts.
  */
-function get_voting_list_count_by_category($term_id) {
+function get_voting_list_count_by_category($term_id)
+{
     $query = new WP_Query([
-        'post_type'      => 'voting_list',
+        'post_type' => 'voting_list',
         'posts_per_page' => 1, // optimize, we only need count
-        'fields'         => 'ids',
+        'fields' => 'ids',
         'tax_query' => [[
-            'taxonomy' => 'voting_list_category',
-            'field'    => 'term_id',
-            'terms'    => $term_id,
-        ]],
+                'taxonomy' => 'voting_list_category',
+                'field' => 'term_id',
+                'terms' => $term_id,
+            ]],
     ]);
     $count = $query->found_posts;
     wp_reset_postdata();
@@ -204,26 +202,22 @@ function get_voting_list_count_by_category($term_id) {
  * @param int   $count      How many posts to return (default 1).
  * @return array            Array of WP_Post objects (can be empty).
  */
-function get_featured_posts_for_term($term_id, $count = 1) {
+function get_featured_posts_for_term($term_id, $count = 1)
+{
     return get_posts([
-        'post_type'      => 'voting_list',
+        'post_type' => 'voting_list',
         'posts_per_page' => $count,
         'meta_query' => [
-            'relation' => 'AND',
             [
                 'key' => '_is_featured',
                 'value' => '1',
             ],
-            [
-                'key' => '_is_tournament_match',
-                'compare' => 'NOT EXISTS',
-            ],
         ],
-        'tax_query'      => [[
-            'taxonomy' => 'voting_list_category',
-            'field'    => 'term_id',
-            'terms'    => $term_id,
-        ]],
+        'tax_query' => [[
+                'taxonomy' => 'voting_list_category',
+                'field' => 'term_id',
+                'terms' => $term_id,
+            ]],
     ]);
 }
 
@@ -238,24 +232,19 @@ function get_featured_posts_for_term($term_id, $count = 1) {
  * @param int   $count        Number of posts to return (default 3).
  * @return array              Array of WP_Post objects.
  */
-function get_latest_posts_for_term($term_id, $exclude_ids = [], $count = 3) {
+function get_latest_posts_for_term($term_id, $exclude_ids = [], $count = 3)
+{
     return get_posts([
-        'post_type'      => 'voting_list',
+        'post_type' => 'voting_list',
         'posts_per_page' => $count,
-        'post__not_in'   => $exclude_ids,
-        'orderby'        => 'date',
-        'order'          => 'DESC',
-        'meta_query' => [
-            [
-                'key' => '_is_tournament_match',
-                'compare' => 'NOT EXISTS',
-            ],
-        ],
-        'tax_query'      => [[
-            'taxonomy' => 'voting_list_category',
-            'field'    => 'term_id',
-            'terms'    => $term_id,
-        ]],
+        'post__not_in' => $exclude_ids,
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'tax_query' => [[
+                'taxonomy' => 'voting_list_category',
+                'field' => 'term_id',
+                'terms' => $term_id,
+            ]],
     ]);
 }
 
@@ -271,14 +260,15 @@ function get_latest_posts_for_term($term_id, $exclude_ids = [], $count = 3) {
  * @param int $list_id The ID of the voting list.
  * @return int The total sum of votes for the item in that list, or 0 if none found.
  */
-function get_votes_for_item_in_list($item_id, $list_id) {
+function get_votes_for_item_in_list($item_id, $list_id)
+{
     global $wpdb;
 
     $item_id = intval($item_id);
     $list_id = intval($list_id);
-    
-   
-    $votes_table = $wpdb->prefix . 'voting_list_votes'; 
+
+
+    $votes_table = $wpdb->prefix . 'voting_list_votes';
 
     $total_votes = $wpdb->get_var($wpdb->prepare(
         "SELECT SUM(vote_value) FROM {$votes_table} WHERE voting_item_id = %d AND voting_list_id = %d",

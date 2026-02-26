@@ -50,7 +50,7 @@ if (file_exists($voting_inc_path . 'admin/voting-columns.php')) {
 // (Your main init.php listed db-schema.php and voting-scripts.php here.
 // If you have a general voting helpers.php, include it too.)
 if (file_exists($voting_inc_path . 'helpers.php')) { // Optional general helpers file
-    require_once $voting_inc_path . 'helpers.php'; 
+    require_once $voting_inc_path . 'helpers.php';
 }
 
 if (file_exists($voting_inc_path . 'voting-scripts.php')) { // For enqueuing voting-specific scripts/styles
@@ -60,8 +60,13 @@ if (file_exists($voting_inc_path . 'voting-scripts.php')) { // For enqueuing vot
 // Load Frontend List Submission
 require_once $voting_inc_path . 'frontend-submit.php';
 
-// Load Tournament Module
-require_once $voting_inc_path . 'tournament/tournament-init.php';
+// Load Showdown Module (replaced Tournament)
+require_once $voting_inc_path . 'showdown/showdown-init.php';
+
+// Load admin tools (backfill pivot, etc.)
+if (is_admin() && file_exists($voting_inc_path . 'tools/backfill-pivot.php')) {
+    require_once $voting_inc_path . 'tools/backfill-pivot.php';
+}
 
 
 
