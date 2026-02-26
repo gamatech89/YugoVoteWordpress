@@ -60,8 +60,10 @@ if (file_exists($voting_inc_path . 'voting-scripts.php')) { // For enqueuing vot
 // Load Frontend List Submission
 require_once $voting_inc_path . 'frontend-submit.php';
 
-// Load Showdown Module (replaced Tournament)
-require_once $voting_inc_path . 'showdown/showdown-init.php';
+// Load Showdown Module (replaced Tournament) - conditional until fully deployed
+if (file_exists($voting_inc_path . 'showdown/showdown-init.php')) {
+    require_once $voting_inc_path . 'showdown/showdown-init.php';
+}
 
 // Load admin tools (backfill pivot, etc.)
 if (is_admin() && file_exists($voting_inc_path . 'tools/backfill-pivot.php')) {
