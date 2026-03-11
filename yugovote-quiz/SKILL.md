@@ -35,11 +35,11 @@ For each question, follow this exact process:
 
 1. **Formulate** — Write the question in natural Serbian
 2. **Verify** — Confirm the correct answer is 100% factually accurate
-3. **Calibrate difficulty** — Match question difficulty to the appropriate level:
-   - **Beginner**: Common knowledge most people would know
-   - **Intermediate**: Requires some specific knowledge  
-   - **Advanced**: Requires deeper knowledge of the topic
-   - **Expert**: Only specialists would know
+3. **Calibrate difficulty** — Use the "Would my mom/friend know this?" test:
+   - **Beginner**: Anyone who grew up in ex-Yu or watched ex-Yu content casually would know. Think pop culture basics — the most famous actors, the most iconic films everyone has seen. NO specific dates, NO festival awards, NO director names (unless ultra-famous like Kusturica). Example ✅: "Ko igra Valtera?" Example ❌: "Koji film je osvojio Zlatnog lava 1994?"
+   - **Intermediate**: Requires genuine interest in the topic. You'd know this if you're a casual fan — director names, well-known supporting actors, plot details of famous films, which country a film is from.
+   - **Advanced**: Requires deeper knowledge — specific years, film festival awards, box office data, lesser-known films or actors, technical film details.
+   - **Expert**: Only hardcore film buffs would know — cinematographers, exact award ceremonies, obscure filmography, production details.
 4. **Create distractors** — Wrong answers must be plausible but clearly incorrect
 5. **Call `create_question`** with all required fields
 
