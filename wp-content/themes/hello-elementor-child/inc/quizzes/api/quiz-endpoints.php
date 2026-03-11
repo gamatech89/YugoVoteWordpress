@@ -20,6 +20,10 @@ function get_quiz_data(WP_REST_Request $request) {
     $quiz_type           = get_post_meta($quiz_id, '_quiz_type', true) ?: 'automatic';
     $quiz_description    = get_post_meta($quiz_id, '_quiz_description', true) ?: '';
     $selected_questions  = get_post_meta($quiz_id, '_quiz_questions', true) ?: [];
+    // MCP API stores question IDs as JSON string — decode if needed
+    if (is_string($selected_questions)) {
+        $selected_questions = json_decode($selected_questions, true) ?: [];
+    }
     $selected_categories = get_post_meta($quiz_id, '_quiz_question_categories', true) ?: [];
     $featured_image      = get_the_post_thumbnail_url($quiz_id, 'full') ?: '';
     $allow_guest_play    = get_post_meta($quiz_id, '_allow_guest_play', true);
