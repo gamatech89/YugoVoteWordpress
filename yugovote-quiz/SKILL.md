@@ -68,9 +68,12 @@ Before creating each question verify:
 
 ## Answer Format Reference
 
+> [!IMPORTANT]
+> The `title` field MUST be the **full question text** (identical to `question_text`). The frontend displays `post_title` as the question — NOT the `_question_text` meta field.
+
 ```json
 {
-  "title": "Glavni grad Crne Gore",
+  "title": "Koji je glavni grad Crne Gore?",
   "question_text": "Koji je glavni grad Crne Gore?",
   "answers": ["Nikšić", "Podgorica", "Bar", "Budva"],
   "correct_answer": 1,
@@ -81,6 +84,9 @@ Before creating each question verify:
 ```
 
 Note: `correct_answer` is zero-indexed. In the example above, index 1 = "Podgorica".
+
+> [!TIP]
+> When creating a quiz, always assign `quiz_category_id` to ensure the quiz appears in the correct category on the frontend. Use quiz_category IDs (not question_category IDs): Film i TV=217, Sport=215, Muzika=216, Culture Club=220, Trendy/Lifestyle=221.
 
 ## Difficulty & Reward Defaults
 
