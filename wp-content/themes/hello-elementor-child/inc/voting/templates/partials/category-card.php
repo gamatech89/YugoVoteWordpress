@@ -22,7 +22,7 @@ $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'medium') : '';
         <h3 class="cs-color--<?php echo esc_attr($slug); ?> cs-color-hover--<?php echo esc_attr($slug); ?>">
             <?php echo esc_html($term->name); ?>
         </h3>
-        <div class="cs-subcategory-card__description"><?php echo wp_kses_post($description); ?></div>
+        <div class="cs-subcategory-card__description"><?php echo wp_kses_post(wpautop($description)); ?></div>
         <p class="cs-subcategory-card__meta cs-bg--<?php echo esc_attr($slug); ?>">
             <?php echo esc_html($total_posts); ?> liste
         </p>

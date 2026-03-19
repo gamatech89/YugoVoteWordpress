@@ -25,6 +25,8 @@ $is_parent = $current_term->parent === 0;
 $category_color = get_term_meta($term_id, 'category_color', true) ?: '#4456A6';
 $category_logo_id = get_term_meta($term_id, 'category_logo', true);
 $category_logo_url = $category_logo_id ? wp_get_attachment_url($category_logo_id) : '';
+$category_featured_image_id = get_term_meta($term_id, 'category_featured_image', true);
+$category_featured_image_url = $category_featured_image_id ? wp_get_attachment_image_url($category_featured_image_id, 'large') : '';
 $category_description = $current_term->description;
 
 // Get parent category info (for breadcrumb on child)
@@ -201,7 +203,7 @@ get_header();
 <div class="ygv-page ygv-category-page">
     
     <!-- ========== HERO SECTION ========== -->
-    <section class="ygv-cat-hero" style="--ygv-cat-color: <?php echo esc_attr($category_color); ?>;">
+    <section class="ygv-cat-hero" style="--ygv-cat-color: <?php echo esc_attr($category_color); ?>; <?php if ($category_featured_image_url): ?>--hero-bg: url('<?php echo esc_url($category_featured_image_url); ?>');<?php endif; ?>">
         <div class="ygv-cat-hero__inner">
             
             <?php if ($category_logo_url): ?>

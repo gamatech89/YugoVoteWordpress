@@ -744,8 +744,16 @@ if (!empty($voting_items_ids)) {
                         <h3 class="vlp-item__title">
                             <a href="<?php echo esc_url($item['permalink']); ?>"><?php echo esc_html($item['title']); ?></a>
                         </h3>
-                        <?php if ($item['short_desc']): ?>
-                        <p class="vlp-item__desc"><?php echo esc_html(wp_trim_words($item['short_desc'], 20, '...')); ?></p>
+                        <?php if ($item['short_desc']): 
+                            $full_words = str_word_count($item['short_desc']);
+                            $trimmed = wp_trim_words($item['short_desc'], 30, '...');
+                        ?>
+                        <div class="vlp-item__desc-wrapper">
+                            <p class="vlp-item__desc"><?php echo esc_html($trimmed); ?></p>
+                            <?php if ($full_words > 30): ?>
+                            <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__read-more">Pročitaj više</a>
+                            <?php endif; ?>
+                        </div>
                         <?php endif; ?>
                         
                         <!-- Score Display -->
