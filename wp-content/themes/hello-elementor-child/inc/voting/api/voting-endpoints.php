@@ -330,14 +330,14 @@ function submit_vote() {
             $response['level_ups'] = $xp_result['level_ups'];
         }
         
-        // Check for newly unlocked achievements
-        require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-achievement-service.php';
-        $achievement_service = new YGV_Achievement_Service();
-        $new_achievements = $achievement_service->check_and_unlock($user_id);
-        
-        if (!empty($new_achievements)) {
-            $response['achievements'] = $new_achievements;
-        }
+        // [DISABLED] Achievements temporarily disabled while leveling system is being fixed
+        // require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-achievement-service.php';
+        // $achievement_service = new YGV_Achievement_Service();
+        // $new_achievements = $achievement_service->check_and_unlock($user_id);
+        // 
+        // if (!empty($new_achievements)) {
+        //     $response['achievements'] = $new_achievements;
+        // }
     }
     
     wp_send_json_success($response);

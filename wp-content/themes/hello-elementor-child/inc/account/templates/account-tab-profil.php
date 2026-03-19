@@ -87,22 +87,34 @@ if (!function_exists('ygv_get_next_level_xp')) {
 $global_title = ygv_get_title_for_level((int)$overall['overall_level'], $level_config);
 $global_next_xp = ygv_get_next_level_xp((int)$overall['overall_level'], $level_config);
 
-// Get voting streak info
+// Get voting streak info (direct DB query - achievements disabled)
 $voting_streak = 0;
 $streak_bonus = 0;
-if (class_exists('YGV_Achievement_Service')) {
-    $achievement_service = new YGV_Achievement_Service();
-    $user_stats = $achievement_service->get_user_stats($user_id);
-    $voting_streak = $user_stats['voting_streak'] ?? 0;
-    $streak_bonus = min($voting_streak, 10);
-} else {
-    // Fallback: calculate directly
-    require_once get_stylesheet_directory() . '/inc/quizzes/services/class-ygv-achievement-service.php';
-    $achievement_service = new YGV_Achievement_Service();
-    $user_stats = $achievement_service->get_user_stats($user_id);
-    $voting_streak = $user_stats['voting_streak'] ?? 0;
-    $streak_bonus = min($voting_streak, 10);
+global $wpdb;
+$streak_votes_table = $wpdb->prefix . 'voting_list_votes';
+$streak_dates = $wpdb->get_col($wpdb->prepare(
+    "SELECT DISTINCT DATE(created_at) as vote_date 
+     FROM {$streak_votes_table} 
+     WHERE user_id = %d AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY)
+     ORDER BY vote_date DESC",
+    $user_id
+));
+if (!empty($streak_dates)) {
+    $today_str = gmdate('Y-m-d');
+    $yesterday_str = gmdate('Y-m-d', strtotime('-1 day'));
+    if ($streak_dates[0] === $today_str || $streak_dates[0] === $yesterday_str) {
+        $expected = $streak_dates[0];
+        foreach ($streak_dates as $d) {
+            if ($d === $expected) {
+                $voting_streak++;
+                $expected = gmdate('Y-m-d', strtotime($expected . ' -1 day'));
+            } else {
+                break;
+            }
+        }
+    }
 }
+$streak_bonus = min($voting_streak, 10);
 
 // Get YugoCoins
 $yugocoins = function_exists('ygv_get_user_yugocoins') ? ygv_get_user_yugocoins($user_id) : (int) get_user_meta($user_id, 'yugocoins', true);

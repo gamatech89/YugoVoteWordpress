@@ -164,16 +164,35 @@ class ProgressService {
         $limit_reached = ($votes_today >= $daily_limit);
         $base_xp = $limit_reached ? 0 : $xp_per_vote;
         
-        // Get streak bonus
+        // Get streak bonus (simplified - no achievement service dependency)
         $streak_bonus_xp = 0;
         $streak_info = null;
-        if (class_exists('YGV_Achievement_Service')) {
-            $ach = new \YGV_Achievement_Service();
-            $stats = $ach->get_user_stats($user_id);
-            $streak = (int)($stats['voting_streak'] ?? 0);
-            $streak_bonus_xp = min($streak, 10); // Max 10 XP bonus
-            $streak_info = ['days' => $streak, 'bonus' => $streak_bonus_xp];
+        $votes_table_streak = $wpdb->prefix . 'voting_list_votes';
+        $streak_dates = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT DATE(created_at) as vote_date 
+             FROM {$votes_table_streak} 
+             WHERE user_id = %d AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY)
+             ORDER BY vote_date DESC",
+            $user_id
+        ));
+        $streak = 0;
+        if (!empty($streak_dates)) {
+            $today_str = gmdate('Y-m-d');
+            $yesterday_str = gmdate('Y-m-d', strtotime('-1 day'));
+            if ($streak_dates[0] === $today_str || $streak_dates[0] === $yesterday_str) {
+                $expected = $streak_dates[0];
+                foreach ($streak_dates as $d) {
+                    if ($d === $expected) {
+                        $streak++;
+                        $expected = gmdate('Y-m-d', strtotime($expected . ' -1 day'));
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
+        $streak_bonus_xp = min($streak, 10); // Max 10 XP bonus
+        $streak_info = ['days' => $streak, 'bonus' => $streak_bonus_xp];
         
         $awarded_xp = $base_xp + ($limit_reached ? 0 : $streak_bonus_xp);
         
