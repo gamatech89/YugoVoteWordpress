@@ -21,3 +21,17 @@ function ygv_enqueue_poll_scripts() {
     );
 }
 add_action('wp_enqueue_scripts', 'ygv_enqueue_poll_scripts');
+
+/**
+ * Render floating poll button on all pages
+ */
+function ygv_render_floating_poll() {
+    // Skip on ankete archive page to avoid duplication
+    if (is_page_template('page-ankete.php')) return;
+    
+    $template = get_stylesheet_directory() . '/inc/polls/templates/floating-poll.php';
+    if (file_exists($template)) {
+        include $template;
+    }
+}
+add_action('wp_footer', 'ygv_render_floating_poll');
