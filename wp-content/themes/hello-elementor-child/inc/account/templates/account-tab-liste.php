@@ -309,7 +309,7 @@ if (!empty($voting_days)) {
                     </div>
                     <div class="ygv-mini-stat">
                         <span class="ygv-mini-stat-value"><?php echo number_format($unique_items_voted); ?></span>
-                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Stavki', 'hello-elementor-child'); ?></span>
+                        <span class="ygv-mini-stat-label"><?php echo esc_html__('Itema', 'hello-elementor-child'); ?></span>
                     </div>
                     <?php if ($total_points > 0): ?>
                     <div class="ygv-mini-stat">

@@ -340,10 +340,10 @@
   justify-content: center;
   background: var(--vlp-primary);
   color: white;
-  padding: 8px 12px;
+  padding: 4px 8px;
   border-radius: 0 0 10px 0;
   z-index: 3;
-  min-width: 36px;
+  min-width: 28px;
 }
 
 .vlp-item--rank-1 .vlp-item__rank {
@@ -367,7 +367,7 @@
 }
 
 .vlp-item__rank-num {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -434,11 +434,11 @@
 }
 
 .vlp-item__desc {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--vlp-text-muted);
   margin: 0;
   line-height: 1.5;
-  font-style: italic;
+  font-weight: 500;
 }
 
 .vlp-item__desc-wrapper {
@@ -967,6 +967,12 @@
     width: 32px;
     height: 32px;
     font-size: 12px;
+  }
+
+  .vlp-item__buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
   }
 
   .vlp-panel {

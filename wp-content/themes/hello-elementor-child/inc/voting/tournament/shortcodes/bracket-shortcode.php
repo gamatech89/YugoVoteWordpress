@@ -33,7 +33,7 @@ function yuv_active_duel_shortcode($atts) {
     ));
     
     if (empty($tournament)) {
-        return '<div class="yuv-no-duel"><p>Trenutno nema aktivnih duelova.</p></div>';
+        return '<div class="yuv-no-duel"><p>Trenutno nema aktivnih duela.</p></div>';
     }
     
     $tournament_id = $tournament[0]->ID;

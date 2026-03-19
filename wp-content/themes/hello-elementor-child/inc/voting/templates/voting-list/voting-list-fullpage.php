@@ -646,16 +646,18 @@ if (!empty($voting_items_ids)) {
             <div class="vlp-stats">
                 <div class="vlp-stat">
                     <span class="vlp-stat__value"><?php echo number_format($items_count); ?></span>
-                    <span class="vlp-stat__label">Stavki</span>
+                    <span class="vlp-stat__label">Itema</span>
                 </div>
                 <div class="vlp-stat">
                     <span class="vlp-stat__value"><?php echo number_format($total_score); ?></span>
                     <span class="vlp-stat__label">Ukupno poena</span>
                 </div>
+                <!-- Voter count hidden until numbers are respectable
                 <div class="vlp-stat">
                     <span class="vlp-stat__value"><?php echo number_format($unique_voters); ?></span>
                     <span class="vlp-stat__label">Glasača</span>
                 </div>
+                -->
             </div>
             
             <!-- User Progress -->
@@ -664,7 +666,7 @@ if (!empty($voting_items_ids)) {
                     <div class="vlp-user-progress__fill" style="width: <?php echo round(($user_votes_count / $voting_scale) * 100); ?>%"></div>
                 </div>
                 <span class="vlp-user-progress__text">
-                    Glasali ste za <strong><?php echo $user_votes_count; ?></strong> od <strong><?php echo $voting_scale; ?></strong> stavki
+                    Glasali ste za <strong><?php echo $user_votes_count; ?></strong> od <strong><?php echo $voting_scale; ?></strong> itema
                     (<?php echo round(($user_votes_count / $voting_scale) * 100); ?>%)
                 </span>
             </div>
@@ -1535,7 +1537,7 @@ if (!empty($voting_items_ids)) {
         panelProgress.style.width = percent + '%';
         if (heroProgress) heroProgress.style.width = percent + '%';
         if (heroText) {
-            heroText.innerHTML = 'Glasali ste za <strong>' + current + '</strong> od <strong>' + votingScale + '</strong> stavki (' + percent + '%)';
+            heroText.innerHTML = 'Glasali ste za <strong>' + current + '</strong> od <strong>' + votingScale + '</strong> itema (' + percent + '%)';
         }
     }
     

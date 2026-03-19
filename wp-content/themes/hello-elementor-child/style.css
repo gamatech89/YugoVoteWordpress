@@ -1681,7 +1681,7 @@ a {
   }
 
   .cs-home-cat-hero__title a {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
   }
 
   .cs-home-cat-hero__stats {
@@ -1698,6 +1698,12 @@ a {
   .cs-home-category-swiper .swiper-button-prev {
     display: none;
   }
+}
+
+/* Subcategory circle images - fill entire circle */
+.cs-subcategory-icon {
+  background-size: cover;
+  background-position: center;
 }
 /* ==========================================================================
    TRENDING LEADERBOARD SECTION

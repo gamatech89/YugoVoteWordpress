@@ -278,7 +278,7 @@ get_header();
                     <div class="ygv-list-card__meta">
                         <span class="ygv-list-card__meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-                            <?php echo $items_count; ?> stavki
+                            <?php echo $items_count; ?> itema
                         </span>
                         <span class="ygv-list-card__meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
