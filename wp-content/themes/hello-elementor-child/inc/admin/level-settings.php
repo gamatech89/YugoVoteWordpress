@@ -142,6 +142,11 @@ function ygv_sanitize_level_config($input): array {
     $sanitized['list_creation_category_level'] = absint($input['list_creation_category_level'] ?? 10);
     $sanitized['list_creation_global_level'] = absint($input['list_creation_global_level'] ?? 5);
     
+    // Preserve XP reward settings
+    $sanitized['xp_per_vote'] = absint($input['xp_per_vote'] ?? 2);
+    $sanitized['daily_vote_limit'] = absint($input['daily_vote_limit'] ?? 50);
+    $sanitized['xp_for_list_creation'] = absint($input['xp_for_list_creation'] ?? 50);
+    
     return $sanitized;
 }
 
@@ -248,6 +253,40 @@ function ygv_render_level_settings_page() {
                                value="<?php echo esc_attr($config['max_level']); ?>" 
                                min="50" max="200" style="width: 80px;">
                         <p class="description">Maximum achievable level (default: 100)</p>
+                    </td>
+                </tr>
+            </table>
+            
+            <hr style="margin: 30px 0;">
+            
+            <h2>XP Rewards</h2>
+            <p class="description">Configure how much XP users earn from different actions.</p>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">XP per Vote</th>
+                    <td>
+                        <input type="number" name="ygv_level_config[xp_per_vote]" 
+                               value="<?php echo esc_attr($config['xp_per_vote'] ?? 2); ?>" 
+                               min="1" max="20" style="width: 60px;">
+                        <p class="description">XP earned per vote cast (default: 2)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Daily Vote XP Limit</th>
+                    <td>
+                        <input type="number" name="ygv_level_config[daily_vote_limit]" 
+                               value="<?php echo esc_attr($config['daily_vote_limit'] ?? 50); ?>" 
+                               min="10" max="200" style="width: 80px;">
+                        <p class="description">Max votes per day that earn XP (default: 50)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">XP for List Creation</th>
+                    <td>
+                        <input type="number" name="ygv_level_config[xp_for_list_creation]" 
+                               value="<?php echo esc_attr($config['xp_for_list_creation'] ?? 50); ?>" 
+                               min="10" max="500" step="10" style="width: 80px;">
+                        <p class="description">XP earned when creating a list (default: 50)</p>
                     </td>
                 </tr>
             </table>

@@ -73,7 +73,7 @@ class ProgressService {
             return $thresholds;
         }
 
-        return [1=>0, 2=>50, 3=>120, 4=>210, 5=>320, 6=>450, 7=>620, 8=>830, 9=>1080, 10=>1370];
+        return [1=>0, 2=>50, 3=>120, 4=>210, 5=>320, 6=>450, 7=>600, 8=>780, 9=>1000, 10=>1250];
     }
 
     public function xp_to_level(int $xp, string $scope = 'category'): array {
@@ -177,14 +177,14 @@ class ProgressService {
         ));
         $streak = 0;
         if (!empty($streak_dates)) {
-            $today_str = gmdate('Y-m-d');
-            $yesterday_str = gmdate('Y-m-d', strtotime('-1 day'));
+            $today_str = current_time('Y-m-d');
+            $yesterday_str = wp_date('Y-m-d', strtotime('-1 day'));
             if ($streak_dates[0] === $today_str || $streak_dates[0] === $yesterday_str) {
                 $expected = $streak_dates[0];
                 foreach ($streak_dates as $d) {
                     if ($d === $expected) {
                         $streak++;
-                        $expected = gmdate('Y-m-d', strtotime($expected . ' -1 day'));
+                        $expected = wp_date('Y-m-d', strtotime($expected . ' -1 day'));
                     } else {
                         break;
                     }
@@ -240,7 +240,7 @@ class ProgressService {
      */
     public function award_list_creation_xp(int $user_id, int $category_id): array {
         $config = function_exists('ygv_get_level_config') ? ygv_get_level_config() : null;
-        $xp_for_list = $config['xp_per_list_creation'] ?? 50;
+        $xp_for_list = $config['xp_for_list_creation'] ?? 50;
         
         // Get parent category if this is a child
         $term = get_term($category_id, 'voting_list_category');
@@ -257,7 +257,7 @@ class ProgressService {
 
     public function add_xp(int $user_id, int $term_id, int $xp): array {
         global $wpdb;
-        if ($xp <= 0) return ['awarded'=>0];
+        if ($xp <= 0 || $term_id <= 0) return ['awarded'=>0];
 
         $row = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$this->t_cat} WHERE user_id=%d AND category_term_id=%d",
@@ -354,7 +354,13 @@ class ProgressService {
             $user_id
         ), ARRAY_A);
         if (!$row) {
-            $this->add_xp($user_id, 0, 0);
+            // Initialize overall progress row directly (don't use add_xp with term_id=0)
+            $wpdb->insert($this->t_over, [
+                'user_id' => $user_id,
+                'overall_xp' => 0,
+                'overall_level' => 1,
+                'last_updated' => current_time('mysql', true),
+            ], ['%d','%d','%d','%s']);
             $row = ['overall_xp'=>0,'overall_level'=>1];
         }
         return $row;
@@ -398,7 +404,7 @@ class ProgressService {
             $config = ygv_get_level_config();
             foreach ($config['tiers'] as $tier) {
                 if ($level >= $tier['min_level'] && $level <= $tier['max_level']) {
-                    $bonus = (int)$tier['xp_bonus'];
+                    $bonus = (int)($tier['vote_bonus'] ?? 0);
                     break;
                 }
             }
@@ -416,12 +422,15 @@ class ProgressService {
         $attempts = (int)($attempt_row['attempts'] ?? 0) + 1;
 
         $best_percent = max($best_percent, $percent);
-        $awarded_xp   = max($awarded_xp, $awarded_before);
+        $new_awarded_xp = max($awarded_xp, $awarded_before);
+
+        // Only award the DELTA (improvement) XP, not the full amount again
+        $xp_delta = max(0, $new_awarded_xp - $awarded_before);
 
         if ($attempt_row) {
             $wpdb->update($this->t_quiz, [
                 'best_percent' => $best_percent,
-                'awarded_xp' => $awarded_xp,
+                'awarded_xp' => $new_awarded_xp,
                 'attempts' => $attempts,
                 'last_attempt_at' => current_time('mysql', true),
             ], ['user_id'=>$user_id, 'quiz_id'=>$quiz_id], ['%d','%d','%d','%s'], ['%d','%d']);
@@ -430,14 +439,16 @@ class ProgressService {
                 'user_id'=>$user_id,
                 'quiz_id'=>$quiz_id,
                 'best_percent'=>$best_percent,
-                'awarded_xp'=>$awarded_xp,
+                'awarded_xp'=>$new_awarded_xp,
                 'attempts'=>$attempts,
                 'last_attempt_at'=>current_time('mysql', true),
             ], ['%d','%d','%d','%d','%d','%s']);
         }
 
-        $result = $this->add_xp($user_id, $cat_id, $awarded_xp);
+        // Award only the delta XP (new improvement), not the full cumulative amount
+        $result = $this->add_xp($user_id, $cat_id, $xp_delta);
         $result['awarded_percent'] = $percent;
+        $result['xp_delta'] = $xp_delta;
         return $result;
     }
 }
