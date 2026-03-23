@@ -60,7 +60,12 @@ if (file_exists($voting_inc_path . 'voting-scripts.php')) { // For enqueuing vot
 // Load Frontend List Submission
 require_once $voting_inc_path . 'frontend-submit.php';
 
-// Load Showdown Module (replaced Tournament) - conditional until fully deployed
+// Load Tournament Module (brackets, duels)
+if (file_exists($voting_inc_path . 'tournament/tournament-init.php')) {
+    require_once $voting_inc_path . 'tournament/tournament-init.php';
+}
+
+// Load Showdown Module (replaced Tournament for some features) - conditional until fully deployed
 if (file_exists($voting_inc_path . 'showdown/showdown-init.php')) {
     require_once $voting_inc_path . 'showdown/showdown-init.php';
 }
