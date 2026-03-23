@@ -9,8 +9,9 @@
 
 2. **SSH to server:**
    ```bash
-   ssh u239567293@92.112.183.134
+   ssh yugovote
    ```
+   *(alias for `u239567293@82.25.98.202 -p 65002`)*
 
 3. **Run deploy script:**
    ```bash
