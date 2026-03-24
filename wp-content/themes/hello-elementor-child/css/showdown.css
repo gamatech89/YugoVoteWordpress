@@ -192,11 +192,6 @@
 .sd-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
-  max-height: 100vh;
-  max-height: 100dvh;
-  overflow: hidden;
   padding: 16px 20px;
   background: var(--sd-bg);
   font-family: var(--sd-font-body);
@@ -361,7 +356,8 @@
 .sd-fighter__img-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
+  max-height: 300px;
   flex-shrink: 0;
   overflow: hidden;
 }
