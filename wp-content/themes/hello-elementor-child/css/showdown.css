@@ -292,14 +292,12 @@
 
 /* ========== ARENA ========== */
 .sd-arena {
-  flex: 1;
   display: flex;
-  align-items: stretch;
+  align-items: start;
   gap: 16px;
   max-width: var(--sd-max-width);
   width: 100%;
   margin: 0 auto;
-  min-height: 0;
   position: relative;
 }
 
@@ -379,7 +377,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 40%;
+  height: 25%;
   background: linear-gradient(to top, var(--sd-bg-card) 0%, transparent 100%);
   pointer-events: none;
 }
