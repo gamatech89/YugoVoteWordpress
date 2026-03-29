@@ -129,6 +129,18 @@ if ($current_user_id && function_exists('ygv_get_list_parent_category') && funct
 }
 
 // ========================================
+// VIP LIST DATA
+// ========================================
+$is_vip_list = function_exists('ygv_is_vip_list') ? ygv_is_vip_list($voting_list_id) : false;
+$vip_person = null;
+$vip_ranks = [];
+
+if ($is_vip_list) {
+    $vip_person = function_exists('ygv_get_vip_person') ? ygv_get_vip_person($voting_list_id) : null;
+    $vip_ranks = function_exists('ygv_get_vip_ranks') ? ygv_get_vip_ranks($voting_list_id) : [];
+}
+
+// ========================================
 // PREPARE ITEMS DATA
 // ========================================
 
@@ -175,6 +187,7 @@ if (!empty($voting_items_ids)) {
             'score'       => floatval($item_score),
             'ranking'     => $ranking,
             'user_vote'   => $user_votes[$item_id] ?? null,
+            'vip_rank'    => $vip_ranks[$item_id] ?? null,
         ];
     }
     wp_reset_postdata();
@@ -589,6 +602,75 @@ if (!empty($voting_items_ids)) {
     color: rgba(255, 255, 255, 0.7);
     margin-left: 6px;
 }
+
+/* ========================================
+   VIP LIST STYLES
+   ======================================== */
+.vlp-vip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 193, 7, 0.1));
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 50px;
+    padding: 8px 20px 8px 8px;
+    margin-top: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.vlp-vip-badge:hover {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 193, 7, 0.15));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+}
+.vlp-vip-badge__photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FFD700;
+}
+.vlp-vip-badge__info {
+    display: flex;
+    flex-direction: column;
+}
+.vlp-vip-badge__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+}
+.vlp-vip-badge__name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFD700;
+}
+.vlp-vip-badge__subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+/* VIP rank on item card */
+.vlp-vip-rank {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #FFF8E1, #FFF3C4);
+    border: 1px solid #FFD54F;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #F57F17;
+    margin-top: 6px;
+}
+.vlp-vip-rank__icon {
+    font-size: 14px;
+}
+.vlp-vip-rank__value {
+    font-weight: 800;
+    color: #E65100;
+}
 </style>
 
 <div class="vlp-page" data-list-id="<?php echo esc_attr($voting_list_id); ?>">
@@ -619,6 +701,22 @@ if (!empty($voting_items_ids)) {
             <?php if ($category_name): ?>
             <a href="<?php echo esc_url($category_link); ?>" class="vlp-category-badge">
                 <?php echo esc_html($category_name); ?>
+            </a>
+            <?php endif; ?>
+            
+            <?php if ($is_vip_list && $vip_person): ?>
+            <!-- VIP Person Badge -->
+            <a href="<?php echo esc_url($vip_person['permalink']); ?>" class="vlp-vip-badge">
+                <?php if ($vip_person['photo_url']): ?>
+                    <img src="<?php echo esc_url($vip_person['photo_url']); ?>" alt="<?php echo esc_attr($vip_person['name']); ?>" class="vlp-vip-badge__photo">
+                <?php endif; ?>
+                <span class="vlp-vip-badge__info">
+                    <span class="vlp-vip-badge__label">⭐ VIP Lista</span>
+                    <span class="vlp-vip-badge__name"><?php echo esc_html($vip_person['name']); ?></span>
+                    <?php if ($vip_person['subtitle']): ?>
+                        <span class="vlp-vip-badge__subtitle"><?php echo esc_html($vip_person['subtitle']); ?></span>
+                    <?php endif; ?>
+                </span>
             </a>
             <?php endif; ?>
             
@@ -763,6 +861,15 @@ if (!empty($voting_items_ids)) {
                             </span>
                             <span class="vlp-item__score-label">poena</span>
                         </div>
+                        
+                        <?php if ($is_vip_list && $vip_person && $item['vip_rank'] !== null): ?>
+                        <!-- VIP Rank Badge -->
+                        <div class="vlp-vip-rank">
+                            <span class="vlp-vip-rank__icon">⭐</span>
+                            <span>#<span class="vlp-vip-rank__value"><?php echo intval($item['vip_rank']); ?></span></span>
+                            <span>po <?php echo esc_html(explode(' ', $vip_person['name'])[0]); ?>u</span>
+                        </div>
+                        <?php endif; ?>
                         
                         <!-- Vote Buttons - moved here under score -->
                         <div class="vlp-item__buttons">

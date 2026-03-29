@@ -278,3 +278,117 @@ function get_votes_for_item_in_list($item_id, $list_id)
 
     return $total_votes ? intval($total_votes) : 0;
 }
+
+// ========================================
+// VIP LIST HELPERS
+// ========================================
+
+/**
+ * Check if a voting list is a VIP list.
+ *
+ * @param int $list_id The voting list post ID.
+ * @return bool
+ */
+function ygv_is_vip_list($list_id) {
+    return get_post_meta($list_id, '_is_vip_list', true) === '1';
+}
+
+/**
+ * Get VIP person data for a voting list.
+ *
+ * @param int $list_id The voting list post ID.
+ * @return array|null {id, name, photo_url, subtitle} or null if not a VIP list.
+ */
+function ygv_get_vip_person($list_id) {
+    if (!ygv_is_vip_list($list_id)) {
+        return null;
+    }
+
+    $vip_id = get_post_meta($list_id, '_vip_person_id', true);
+    if (!$vip_id) return null;
+
+    $vip_post = get_post($vip_id);
+    if (!$vip_post || $vip_post->post_type !== 'vip_person') return null;
+
+    return [
+        'id'        => $vip_post->ID,
+        'name'      => $vip_post->post_title,
+        'photo_url' => get_the_post_thumbnail_url($vip_post->ID, 'medium') ?: '',
+        'subtitle'  => get_post_meta($vip_post->ID, '_vip_subtitle', true) ?: '',
+        'bio'       => $vip_post->post_content,
+        'permalink' => get_permalink($vip_post->ID),
+    ];
+}
+
+/**
+ * Get VIP person's rankings for all items in a list.
+ *
+ * @param int $list_id The voting list post ID.
+ * @return array Associative array [item_id => rank], empty if not VIP.
+ */
+function ygv_get_vip_ranks($list_id) {
+    if (!ygv_is_vip_list($list_id)) {
+        return [];
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'voting_list_item_relations';
+
+    $rows = $wpdb->get_results($wpdb->prepare(
+        "SELECT voting_item_id, vip_rank FROM {$table} WHERE voting_list_id = %d AND vip_rank IS NOT NULL",
+        $list_id
+    ), ARRAY_A);
+
+    $ranks = [];
+    foreach ($rows as $row) {
+        $ranks[intval($row['voting_item_id'])] = intval($row['vip_rank']);
+    }
+    return $ranks;
+}
+
+/**
+ * Get all voting lists curated by a VIP person.
+ *
+ * @param int $vip_person_id The vip_person post ID.
+ * @return array Array of WP_Post objects.
+ */
+function ygv_get_vip_person_lists($vip_person_id) {
+    return get_posts([
+        'post_type'      => 'voting_list',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'meta_query'     => [
+            [
+                'key'   => '_vip_person_id',
+                'value' => intval($vip_person_id),
+            ]
+        ],
+        'orderby' => 'date',
+        'order'   => 'DESC',
+    ]);
+}
+
+// ========================================
+// VIP RANK COLUMN MIGRATION
+// ========================================
+
+/**
+ * Add vip_rank column to voting_list_item_relations if it doesn't exist.
+ */
+function ygv_maybe_add_vip_rank_column() {
+    if (get_option('ygv_vip_rank_column_added')) {
+        return;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'voting_list_item_relations';
+
+    // Check if column exists
+    $col = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'vip_rank'");
+    if (empty($col)) {
+        $wpdb->query("ALTER TABLE {$table} ADD COLUMN vip_rank TINYINT UNSIGNED DEFAULT NULL AFTER url");
+    }
+
+    update_option('ygv_vip_rank_column_added', 1);
+}
+add_action('admin_init', 'ygv_maybe_add_vip_rank_column');

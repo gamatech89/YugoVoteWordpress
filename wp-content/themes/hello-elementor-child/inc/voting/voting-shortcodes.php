@@ -706,3 +706,20 @@ if (!function_exists('cs_voting_top_categories_shortcode')) {
     }
     add_shortcode('voting_top_categories', 'cs_voting_top_categories_shortcode');
 }
+
+/**
+ * Shortcode: VIP Section for Homepage
+ * Usage: [voting_vip_section]
+ * Displays featured VIP persons with their curated list counts.
+ */
+function cs_voting_vip_section_shortcode() {
+    ob_start();
+
+    $template_path = get_stylesheet_directory() . '/inc/voting/templates/global/vip-section.php';
+    if (file_exists($template_path)) {
+        include $template_path;
+    }
+
+    return ob_get_clean();
+}
+add_shortcode('voting_vip_section', 'cs_voting_vip_section_shortcode');

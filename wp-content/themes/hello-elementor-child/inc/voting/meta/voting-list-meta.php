@@ -17,6 +17,30 @@ function voting_list_metabox_callback($post) {
     $selected_items = is_array($selected_items) ? $selected_items : [];
     $voting_scale = get_post_meta($post->ID, '_voting_scale', true) ?: 10; // Default 10
 
+    // VIP fields
+    $is_vip_list = get_post_meta($post->ID, '_is_vip_list', true);
+    $vip_person_id = get_post_meta($post->ID, '_vip_person_id', true);
+    $vip_persons = get_posts([
+        'post_type'      => 'vip_person',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ]);
+    // Get VIP ranks from pivot table
+    $vip_ranks = [];
+    if ($is_vip_list && !empty($selected_items)) {
+        global $wpdb;
+        $pivot_table = $wpdb->prefix . 'voting_list_item_relations';
+        $rank_rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT voting_item_id, vip_rank FROM {$pivot_table} WHERE voting_list_id = %d AND vip_rank IS NOT NULL",
+            $post->ID
+        ), ARRAY_A);
+        foreach ($rank_rows as $row) {
+            $vip_ranks[intval($row['voting_item_id'])] = intval($row['vip_rank']);
+        }
+    }
+
     // Fetch Voting Item Categories for filtering
     $categories = get_terms([
         'taxonomy'   => 'voting_item_category',
@@ -45,6 +69,43 @@ function voting_list_metabox_callback($post) {
             <strong>Mark this list as Featured</strong>
         </label>
     </p>
+
+    <!-- VIP List Section -->
+    <div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <h3 style="margin-top: 0;">⭐ VIP List Settings</h3>
+        <p>
+            <label>
+                <input type="checkbox" name="voting_list_is_vip" id="voting_list_is_vip" value="1" <?php checked($is_vip_list, '1'); ?> />
+                <strong>This is a VIP List</strong>
+            </label>
+            <br><small>Enable to assign a VIP person and their rankings to this list.</small>
+        </p>
+
+        <div id="vip-list-fields" style="<?php echo $is_vip_list ? '' : 'display:none;'; ?>">
+            <p>
+                <label for="vip_person_id"><strong>VIP Person:</strong></label>
+                <select name="vip_person_id" id="vip_person_id" class="widefat">
+                    <option value="">-- Select VIP Person --</option>
+                    <?php foreach ($vip_persons as $vp): ?>
+                        <option value="<?php echo esc_attr($vp->ID); ?>" <?php selected($vip_person_id, $vp->ID); ?>>
+                            <?php echo esc_html($vp->post_title); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if (empty($vip_persons)): ?>
+                    <small>No VIP Persons found. <a href="<?php echo admin_url('post-new.php?post_type=vip_person'); ?>">Create one</a></small>
+                <?php endif; ?>
+            </p>
+        </div>
+    </div>
+
+    <script>
+    jQuery(function($) {
+        $('#voting_list_is_vip').on('change', function() {
+            $('#vip-list-fields').toggle(this.checked);
+        });
+    });
+    </script>
 
 
     <h3>Voting Items Selection</h3>
@@ -89,6 +150,7 @@ function voting_list_metabox_callback($post) {
         <thead>
             <tr>
                 <th>Item</th>
+                <th class="vip-rank-col" style="width:90px;<?php echo $is_vip_list ? '' : 'display:none;'; ?>">VIP Rank</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -96,14 +158,26 @@ function voting_list_metabox_callback($post) {
             <?php foreach ($selected_items as $item_id) {
                 $item = get_post($item_id);
                 if ($item) {
+                    $rank_val = isset($vip_ranks[$item_id]) ? $vip_ranks[$item_id] : '';
                     echo '<tr data-id="' . esc_attr($item_id) . '">';
                     echo '<td>' . esc_html($item->post_title) . '</td>';
+                    echo '<td class="vip-rank-col" style="' . ($is_vip_list ? '' : 'display:none;') . '">';
+                    echo '<input type="number" name="vip_ranks[' . esc_attr($item_id) . ']" value="' . esc_attr($rank_val) . '" min="1" max="100" style="width:60px;" />';
+                    echo '</td>';
                     echo '<td><button type="button" class="remove-voting-item button">Remove</button><button type="button" class="edit-voting-item button">Edit</button></td>';
                     echo '</tr>';
                 }
             } ?>
         </tbody>
     </table>
+
+    <script>
+    jQuery(function($) {
+        $('#voting_list_is_vip').on('change', function() {
+            $('.vip-rank-col').toggle(this.checked);
+        });
+    });
+    </script>
 
     <input type="hidden" id="voting_items" name="voting_items" value="<?php echo esc_attr(json_encode($selected_items)); ?>">
     <input type="hidden" id="current_voting_list_id" value="<?php echo esc_attr($voting_list_id); ?>">
@@ -129,9 +203,40 @@ function save_voting_list_data($post_id) {
         update_post_meta($post_id, '_voting_scale', intval($_POST['voting_scale']));
     }
     if (isset($_POST['voting_list_is_featured'])) {
-    update_post_meta($post_id, '_is_featured', '1');
+        update_post_meta($post_id, '_is_featured', '1');
     } else {
         delete_post_meta($post_id, '_is_featured');
+    }
+
+    // VIP List fields
+    if (isset($_POST['voting_list_is_vip'])) {
+        update_post_meta($post_id, '_is_vip_list', '1');
+    } else {
+        delete_post_meta($post_id, '_is_vip_list');
+    }
+
+    if (isset($_POST['vip_person_id'])) {
+        $vip_pid = intval($_POST['vip_person_id']);
+        if ($vip_pid > 0) {
+            update_post_meta($post_id, '_vip_person_id', $vip_pid);
+        } else {
+            delete_post_meta($post_id, '_vip_person_id');
+        }
+    }
+
+    // Save VIP ranks to pivot table
+    if (!empty($_POST['vip_ranks']) && is_array($_POST['vip_ranks'])) {
+        global $wpdb;
+        $pivot = $wpdb->prefix . 'voting_list_item_relations';
+        foreach ($_POST['vip_ranks'] as $item_id => $rank) {
+            $item_id = intval($item_id);
+            $rank = $rank !== '' ? intval($rank) : null;
+            $wpdb->update(
+                $pivot,
+                ['vip_rank' => $rank, 'updated_at' => current_time('mysql', 1)],
+                ['voting_list_id' => $post_id, 'voting_item_id' => $item_id]
+            );
+        }
     }
 }
 add_action('save_post', 'save_voting_list_data');

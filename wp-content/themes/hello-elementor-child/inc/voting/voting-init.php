@@ -20,6 +20,7 @@ $voting_inc_path = get_stylesheet_directory() . '/inc/voting/';
 // require_once $voting_inc_path . 'cpts/cpt-user-level.php';
 require_once $voting_inc_path . 'cpts/cpt-voting-list.php';
 require_once $voting_inc_path . 'cpts/cpt-voting-list-items.php';
+require_once $voting_inc_path . 'cpts/cpt-vip-person.php';
 
 // Load Taxonomies
 require_once $voting_inc_path . 'cpts/taxonomy-voting-list-category.php';
@@ -31,6 +32,7 @@ require_once $voting_inc_path . 'cpts/taxonomy-voting-item-category.php';
 require_once $voting_inc_path . 'meta/voting-list-meta.php';
 require_once $voting_inc_path . 'meta/voting-list-items-meta.php';
 require_once $voting_inc_path . 'meta/voting-list-taxonomy-meta.php';
+require_once $voting_inc_path . 'meta/vip-person-meta.php';
 
 // Load Shortcodes
 require_once $voting_inc_path . 'voting-shortcodes.php';
