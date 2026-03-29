@@ -21,9 +21,7 @@ $vip_persons = get_posts([
 if (empty($vip_persons)) return;
 ?>
 
-<?php
-wp_enqueue_style('ygv-vip-section', get_stylesheet_directory_uri() . '/css/vip-section.css', [], '1.0.0');
-?>
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/css/vip-section.css'); ?>?ver=1.0.0" type="text/css" media="all" />
 
 <section class="cs-vip-section">
     <div class="cs-vip-section__header">

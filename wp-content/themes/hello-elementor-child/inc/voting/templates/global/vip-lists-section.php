@@ -26,8 +26,7 @@ $vip_lists = get_posts([
 
 if (empty($vip_lists)) return;
 
-wp_enqueue_style('ygv-vip-lists-section', get_stylesheet_directory_uri() . '/css/vip-lists-section.css', [], '1.0.0');
-?>
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/css/vip-lists-section.css'); ?>?ver=1.0.0" type="text/css" media="all" />
 
 <section class="cs-vip-lists-section">
     <div class="cs-vip-lists-section__header">
