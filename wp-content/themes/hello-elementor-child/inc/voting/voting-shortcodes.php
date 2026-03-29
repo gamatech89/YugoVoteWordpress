@@ -723,3 +723,20 @@ function cs_voting_vip_section_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('voting_vip_section', 'cs_voting_vip_section_shortcode');
+
+/**
+ * Shortcode: VIP Lists for Homepage
+ * Usage: [voting_vip_lists]
+ * Displays VIP-curated voting lists in a grid with VIP person info.
+ */
+function cs_voting_vip_lists_shortcode() {
+    ob_start();
+
+    $template_path = get_stylesheet_directory() . '/inc/voting/templates/global/vip-lists-section.php';
+    if (file_exists($template_path)) {
+        include $template_path;
+    }
+
+    return ob_get_clean();
+}
+add_shortcode('voting_vip_lists', 'cs_voting_vip_lists_shortcode');
