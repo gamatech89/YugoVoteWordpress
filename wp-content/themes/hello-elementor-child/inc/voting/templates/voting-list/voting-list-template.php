@@ -92,6 +92,16 @@ if (!empty($voting_items_ids)) {
     );
     $pivot_results = $wpdb->get_results($pivot_query, OBJECT_K);
     $pivot_data_cache = $pivot_results;
+
+    $other_lists_query = $wpdb->prepare(
+        "SELECT voting_item_id, COUNT(DISTINCT voting_list_id) as other_lists_count
+         FROM $table_name 
+         WHERE voting_list_id != %d AND voting_item_id IN ($item_ids_placeholders)
+         GROUP BY voting_item_id",
+        $voting_list_id,
+        ...$voting_items_ids
+    );
+    $other_lists_results = $wpdb->get_results($other_lists_query, OBJECT_K);
 }
 
 if ($query->have_posts()) :
@@ -116,6 +126,8 @@ if ($query->have_posts()) :
         $short_desc = !empty($pivot_data) && !empty($pivot_data['short_description']) ? $pivot_data['short_description'] : $default_short_desc;
         $image      = !empty($pivot_data) && !empty($pivot_data['custom_image_url']) ? $pivot_data['custom_image_url'] : $default_image;
         $video_url = !empty($pivot_data) && !empty($pivot_data['url']) ? $pivot_data['url'] : get_post_meta($item_id, '_item_url', true);
+        
+        $other_lists_count = isset($other_lists_results[$item_id]) ? (int)$other_lists_results[$item_id]->other_lists_count : 0;
 
 
         // Render voting card
@@ -149,6 +161,11 @@ if ($query->have_posts()) :
                 
                         <?php if (!empty($short_desc)): ?>
                             <div class="cs-voting-card__short-description"><?php echo wp_kses_post(wpautop($short_desc)); ?></div>
+                        <?php endif; ?>
+                        <?php if ($other_lists_count > 0): ?>
+                            <div style="margin-top:8px;">
+                                <a href="<?php echo esc_url(get_permalink($item_id)); ?>" style="font-size: 13px; color: var(--cs-primary-color, #2D3A8C); text-decoration: underline;">pojavljuje se u jos <?php echo $other_lists_count; ?> lista</a>
+                            </div>
                         <?php endif; ?>
                     </div>
                     

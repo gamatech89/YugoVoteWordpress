@@ -97,6 +97,12 @@ while ($query->have_posts()) {
         "SELECT short_description, custom_image_url, url FROM $table_name WHERE voting_list_id = %d AND voting_item_id = %d",
         $voting_list_id, $item_id
     ), ARRAY_A);
+    
+    // Get how many other lists this item appears in
+    $other_lists_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(DISTINCT voting_list_id) FROM $table_name WHERE voting_item_id = %d AND voting_list_id != %d",
+        $item_id, $voting_list_id
+    )) ?: 0;
 
     $items[] = [
         'id' => $item_id,
@@ -106,6 +112,7 @@ while ($query->have_posts()) {
         'video_url' => !empty($pivot_data['url']) ? $pivot_data['url'] : get_post_meta($item_id, '_item_url', true),
         'permalink' => get_permalink($item_id),
         'ranking' => array_search($item_id, $voting_items_ids) + 1,
+        'other_lists_count' => (int) $other_lists_count,
     ];
 }
 wp_reset_postdata();
@@ -172,8 +179,12 @@ endif; ?>
                 <?php if ($item['short_desc']): ?>
                 <p class="ygv-vote-card__desc">
                     <?php echo esc_html(wp_trim_words($item['short_desc'], 12)); ?>
-                </php
-        endif; ?>
+                </p>
+                <?php endif; ?>
+                <?php if ($item['other_lists_count'] > 0): ?>
+                <div style="margin-top:8px;">
+                    <a href="<?php echo esc_url($item['permalink']); ?>" style="font-size: 13px; color: var(--ygv-list-color, #2D3A8C); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                </div>
                 <?php endif; ?>
 
                 <div class="ygv-vote-card__score">
@@ -239,8 +250,12 @@ elseif ($layout === 'compact'): ?>
                 <p class="ygv-compact-row__desc">
                     <?php echo esc_html(wp_trim_words($item['short_desc'], 15)); ?>
                 </p>
-                <?php
-        endif; ?>
+                <?php endif; ?>
+                <?php if ($item['other_lists_count'] > 0): ?>
+                <div style="margin-top:4px;">
+                    <a href="<?php echo esc_url($item['permalink']); ?>" style="font-size: 13px; color: var(--ygv-list-color, #2D3A8C); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                </div>
+                <?php endif; ?>
             </div>
 
             <div class="ygv-compact-row__score">
@@ -299,8 +314,12 @@ else: ?>
                     <p class="ygv-classic-card__desc">
                         <?php echo wp_kses_post($item['short_desc']); ?>
                     </p>
-                    <?php
-        endif; ?>
+                    <?php endif; ?>
+                    <?php if ($item['other_lists_count'] > 0): ?>
+                    <div style="margin-top:8px;">
+                        <a href="<?php echo esc_url($item['permalink']); ?>" style="font-size: 13px; color: var(--ygv-list-color, #2D3A8C); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="ygv-classic-card__voting">

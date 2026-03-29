@@ -174,6 +174,12 @@ if (!empty($voting_items_ids)) {
             $voting_list_id, $item_id
         ), ARRAY_A);
         
+        // Get how many other lists this item appears in
+        $other_lists_count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT voting_list_id) FROM $relations_table WHERE voting_item_id = %d AND voting_list_id != %d",
+            $item_id, $voting_list_id
+        )) ?: 0;
+        
         $default_image = get_the_post_thumbnail_url($item_id, 'medium');
         $default_desc = get_post_meta($item_id, '_short_description', true);
         
@@ -188,6 +194,7 @@ if (!empty($voting_items_ids)) {
             'ranking'     => $ranking,
             'user_vote'   => $user_votes[$item_id] ?? null,
             'vip_rank'    => $vip_ranks[$item_id] ?? null,
+            'other_lists_count' => (int) $other_lists_count,
         ];
     }
     wp_reset_postdata();
@@ -851,6 +858,17 @@ if (!empty($voting_items_ids)) {
                             <?php if ($full_words > 30): ?>
                             <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__read-more">Pročitaj više</a>
                             <?php endif; ?>
+                            <?php if ($item['other_lists_count'] > 0): ?>
+                            <div style="margin-top:8px;">
+                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-size: 13px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php elseif ($item['other_lists_count'] > 0): ?>
+                        <div class="vlp-item__desc-wrapper">
+                            <div style="margin-top:8px;">
+                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-size: 13px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                            </div>
                         </div>
                         <?php endif; ?>
                         
