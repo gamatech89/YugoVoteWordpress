@@ -823,17 +823,6 @@ if (!empty($voting_items_ids)) {
                     
                     <!-- Image with Rank Badge -->
                     <div class="vlp-item__media">
-                        <div class="vlp-item__rank">
-                            <?php if ($is_top3): ?>
-                                <span class="vlp-item__rank-medal">
-                                    <?php if ($item['ranking'] === 1): ?>🥇
-                                    <?php elseif ($item['ranking'] === 2): ?>🥈
-                                    <?php elseif ($item['ranking'] === 3): ?>🥉
-                                    <?php endif; ?>
-                                </span>
-                            <?php endif; ?>
-                            <span class="vlp-item__rank-num">#<?php echo $item['ranking']; ?></span>
-                        </div>
                         <img src="<?php echo esc_url($item['image']); ?>" 
                              alt="<?php echo esc_attr($item['title']); ?>" 
                              class="vlp-item__img" loading="lazy">
@@ -843,31 +832,30 @@ if (!empty($voting_items_ids)) {
                         </button>
                         <?php endif; ?>
                     </div>
+
+                    <!-- Watermark Rank -->
+                    <div class="vlp-item__rank">
+                        <span class="vlp-item__rank-num"><?php echo $item['ranking']; ?></span>
+                    </div>
                     
                     <!-- Info -->
                     <div class="vlp-item__info">
                         <h3 class="vlp-item__title">
                             <a href="<?php echo esc_url($item['permalink']); ?>"><?php echo esc_html($item['title']); ?></a>
                         </h3>
-                        <?php if ($item['short_desc']): 
-                            $full_words = str_word_count($item['short_desc']);
-                            $trimmed = wp_trim_words($item['short_desc'], 30, '...');
-                        ?>
+                        <?php if ($item['short_desc']): ?>
                         <div class="vlp-item__desc-wrapper">
-                            <p class="vlp-item__desc"><?php echo esc_html($trimmed); ?></p>
-                            <?php if ($full_words > 30): ?>
-                            <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__read-more">Pročitaj više</a>
-                            <?php endif; ?>
+                            <p class="vlp-item__desc"><?php echo wp_kses_post($item['short_desc']); ?></p>
                             <?php if ($item['other_lists_count'] > 0): ?>
                             <div style="margin-top:8px;">
-                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-size: 13px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-weight: 700; font-size: 14px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
                             </div>
                             <?php endif; ?>
                         </div>
                         <?php elseif ($item['other_lists_count'] > 0): ?>
                         <div class="vlp-item__desc-wrapper">
                             <div style="margin-top:8px;">
-                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-size: 13px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
+                                <a href="<?php echo esc_url($item['permalink']); ?>" class="vlp-item__other-lists" style="font-weight: 700; font-size: 14px; color: var(--vlp-primary); text-decoration: underline;">pojavljuje se u jos <?php echo $item['other_lists_count']; ?> lista</a>
                             </div>
                         </div>
                         <?php endif; ?>
