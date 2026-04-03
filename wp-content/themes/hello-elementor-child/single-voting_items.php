@@ -111,9 +111,13 @@ get_header();
             <div class="ygv-item-hero__content">
                 <h1 class="ygv-item-hero__title"><?php echo esc_html($item_title); ?></h1>
                 
-                <?php if ($item_excerpt || $item_description): ?>
+                <?php if ($item_description): ?>
+                <div class="ygv-item-hero__desc">
+                    <?php echo wp_kses_post($item_description); ?>
+                </div>
+                <?php elseif ($item_excerpt): ?>
                 <p class="ygv-item-hero__desc">
-                    <?php echo $item_excerpt ? esc_html($item_excerpt) : wp_trim_words(strip_tags($item_description), 40); ?>
+                    <?php echo esc_html($item_excerpt); ?>
                 </p>
                 <?php endif; ?>
                 

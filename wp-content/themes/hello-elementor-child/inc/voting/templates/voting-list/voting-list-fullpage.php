@@ -730,20 +730,15 @@ if (!empty($voting_items_ids)) {
             <h1 class="vlp-hero__title"><?php echo esc_html($list_title); ?></h1>
             
             <?php 
-            // Get full description text (strip HTML tags for clean display)
-            $full_description = strip_tags($list_post->post_content);
-            $short_description = wp_trim_words($full_description, 30, '');
-            $is_long_description = str_word_count($full_description) > 30;
+            // Get full description text
+            $full_description = $list_post->post_content;
             
             if ($full_description): 
             ?>
             <div class="vlp-hero__desc-wrapper">
-                <p class="vlp-hero__desc" data-full="<?php echo esc_attr($full_description); ?>" data-short="<?php echo esc_attr($short_description); ?>">
-                    <?php echo esc_html($short_description); ?><?php if ($is_long_description): ?> [...]<?php endif; ?>
-                </p>
-                <?php if ($is_long_description): ?>
-                <button class="vlp-hero__read-more" type="button">Pročitaj više</button>
-                <?php endif; ?>
+                <div class="vlp-hero__desc">
+                    <?php echo wp_kses_post($full_description); ?>
+                </div>
             </div>
             <?php endif; ?>
             
