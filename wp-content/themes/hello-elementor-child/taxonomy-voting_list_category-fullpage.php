@@ -39,7 +39,7 @@ if (!$is_parent) {
 }
 
 // Stats - calculate real votes
-$lists_count = $current_term->count;
+$lists_count = 0; // Set below after fetching all lists
 
 // Calculate total votes for this category
 $total_votes = 0;
@@ -55,9 +55,9 @@ $all_lists_in_cat = get_posts([
         'include_children' => true,
     ]],
     'meta_query'     => [
-        ['key' => '_is_tournament_match', 'compare' => 'NOT EXISTS'],
     ],
 ]);
+$lists_count = count($all_lists_in_cat);
 foreach ($all_lists_in_cat as $lid) {
     if (function_exists('get_total_score_for_voting_list')) {
         $total_votes += (int) get_total_score_for_voting_list($lid);
