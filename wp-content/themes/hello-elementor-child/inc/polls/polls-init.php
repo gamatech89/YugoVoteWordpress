@@ -29,6 +29,9 @@ function ygv_render_floating_poll() {
     // Skip on ankete archive page to avoid duplication
     if (is_page_template('page-ankete.php')) return;
     
+    // Skip on all voting list pages (single, category, archive)
+    if (is_singular('voting_list') || is_tax('voting_list_category') || is_post_type_archive('voting_list')) return;
+    
     $template = get_stylesheet_directory() . '/inc/polls/templates/floating-poll.php';
     if (file_exists($template)) {
         include $template;
