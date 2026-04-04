@@ -14,26 +14,22 @@ if (!defined('ABSPATH')) {
 /**
  * Helper function to restrict search to title only
  */
-function ygv_search_by_title_only($where, $wp_query) {
-    global $wpdb;
-    if ($search_term = $wp_query->get('search_title_only')) {
-        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . $wpdb->esc_like($search_term) . '%\'';
+function ygv_search_by_title_only($search, $wp_query) {
+    if (!empty($search) && $wp_query->get('search_title_only')) {
+        global $wpdb;
+        $q = $wp_query->query_vars;
+        $search_term = $q['s'];
+        $search = $wpdb->prepare(" AND ({$wpdb->posts}.post_title LIKE %s)", '%' . $wpdb->esc_like($search_term) . '%');
     }
-    return $where;
+    return $search;
 }
 
 /**
  * Handle live search AJAX request
  */
 function ygv_live_search_handler() {
-    // Temporarily disable nonce check to debug (remove after debugging)
     // Verify nonce - skip if nonce is expired (for cached pages)
     $nonce_valid = isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'ygv_live_search');
-    
-    // Log for debugging
-    if (!$nonce_valid) {
-        error_log('YGV Live Search: Nonce invalid or expired. Proceeding anyway for user experience.');
-    }
     
     $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
     $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
@@ -46,27 +42,16 @@ function ygv_live_search_handler() {
     $args = [
         'post_type' => 'voting_list',
         'post_status' => 'publish',
-        'search_title_only' => $search, // Custom parameter for our filter
+        's' => $search, // Provide 's' to trigger search logic
+        'search_title_only' => true, // custom flag for our filter
         'posts_per_page' => 8,
         'orderby' => 'relevance',
     ];
     
-    add_filter('posts_where', 'ygv_search_by_title_only', 10, 2);
+    add_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     $query = new WP_Query($args);
-    remove_filter('posts_where', 'ygv_search_by_title_only', 10, 2);
-    
-    // Filter by category if provided
-    if (!empty($category)) {
-        $args['tax_query'] = [
-            [
-                'taxonomy' => 'voting_list_category',
-                'field' => 'slug',
-                'terms' => $category,
-            ]
-        ];
-    }
-    
-    $query = new WP_Query($args);
+    remove_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
+
     $results = [];
     $seen_list_ids = []; // Track which lists we've already added
     
@@ -127,14 +112,15 @@ function ygv_live_search_handler() {
     $items_args = [
         'post_type' => 'voting_items',
         'post_status' => 'publish',
-        'search_title_only' => $search, // Custom parameter for our filter
+        's' => $search,
+        'search_title_only' => true,
         'posts_per_page' => 5,
         'orderby' => 'relevance',
     ];
     
-    add_filter('posts_where', 'ygv_search_by_title_only', 10, 2);
+    add_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     $items_query = new WP_Query($items_args);
-    remove_filter('posts_where', 'ygv_search_by_title_only', 10, 2);
+    remove_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     
     if ($items_query->have_posts()) {
         global $wpdb;
