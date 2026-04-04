@@ -71,7 +71,6 @@ get_header();
                             $date = get_the_date('d. M Y.');
                     ?>
                         <article class="ygv-poll-card">
-                            <div class="ygv-poll-card__header">
                                 <time class="ygv-poll-card__date">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -81,13 +80,6 @@ get_header();
                                     </svg>
                                     <?php echo esc_html($date); ?>
                                 </time>
-                                <span class="ygv-poll-card__votes">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                    </svg>
-                                    <?php echo $total_votes; ?>
-                                </span>
                             </div>
                             
                             <h3 class="ygv-poll-card__title"><?php the_title(); ?></h3>

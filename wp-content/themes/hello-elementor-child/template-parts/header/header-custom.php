@@ -292,6 +292,14 @@ $categories = get_terms([
     const SEARCH_DELAY = 300; // ms delay before searching
     
     if (searchTrigger && searchOverlay) {
+        // Prevent form submission/redirection
+        const searchForm = document.querySelector('.ygv-search-overlay__form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+            });
+        }
+
         searchTrigger.addEventListener('click', function() {
             searchOverlay.classList.add('is-active');
             searchOverlay.setAttribute('aria-hidden', 'false');
