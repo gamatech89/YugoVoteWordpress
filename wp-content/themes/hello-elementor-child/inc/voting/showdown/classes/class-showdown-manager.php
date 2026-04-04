@@ -229,11 +229,13 @@ class YUV_Showdown_Manager
             return $a['avg_rank'] <=> $b['avg_rank'];
         });
 
-        // Add item data (image, description)
+        // Add item data and calculate total sessions once
         $items_by_name = [];
         foreach ($items as $item) {
             $items_by_name[$item['name']] = $item;
         }
+
+        $total_sessions = $this->get_session_count($showdown_id);
 
         foreach ($scores as &$score) {
             $item = $items_by_name[$score['name']] ?? null;
@@ -241,6 +243,7 @@ class YUV_Showdown_Manager
                 $score['image'] = $item['image'];
                 $score['description'] = $item['description'];
             }
+            $score['total_sessions'] = $total_sessions;
         }
 
         return $scores;

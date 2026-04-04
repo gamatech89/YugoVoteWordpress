@@ -31,7 +31,8 @@
             }
 
             try {
-                this.items = JSON.parse($page.attr("data-items"));
+                const itemsAttr = $page.attr("data-items");
+                this.items = JSON.parse(itemsAttr);
             } catch (e) {
                 console.error("Failed to parse showdown items:", e);
                 return;
@@ -72,9 +73,9 @@
             const prefix = "#sd-fighter-" + slot;
             $(prefix + "-name").text(fighter.name);
             $(prefix + "-desc").text(fighter.description || "");
-            if (fighter.image_url || fighter.image) {
+            if (fighter.image) {
                 $(prefix + "-img")
-                    .attr("src", fighter.image_url || fighter.image)
+                    .attr("src", fighter.image)
                     .attr("alt", fighter.name);
             }
         },
@@ -217,19 +218,12 @@
             });
         },
 
-        /**
-         * Show results as a fixed overlay (light theme) with staggered animations
-         */
         showResults: function ($results, html) {
-            // Wrap in inner container
             $results.html('<div class="sd-results-inner">' + html + '</div>');
-
-            // Hide the arena page completely after fade-out completes
             setTimeout(function () {
                 $(".sd-page").css("display", "none");
             }, 600);
 
-            // Trigger the results to fade in
             requestAnimationFrame(function () {
                 $results.addClass("sd-results-screen--visible");
             });
@@ -256,34 +250,46 @@
             for (const p of podiumOrder) {
                 if (!leaderboard[p.idx]) continue;
                 const entry = leaderboard[p.idx];
+                const winPct = totalPlayers > 0 ? ((entry.wins / totalPlayers) * 100).toFixed(1) : 0;
+                
                 html += '<div class="sd-podium__item sd-podium__item--' + p.cls + '">';
                 html += '<div class="sd-podium__avatar-wrap">';
-                if (p.cls === 'gold') html += '<span class="sd-podium__crown">👑</span>';
-                html += '<span class="sd-podium__medal">' + (p.idx + 1) + '</span>';
+                if (p.cls === 'gold') {
+                    html += '<div class="sd-podium__crown"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/></svg></div>';
+                }
+                html += '<div class="sd-podium__rank-badge">' + (p.idx + 1) + '</div>';
                 if (entry.image) html += '<img class="sd-podium__avatar" src="' + entry.image + '" alt="' + Showdown.escHtml(entry.name) + '">';
+                html += '<div class="sd-podium__pct-badge">' + winPct + '%</div>';
                 html += '</div>';
                 html += '<h3 class="sd-podium__name">' + Showdown.escHtml(entry.name) + '</h3>';
-                html += '<p class="sd-podium__wins">Pobede: <strong>' + entry.wins + '</strong></p>';
+                html += '<p class="sd-podium__stats">' + entry.wins + ' pobeda</p>';
                 html += '</div>';
             }
             html += '</section>';
 
-            // Ranked list with staggered delays
+            // Ranked list
             if (leaderboard.length > 3) {
                 html += '<section class="sd-ranked">';
                 html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
                 html += '<div class="sd-ranked__list">';
                 for (let i = 3; i < leaderboard.length; i++) {
                     const entry = leaderboard[i];
+                    const winPct = totalPlayers > 0 ? ((entry.wins / totalPlayers) * 100).toFixed(1) : 0;
                     const delay = 0.6 + (i - 3) * 0.08;
+                    
                     html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
-                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
+                    html += '<span class="sd-ranked__rank">#' + (i + 1) + '</span>';
+                    html += '<div class="sd-ranked__avatar-wrap">';
                     if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
+                    html += '</div>';
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
                     if (entry.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(entry.description) + '</p>';
                     html += '</div>';
-                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + entry.wins + '</strong></span>';
+                    html += '<div class="sd-ranked__score">';
+                    html += '<span class="sd-ranked__pct">' + winPct + '%</span>';
+                    html += '<span class="sd-ranked__wins">' + entry.wins + ' pobeda</span>';
+                    html += '</div>';
                     html += '</div>';
                 }
                 html += '</div></section>';
@@ -315,12 +321,15 @@
                 if (!ranked[p.idx]) continue;
                 const name = ranked[p.idx];
                 const item = Showdown.items.find(function (it) { return it.name === name; });
+                
                 html += '<div class="sd-podium__item sd-podium__item--' + p.cls + '">';
                 html += '<div class="sd-podium__avatar-wrap">';
-                if (p.cls === 'gold') html += '<span class="sd-podium__crown">👑</span>';
-                html += '<span class="sd-podium__medal">' + (p.idx + 1) + '</span>';
-                if (item && (item.image_url || item.image)) {
-                    html += '<img class="sd-podium__avatar" src="' + (item.image_url || item.image) + '" alt="' + name + '">';
+                if (p.cls === 'gold') {
+                    html += '<div class="sd-podium__crown"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/></svg></div>';
+                }
+                html += '<div class="sd-podium__rank-badge">' + (p.idx + 1) + '</div>';
+                if (item && item.image) {
+                    html += '<img class="sd-podium__avatar" src="' + item.image + '" alt="' + name + '">';
                 }
                 html += '</div>';
                 html += '<h3 class="sd-podium__name">' + Showdown.escHtml(name) + '</h3>';
@@ -328,7 +337,7 @@
             }
             html += '</section>';
 
-            // Ranked list with staggered delays
+            // Ranked list
             if (ranked.length > 3) {
                 html += '<section class="sd-ranked">';
                 html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
@@ -337,11 +346,14 @@
                     const name = ranked[i];
                     const item = Showdown.items.find(function (it) { return it.name === name; });
                     const delay = 0.6 + (i - 3) * 0.08;
+                    
                     html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
-                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
-                    if (item && (item.image_url || item.image)) {
-                        html += '<img class="sd-ranked__avatar" src="' + (item.image_url || item.image) + '" alt="">';
+                    html += '<span class="sd-ranked__rank">#' + (i + 1) + '</span>';
+                    html += '<div class="sd-ranked__avatar-wrap">';
+                    if (item && item.image) {
+                        html += '<img class="sd-ranked__avatar" src="' + item.image + '" alt="">';
                     }
+                    html += '</div>';
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
                     html += '</div>';

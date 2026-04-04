@@ -50,17 +50,15 @@ function yuv_showdown_shortcode($atts) {
          style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>"
          >
         
-        <!-- Header (hidden when showing results) -->
-        <header class="showdown-header" id="sd-header" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+        <!-- Header -->
+        <header class="showdown-header" id="sd-header">
             <div class="showdown-badge">
                 <i class="ri-sword-line"></i>
-                Showdown
+                Showdown Arena
             </div>
             <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
             <?php if ($showdown->post_content): ?>
-                <p class="showdown-subtitle"><?php echo esc_html(wp_trim_words($showdown->post_content, 25)); ?></p>
-            <?php else: ?>
-                <p class="showdown-subtitle">Biraj svog favorita — gubitnik ispada, novi izazivač ulazi u arenu</p>
+                <p class="showdown-subtitle"><?php echo esc_html($showdown->post_content); ?></p>
             <?php endif; ?>
         </header>
 
@@ -145,19 +143,23 @@ function yuv_showdown_shortcode($atts) {
                         foreach ($podium_order as $class => $idx):
                             if (!isset($leaderboard[$idx])) continue;
                             $entry = $leaderboard[$idx];
+                            $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
                         ?>
                             <div class="sd-podium__item sd-podium__item--<?php echo $class; ?>">
                                 <div class="sd-podium__avatar-wrap">
                                     <?php if ($class === 'gold'): ?>
-                                        <span class="sd-podium__crown">👑</span>
+                                        <div class="sd-podium__crown">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/></svg>
+                                        </div>
                                     <?php endif; ?>
-                                    <span class="sd-podium__medal"><?php echo $idx + 1; ?></span>
+                                    <div class="sd-podium__rank-badge"><?php echo $idx + 1; ?></div>
                                     <?php if (!empty($entry['image'])): ?>
                                         <img class="sd-podium__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="<?php echo esc_attr($entry['name']); ?>">
                                     <?php endif; ?>
+                                    <div class="sd-podium__pct-badge"><?php echo $win_pct; ?>%</div>
                                 </div>
                                 <h3 class="sd-podium__name"><?php echo esc_html($entry['name']); ?></h3>
-                                <p class="sd-podium__wins">Pobede: <strong><?php echo $entry['wins']; ?></strong></p>
+                                <p class="sd-podium__stats"><?php echo $entry['wins']; ?> pobeda</p>
                             </div>
                         <?php endforeach; ?>
                     </section>
@@ -167,19 +169,26 @@ function yuv_showdown_shortcode($atts) {
                         <section class="sd-ranked">
                             <h2 class="sd-ranked__title">Ostali plasmani</h2>
                             <div class="sd-ranked__list">
-                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry): ?>
+                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry): 
+                                    $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
+                                ?>
                                     <div class="sd-ranked__item">
-                                        <span class="sd-ranked__rank"><?php echo $rank + 4; ?></span>
-                                        <?php if (!empty($entry['image'])): ?>
-                                            <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
-                                        <?php endif; ?>
+                                        <span class="sd-ranked__rank">#<?php echo $rank + 4; ?></span>
+                                        <div class="sd-ranked__avatar-wrap">
+                                            <?php if (!empty($entry['image'])): ?>
+                                                <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
+                                            <?php endif; ?>
+                                        </div>
                                         <div class="sd-ranked__info">
                                             <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
                                             <?php if (!empty($entry['description'])): ?>
-                                                <p class="sd-ranked__desc"><?php echo esc_html(wp_trim_words($entry['description'], 10)); ?></p>
+                                                <p class="sd-ranked__desc"><?php echo esc_html($entry['description']); ?></p>
                                             <?php endif; ?>
                                         </div>
-                                        <span class="sd-ranked__stats">Pobede: <strong><?php echo $entry['wins']; ?></strong></span>
+                                        <div class="sd-ranked__score">
+                                            <span class="sd-ranked__pct"><?php echo $win_pct; ?>%</span>
+                                            <span class="sd-ranked__wins"><?php echo $entry['wins']; ?> pobeda</span>
+                                        </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
