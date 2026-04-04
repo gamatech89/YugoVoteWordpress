@@ -711,7 +711,7 @@ if (!empty($voting_items_ids)) {
             </a>
             <?php endif; ?>
             
-            <?php if ($is_vip_list && $vip_person): ?>
+            <?php if (false && $is_vip_list && $vip_person): // Temporarily hidden ?>
             <!-- VIP Person Badge -->
             <a href="<?php echo esc_url($vip_person['permalink']); ?>" class="vlp-vip-badge">
                 <?php if ($vip_person['photo_url']): ?>
@@ -863,7 +863,7 @@ if (!empty($voting_items_ids)) {
                             <span class="vlp-item__score-label">poena</span>
                         </div>
                         
-                        <?php if ($is_vip_list && $vip_person && $item['vip_rank'] !== null): ?>
+                        <?php if (false && $is_vip_list && $vip_person && $item['vip_rank'] !== null): // Temporarily hidden ?>
                         <!-- VIP Rank Badge -->
                         <div class="vlp-vip-rank">
                             <span class="vlp-vip-rank__icon">⭐</span>

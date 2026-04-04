@@ -89,7 +89,9 @@ wp_enqueue_style('ygv-vip-profile', get_stylesheet_directory_uri() . '/css/vip-p
                     <div class="vip-list-card__image-placeholder">📋</div>
                 <?php endif; ?>
                 <div class="vip-list-card__body">
+                    <?php if (false): // Temporarily hidden ?>
                     <span class="vip-list-card__vip-badge">⭐ VIP Lista</span>
+                    <?php endif; ?>
                     <h3 class="vip-list-card__title"><?php echo esc_html($list->post_title); ?></h3>
                     <?php if ($list_excerpt): ?>
                         <p class="vip-list-card__desc"><?php echo esc_html($list_excerpt); ?></p>
