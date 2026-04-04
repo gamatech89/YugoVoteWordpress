@@ -12,19 +12,6 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Helper function to restrict search to title only
- */
-function ygv_search_by_title_only($search, $wp_query) {
-    if (!empty($search) && $wp_query->get('search_title_only')) {
-        global $wpdb;
-        $q = $wp_query->query_vars;
-        $search_term = $q['s'];
-        $search = $wpdb->prepare(" AND ({$wpdb->posts}.post_title LIKE %s)", '%' . $wpdb->esc_like($search_term) . '%');
-    }
-    return $search;
-}
-
-/**
  * Handle live search AJAX request
  */
 function ygv_live_search_handler() {
@@ -42,15 +29,12 @@ function ygv_live_search_handler() {
     $args = [
         'post_type' => 'voting_list',
         'post_status' => 'publish',
-        's' => $search, // Provide 's' to trigger search logic
-        'search_title_only' => true, // custom flag for our filter
+        's' => $search, 
         'posts_per_page' => 8,
         'orderby' => 'relevance',
     ];
     
-    add_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     $query = new WP_Query($args);
-    remove_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
 
     $results = [];
     $seen_list_ids = []; // Track which lists we've already added
@@ -113,14 +97,11 @@ function ygv_live_search_handler() {
         'post_type' => 'voting_items',
         'post_status' => 'publish',
         's' => $search,
-        'search_title_only' => true,
         'posts_per_page' => 5,
         'orderby' => 'relevance',
     ];
     
-    add_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     $items_query = new WP_Query($items_args);
-    remove_filter('posts_search', 'ygv_search_by_title_only', 10, 2);
     
     if ($items_query->have_posts()) {
         global $wpdb;
