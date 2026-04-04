@@ -17,12 +17,21 @@ add_action('add_meta_boxes', 'cs_poll_add_meta_box');
 // 2. Renderuj HTML
 function cs_poll_render_meta_box($post) {
     $answers = get_post_meta($post->ID, '_cs_poll_answers', true);
+    $is_locked = get_post_meta($post->ID, '_cs_poll_locked', true);
     if (!is_array($answers)) {
         $answers = [['text' => '', 'votes' => 0], ['text' => '', 'votes' => 0]];
     }
     wp_nonce_field('cs_save_poll_data', 'cs_poll_nonce');
     ?>
     <div id="cs-poll-wrapper">
+        <div style="margin-bottom: 20px; padding: 15px; background: #f6f7f7; border: 1px solid #ccd0d4; border-radius: 4px;">
+            <label style="font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" name="poll_locked" value="1" <?php checked($is_locked, '1'); ?>>
+                Zaključaj anketu (prikaži rezultate bez glasanja)
+            </label>
+            <p class="description">Ako je čekirano, korisnici će videti rezultate odmah, bez potrebe da glasaju.</p>
+        </div>
+
         <div id="cs-poll-answers-container">
             <?php foreach ($answers as $index => $answer) : ?>
                 <div class="cs-poll-row" style="margin-bottom: 10px; display:flex; gap:10px; align-items:center;">
@@ -75,5 +84,9 @@ function cs_save_poll_meta($post_id) {
         update_post_meta($post_id, '_cs_poll_answers', $clean);
         update_post_meta($post_id, '_cs_poll_total_votes', $total);
     }
+
+    // Sačuvaj Locked status
+    $locked = isset($_POST['poll_locked']) ? '1' : '0';
+    update_post_meta($post_id, '_cs_poll_locked', $locked);
 }
 add_action('save_post', 'cs_save_poll_meta');

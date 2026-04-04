@@ -86,6 +86,12 @@ function cs_poll_shortcode($atts) {
     
     $has_voted = function_exists('cs_has_user_voted_poll') ? cs_has_user_voted_poll($poll_id) : isset($_COOKIE['cs_poll_' . $poll_id]);
 
+    // Force results if the poll is locked
+    $is_locked = get_post_meta($poll_id, '_cs_poll_locked', true);
+    if ($is_locked === '1') {
+        $has_voted = true;
+    }
+
     // Učitaj Template
     ob_start();
     $template = get_stylesheet_directory() . '/inc/polls/templates/single-poll.php';
