@@ -215,7 +215,7 @@ $categories = get_terms([
                     <div class="ygv-header__mascot">
                         <?php echo file_get_contents(get_stylesheet_directory() . '/assets/images/king-head.svg'); ?>
                     </div>
-                    <img src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" alt="YugoVote" class="ygv-header__logo-img">
+                    <img width="196" height="28" src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" class="attachment-full size-full wp-image-80" alt="YugoVote">
                 </a>
                 
                 <!-- Mega Menu (shortcode) -->
