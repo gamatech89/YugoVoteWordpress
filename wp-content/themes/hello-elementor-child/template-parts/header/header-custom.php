@@ -213,7 +213,20 @@ $categories = get_terms([
                 <!-- Logo -->
                 <a href="<?php echo home_url('/'); ?>" class="ygv-header__logo">
                     <div class="ygv-header__mascot">
-                        <?php echo file_get_contents(get_stylesheet_directory() . '/assets/images/king-head.svg'); ?>
+                        <?php 
+                        $svg_path = get_stylesheet_directory() . '/assets/images/king-head.svg';
+                        if (file_exists($svg_path)) {
+                            echo file_get_contents($svg_path);
+                        } else {
+                            // Fallback to relative path if stylesheet directory fails
+                            $svg_path_alt = dirname(dirname(__DIR__)) . '/assets/images/king-head.svg';
+                            if (file_exists($svg_path_alt)) {
+                                echo file_get_contents($svg_path_alt);
+                            } else {
+                                echo '<!-- SVG not found at ' . esc_html($svg_path) . ' or ' . esc_html($svg_path_alt) . ' -->';
+                            }
+                        }
+                        ?>
                     </div>
                     <img width="196" height="28" src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" class="ygv-header__logo-img attachment-full size-full wp-image-80" alt="YugoVote">
                 </a>
