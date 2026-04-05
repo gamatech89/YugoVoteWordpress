@@ -95,7 +95,7 @@ class YUV_Showdown_Manager
 
             $image_url = $item['image_url'] ?? '';
             if (!empty($item['image_id']) && !$image_url) {
-                $image_url = wp_get_attachment_image_url($item['image_id'], 'large');
+                $image_url = wp_get_attachment_image_url($item['image_id'], 'full');
             }
 
             $result[] = [
