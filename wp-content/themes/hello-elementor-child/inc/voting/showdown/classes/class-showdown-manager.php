@@ -60,6 +60,7 @@ class YUV_Showdown_Manager
      */
     public function has_user_played($showdown_id, $user_id = 0, $ip_address = '')
     {
+        return false; // TEMPORARY FOR TESTING: allow multiple votes
         global $wpdb;
         $table = $wpdb->prefix . 'yuv_showdown_sessions';
 
