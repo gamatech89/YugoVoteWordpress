@@ -73,6 +73,12 @@ function yuv_showdown_shortcode($atts) {
             </div>
         </div>
 
+        <!-- Arena Background Glows -->
+        <div class="sd-arena-bg">
+            <div class="sd-arena-glow sd-arena-glow--a"></div>
+            <div class="sd-arena-glow sd-arena-glow--b"></div>
+        </div>
+
         <!-- Arena (two cards side by side) -->
         <div class="sd-arena" id="sd-arena" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
             
@@ -83,17 +89,21 @@ function yuv_showdown_shortcode($atts) {
                     <div class="sd-fighter__img-overlay"></div>
                 </div>
                 <div class="sd-fighter__content">
-                    <h2 class="sd-fighter__name" id="sd-fighter-a-name"></h2>
-                    <p class="sd-fighter__desc" id="sd-fighter-a-desc"></p>
-                    <button class="sd-fighter__pick" data-side="left">
-                        <i class="ri-trophy-line"></i>
-                        Izaberi
-                    </button>
+                    <div class="sd-fighter__info-drawer">
+                        <h2 class="sd-fighter__name" id="sd-fighter-a-name"></h2>
+                        <?php /* <p class="sd-fighter__desc" id="sd-fighter-a-desc"></p> */ ?>
+                        <button class="sd-fighter__pick" data-side="left">
+                            <i class="ri-trophy-line"></i> Izaberi
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- VS -->
-            <div class="sd-vs" id="sd-vs">VS</div>
+            <!-- VS Badge -->
+            <div class="sd-vs-wrap" id="sd-vs-wrap">
+                <div class="sd-vs-glow"></div>
+                <div class="sd-vs" id="sd-vs">VS</div>
+            </div>
 
             <!-- Fighter B -->
             <div class="sd-fighter" id="sd-fighter-b" data-side="right">
@@ -102,12 +112,13 @@ function yuv_showdown_shortcode($atts) {
                     <div class="sd-fighter__img-overlay"></div>
                 </div>
                 <div class="sd-fighter__content">
-                    <h2 class="sd-fighter__name" id="sd-fighter-b-name"></h2>
-                    <p class="sd-fighter__desc" id="sd-fighter-b-desc"></p>
-                    <button class="sd-fighter__pick" data-side="right">
-                        <i class="ri-trophy-line"></i>
-                        Izaberi
-                    </button>
+                    <div class="sd-fighter__info-drawer">
+                        <h2 class="sd-fighter__name" id="sd-fighter-b-name"></h2>
+                        <?php /* <p class="sd-fighter__desc" id="sd-fighter-b-desc"></p> */ ?>
+                        <button class="sd-fighter__pick" data-side="right">
+                            <i class="ri-trophy-line"></i> Izaberi
+                        </button>
+                    </div>
                 </div>
             </div>
 

@@ -1,8 +1,6 @@
 /**
- * Showdown — Client-side Game Engine
- * Matches mockup 01-arena.html animations exactly.
- * Winner stays in place. Loser exits with direction animation.
- * New challenger enters from the same direction.
+ * Showdown — Cinematic Engine
+ * Refined animations and matching structure for the Cinematic redesign.
  */
 (function ($) {
     "use strict";
@@ -72,7 +70,7 @@
         renderFighter: function (slot, fighter) {
             const prefix = "#sd-fighter-" + slot;
             $(prefix + "-name").text(fighter.name);
-            $(prefix + "-desc").text(fighter.description || "");
+            // $(prefix + "-desc").text(fighter.description || "");
             if (fighter.image) {
                 $(prefix + "-img")
                     .attr("src", fighter.image)
@@ -111,7 +109,7 @@
             const winnerCard = document.getElementById("sd-fighter-" + winnerSlot);
             const loserCard = document.getElementById("sd-fighter-" + loserSlot);
             const arena = document.getElementById("sd-arena");
-            const vs = document.getElementById("sd-vs");
+            const vs = document.getElementById("sd-vs-wrap");
 
             const winner = winnerSlot === "a" ? this.currentA : this.currentB;
             const loser = winnerSlot === "a" ? this.currentB : this.currentA;
@@ -120,20 +118,23 @@
             this.currentRound++;
             this.eliminated.push(loser.name);
 
-            // Winner pulse animation
-            winnerCard.classList.add("anim-winner");
-            vs.classList.add("anim-pulse");
+            // Cinematic winner highlight
+            winnerCard.style.zIndex = "10";
+            winnerCard.style.transform = "scale(1.05) translateY(-20px)";
+            
+            if (vs) vs.classList.add("anim-pulse");
 
-            // Loser exit animation (direction-aware)
-            const loserDir = loserSlot === "a" ? "anim-loser-left" : "anim-loser-right";
-            loserCard.classList.add(loserDir);
+            // Loser fade and drift
+            loserCard.style.opacity = "0";
+            loserCard.style.transform = "scale(0.9) translateY(40px)";
+            loserCard.style.pointerEvents = "none";
 
             setTimeout(function () {
                 if (self.queue.length === 0) {
                     // Game over — show results after a brief pause
                     setTimeout(function () {
                         self.showWinner(winner);
-                    }, 400);
+                    }, 600);
                     return;
                 }
 
@@ -142,29 +143,37 @@
                 // Update tracking — winner stays in place
                 if (loserSlot === "a") { self.currentA = newChallenger; }
                 else { self.currentB = newChallenger; }
-                if (winnerSlot === "a") { self.currentA = winner; }
-                else { self.currentB = winner; }
-
-                // Populate the loser card with new challenger
+                
+                // Re-render the slot that lost
                 self.renderFighter(loserSlot, newChallenger);
 
-                // Remove loser exit, add enter animation
-                loserCard.classList.remove(loserDir);
-                const enterDir = loserSlot === "a" ? "anim-enter-left" : "anim-enter-right";
-                loserCard.classList.add(enterDir);
+                // Reset loser card for entry
+                loserCard.style.transition = "none";
+                loserCard.style.transform = "scale(0.8) translateY(100px)";
+                loserCard.style.opacity = "0";
+                
+                // Trigger reflow
+                void loserCard.offsetWidth;
+
+                // Entry animation
+                loserCard.style.transition = "";
+                loserCard.style.transform = "";
+                loserCard.style.opacity = "1";
+                loserCard.style.pointerEvents = "auto";
+                
+                // Reset winner card position
+                winnerCard.style.transform = "";
+                winnerCard.style.zIndex = "";
 
                 self.updateProgress();
 
-                // Cleanup animations
                 setTimeout(function () {
-                    winnerCard.classList.remove("anim-winner");
-                    loserCard.classList.remove(enterDir);
-                    vs.classList.remove("anim-pulse");
+                    if (vs) vs.classList.remove("anim-pulse");
                     arena.classList.remove("sd-arena--locked");
                     self.locked = false;
                 }, 500);
 
-            }, 500);
+            }, 600);
         },
 
         updateProgress: function () {
@@ -308,7 +317,7 @@
             html += '<div class="showdown-badge"><i class="ri-trophy-fill"></i> Tvoji Rezultati</div>';
             html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
             html += '<p class="showdown-subtitle">Evo tvog ličnog poretka</p>';
-            html += '</header>';
+            header += '</header>';
 
             // Podium
             html += '<section class="sd-podium">';
