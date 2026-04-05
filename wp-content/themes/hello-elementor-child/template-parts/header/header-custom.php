@@ -212,10 +212,7 @@ $categories = get_terms([
             <div class="ygv-header__frame">
                 <!-- Logo -->
                 <a href="<?php echo home_url('/'); ?>" class="ygv-header__logo">
-                    <div class="ygv-header__mascot">
-                        <?php echo file_get_contents(get_stylesheet_directory() . '/assets/images/mascot.svg'); ?>
-                    </div>
-                    <span class="ygv-header__logo-text">YugoVote</span>
+                    <img src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" alt="YugoVote" class="ygv-header__logo-img">
                 </a>
                 
                 <!-- Mega Menu (shortcode) -->
