@@ -525,7 +525,7 @@ button.ygv-header__search-trigger:hover,
 }
 
 .ygv-header__logo-img {
-  height: 44px;
+  height: 28px;
   width: auto;
   display: block;
   object-fit: contain;
@@ -828,7 +828,7 @@ button.ygv-header__search-trigger:hover,
   }
 
   .ygv-header__logo-img {
-    height: 32px;
+    height: 22px;
   }
 }
 
@@ -847,7 +847,7 @@ button.ygv-header__search-trigger:hover,
   }
 
   .ygv-header__logo-img {
-    height: 28px;
+    height: 18px;
   }
 
   /* Mobile search */
