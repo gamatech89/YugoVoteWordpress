@@ -95,7 +95,7 @@ class YUV_Showdown_Manager
 
             $image_url = $item['image_url'] ?? '';
             if (!empty($item['image_id']) && !$image_url) {
-                $image_url = wp_get_attachment_image_url($item['image_id'], 'full');
+                $image_url = wp_get_attachment_image_url($item['image_id'], 'large');
             }
 
             $result[] = [
@@ -229,13 +229,11 @@ class YUV_Showdown_Manager
             return $a['avg_rank'] <=> $b['avg_rank'];
         });
 
-        // Add item data and calculate total sessions once
+        // Add item data (image, description)
         $items_by_name = [];
         foreach ($items as $item) {
             $items_by_name[$item['name']] = $item;
         }
-
-        $total_sessions = $this->get_session_count($showdown_id);
 
         foreach ($scores as &$score) {
             $item = $items_by_name[$score['name']] ?? null;
@@ -243,7 +241,6 @@ class YUV_Showdown_Manager
                 $score['image'] = $item['image'];
                 $score['description'] = $item['description'];
             }
-            $score['total_sessions'] = $total_sessions;
         }
 
         return $scores;

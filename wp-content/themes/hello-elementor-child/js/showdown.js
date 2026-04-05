@@ -1,88 +1,365 @@
 /**
- * Showdown — Emergency Restoral JS (V5)
- * Simplified logic to match the stable HTML structure
+ * Showdown — Client-side Game Engine
+ * Matches mockup 01-arena.html animations exactly.
+ * Winner stays in place. Loser exits with direction animation.
+ * New challenger enters from the same direction.
  */
+(function ($) {
+    "use strict";
 
-jQuery(document).ready(function($) {
-    var $arena = $('#yuv-showdown-arena');
-    if (!$arena.length) return;
+    const Showdown = {
+        items: [],
+        queue: [],
+        eliminated: [],
+        currentA: null,
+        currentB: null,
+        totalRounds: 0,
+        currentRound: 0,
+        showdownId: 0,
+        locked: false,
 
-    var items = $arena.data('items') || [];
-    var showdownId = $arena.data('showdown-id');
-    var status = $arena.data('status');
-    var hasPlayed = $arena.data('has-played') === 1;
+        init: function () {
+            const $page = $(".sd-page#yuv-showdown-arena");
+            if (!$page.length) return;
 
-    if (hasPlayed || status === 'completed') return;
+            this.showdownId = parseInt($page.data("showdown-id"));
+            const hasPlayed = $page.data("has-played") === 1 || $page.data("has-played") === "1";
+            const status = $page.data("status");
 
-    var queue = [...items];
-    var currentA, currentB;
+            if (hasPlayed || status === "completed") {
+                return;
+            }
 
-    function nextMatchup() {
-        if (queue.length < 2) {
-            finishShowdown();
-            return;
-        }
+            try {
+                this.items = JSON.parse($page.attr("data-items"));
+            } catch (e) {
+                console.error("Failed to parse showdown items:", e);
+                return;
+            }
 
-        currentA = queue.shift();
-        currentB = queue.shift();
+            if (this.items.length < 2) return;
 
-        updateCards();
-    }
+            // Shuffle
+            const shuffled = this.shuffleArray([...this.items]);
+            this.currentA = shuffled[0];
+            this.currentB = shuffled[1];
+            this.queue = shuffled.slice(2);
+            this.eliminated = [];
+            this.totalRounds = this.items.length - 1;
+            this.currentRound = 0;
 
-    function updateCards() {
-        // Simple update without complex animations first to ensure stability
-        $('#sd-fighter-a-img').attr('src', currentA.image);
-        $('#sd-fighter-a-name').text(currentA.name);
-        
-        $('#sd-fighter-b-img').attr('src', currentB.image);
-        $('#sd-fighter-b-name').text(currentB.name);
+            // Show progress
+            $("#sd-progress").show();
+            this.updateProgress();
 
-        // Update progress
-        var total = items.length;
-        var remaining = queue.length + 2;
-        var progress = ((total - remaining) / (total - 1)) * 100;
-        $('#sd-progress-fill').css('width', progress + '%');
-    }
+            // Populate initial cards
+            this.renderFighter("a", this.currentA);
+            this.renderFighter("b", this.currentB);
 
-    function handleVote(side) {
-        var winner = (side === 'left') ? currentA : currentB;
-        var loser = (side === 'left') ? currentB : currentA;
+            // Bind events
+            this.bindPicks();
+        },
 
-        // Simple winner stays in queue pattern
-        queue.push(winner);
-        nextMatchup();
-    }
+        shuffleArray: function (arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        },
 
-    function finishShowdown() {
-        var winner = queue[0];
-        $arena.fadeOut(400, function() {
-            // Send to server
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'yuv_submit_showdown_winner',
-                    showdown_id: showdownId,
-                    winner_id: winner.id
-                },
-                success: function() {
-                    location.reload(); // Simplest way to show results for now
-                }
+        renderFighter: function (slot, fighter) {
+            const prefix = "#sd-fighter-" + slot;
+            $(prefix + "-name").text(fighter.name);
+            $(prefix + "-desc").text(fighter.description || "");
+            if (fighter.image_url || fighter.image) {
+                $(prefix + "-img")
+                    .attr("src", fighter.image_url || fighter.image)
+                    .attr("alt", fighter.name);
+            }
+        },
+
+        bindPicks: function () {
+            const self = this;
+
+            // Button click
+            $(document).on("click", ".sd-fighter__pick", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (self.locked) return;
+                const card = $(this).closest(".sd-fighter");
+                const slot = card.data("side") === "left" ? "a" : "b";
+                self.pickWinner(slot);
             });
-        });
-    }
 
-    $('.sd-card').on('click', function() {
-        var side = $(this).data('side');
-        handleVote(side);
+            // Card click
+            $(document).on("click", ".sd-fighter", function (e) {
+                if ($(e.target).closest(".sd-fighter__pick").length) return;
+                if (self.locked) return;
+                const slot = $(this).data("side") === "left" ? "a" : "b";
+                self.pickWinner(slot);
+            });
+        },
+
+        pickWinner: function (winnerSlot) {
+            if (this.locked) return;
+            this.locked = true;
+
+            const self = this;
+            const loserSlot = winnerSlot === "a" ? "b" : "a";
+            const winnerCard = document.getElementById("sd-fighter-" + winnerSlot);
+            const loserCard = document.getElementById("sd-fighter-" + loserSlot);
+            const arena = document.getElementById("sd-arena");
+            const vs = document.getElementById("sd-vs");
+
+            const winner = winnerSlot === "a" ? this.currentA : this.currentB;
+            const loser = winnerSlot === "a" ? this.currentB : this.currentA;
+
+            arena.classList.add("sd-arena--locked");
+            this.currentRound++;
+            this.eliminated.push(loser.name);
+
+            // Winner pulse animation
+            winnerCard.classList.add("anim-winner");
+            vs.classList.add("anim-pulse");
+
+            // Loser exit animation (direction-aware)
+            const loserDir = loserSlot === "a" ? "anim-loser-left" : "anim-loser-right";
+            loserCard.classList.add(loserDir);
+
+            setTimeout(function () {
+                if (self.queue.length === 0) {
+                    // Game over — show results after a brief pause
+                    setTimeout(function () {
+                        self.showWinner(winner);
+                    }, 400);
+                    return;
+                }
+
+                const newChallenger = self.queue.shift();
+
+                // Update tracking — winner stays in place
+                if (loserSlot === "a") { self.currentA = newChallenger; }
+                else { self.currentB = newChallenger; }
+                if (winnerSlot === "a") { self.currentA = winner; }
+                else { self.currentB = winner; }
+
+                // Populate the loser card with new challenger
+                self.renderFighter(loserSlot, newChallenger);
+
+                // Remove loser exit, add enter animation
+                loserCard.classList.remove(loserDir);
+                const enterDir = loserSlot === "a" ? "anim-enter-left" : "anim-enter-right";
+                loserCard.classList.add(enterDir);
+
+                self.updateProgress();
+
+                // Cleanup animations
+                setTimeout(function () {
+                    winnerCard.classList.remove("anim-winner");
+                    loserCard.classList.remove(enterDir);
+                    vs.classList.remove("anim-pulse");
+                    arena.classList.remove("sd-arena--locked");
+                    self.locked = false;
+                }, 500);
+
+            }, 500);
+        },
+
+        updateProgress: function () {
+            const percent = this.totalRounds > 0
+                ? Math.round((this.currentRound / this.totalRounds) * 100)
+                : 0;
+            const remaining = this.queue.length + 2;
+
+            $("#sd-progress-fill").css("width", percent + "%");
+            $("#sd-progress-round").text("Runda " + (this.currentRound + 1) + " od " + this.totalRounds);
+            $("#sd-progress-remaining").text(Math.max(remaining, 2));
+        },
+
+        showWinner: function (winner) {
+            const self = this;
+
+            // Add winner as last (top) in elimination order
+            this.eliminated.push(winner.name);
+
+            // Fade out the arena page
+            $(".sd-page").addClass("sd-page--fade-out");
+
+            // Save to server
+            $.ajax({
+                url: yuvShowdown.ajaxurl,
+                method: "POST",
+                data: {
+                    action: "yuv_showdown_save_session",
+                    nonce: yuvShowdown.nonce,
+                    showdown_id: self.showdownId,
+                    results: JSON.stringify(self.eliminated),
+                    winner: winner.name,
+                },
+                success: function (response) {
+                    setTimeout(function () {
+                        if (response.success) {
+                            self.renderLeaderboard(
+                                response.data.leaderboard,
+                                response.data.total_players
+                            );
+                        } else {
+                            self.renderLocalLeaderboard();
+                        }
+                    }, 500);
+                },
+                error: function () {
+                    setTimeout(function () {
+                        self.renderLocalLeaderboard();
+                    }, 500);
+                },
+            });
+        },
+
+        /**
+         * Show results as a fixed overlay (light theme) with staggered animations
+         */
+        showResults: function ($results, html) {
+            // Wrap in inner container
+            $results.html('<div class="sd-results-inner">' + html + '</div>');
+
+            // Hide the arena page completely after fade-out completes
+            setTimeout(function () {
+                $(".sd-page").css("display", "none");
+            }, 600);
+
+            // Trigger the results to fade in
+            requestAnimationFrame(function () {
+                $results.addClass("sd-results-screen--visible");
+            });
+        },
+
+        renderLeaderboard: function (leaderboard, totalPlayers) {
+            const $results = $("#sd-results");
+            const title = $(".showdown-title").first().text();
+
+            let html = '';
+            html += '<header class="showdown-header sd-results-header">';
+            html += '<div class="showdown-badge"><i class="ri-trophy-fill"></i> Rezultati</div>';
+            html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
+            html += '<p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>';
+            html += '</header>';
+
+            // Podium
+            html += '<section class="sd-podium">';
+            const podiumOrder = [
+                { idx: 1, cls: 'silver' },
+                { idx: 0, cls: 'gold' },
+                { idx: 2, cls: 'bronze' }
+            ];
+            for (const p of podiumOrder) {
+                if (!leaderboard[p.idx]) continue;
+                const entry = leaderboard[p.idx];
+                html += '<div class="sd-podium__item sd-podium__item--' + p.cls + '">';
+                html += '<div class="sd-podium__avatar-wrap">';
+                if (p.cls === 'gold') html += '<span class="sd-podium__crown">👑</span>';
+                html += '<span class="sd-podium__medal">' + (p.idx + 1) + '</span>';
+                if (entry.image) html += '<img class="sd-podium__avatar" src="' + entry.image + '" alt="' + Showdown.escHtml(entry.name) + '">';
+                html += '</div>';
+                html += '<h3 class="sd-podium__name">' + Showdown.escHtml(entry.name) + '</h3>';
+                html += '<p class="sd-podium__wins">Pobede: <strong>' + entry.wins + '</strong></p>';
+                html += '</div>';
+            }
+            html += '</section>';
+
+            // Ranked list with staggered delays
+            if (leaderboard.length > 3) {
+                html += '<section class="sd-ranked">';
+                html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
+                html += '<div class="sd-ranked__list">';
+                for (let i = 3; i < leaderboard.length; i++) {
+                    const entry = leaderboard[i];
+                    const delay = 0.6 + (i - 3) * 0.08;
+                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
+                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
+                    if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
+                    html += '<div class="sd-ranked__info">';
+                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
+                    if (entry.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(entry.description) + '</p>';
+                    html += '</div>';
+                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + entry.wins + '</strong></span>';
+                    html += '</div>';
+                }
+                html += '</div></section>';
+            }
+
+            this.showResults($results, html);
+        },
+
+        renderLocalLeaderboard: function () {
+            const $results = $("#sd-results");
+            const title = $(".showdown-title").first().text();
+            const ranked = [...Showdown.eliminated].reverse();
+
+            let html = '';
+            html += '<header class="showdown-header sd-results-header">';
+            html += '<div class="showdown-badge"><i class="ri-trophy-fill"></i> Tvoji Rezultati</div>';
+            html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
+            html += '<p class="showdown-subtitle">Evo tvog ličnog poretka</p>';
+            html += '</header>';
+
+            // Podium
+            html += '<section class="sd-podium">';
+            const podiumOrder = [
+                { idx: 1, cls: 'silver' },
+                { idx: 0, cls: 'gold' },
+                { idx: 2, cls: 'bronze' }
+            ];
+            for (const p of podiumOrder) {
+                if (!ranked[p.idx]) continue;
+                const name = ranked[p.idx];
+                const item = Showdown.items.find(function (it) { return it.name === name; });
+                html += '<div class="sd-podium__item sd-podium__item--' + p.cls + '">';
+                html += '<div class="sd-podium__avatar-wrap">';
+                if (p.cls === 'gold') html += '<span class="sd-podium__crown">👑</span>';
+                html += '<span class="sd-podium__medal">' + (p.idx + 1) + '</span>';
+                if (item && (item.image_url || item.image)) {
+                    html += '<img class="sd-podium__avatar" src="' + (item.image_url || item.image) + '" alt="' + name + '">';
+                }
+                html += '</div>';
+                html += '<h3 class="sd-podium__name">' + Showdown.escHtml(name) + '</h3>';
+                html += '</div>';
+            }
+            html += '</section>';
+
+            // Ranked list with staggered delays
+            if (ranked.length > 3) {
+                html += '<section class="sd-ranked">';
+                html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
+                html += '<div class="sd-ranked__list">';
+                for (let i = 3; i < ranked.length; i++) {
+                    const name = ranked[i];
+                    const item = Showdown.items.find(function (it) { return it.name === name; });
+                    const delay = 0.6 + (i - 3) * 0.08;
+                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
+                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
+                    if (item && (item.image_url || item.image)) {
+                        html += '<img class="sd-ranked__avatar" src="' + (item.image_url || item.image) + '" alt="">';
+                    }
+                    html += '<div class="sd-ranked__info">';
+                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+                html += '</div></section>';
+            }
+
+            this.showResults($results, html);
+        },
+
+        escHtml: function (str) {
+            if (!str) return "";
+            return $("<div>").text(str).html();
+        },
+    };
+
+    $(document).ready(function () {
+        Showdown.init();
     });
-
-    $('.sd-card__btn').on('click', function(e) {
-        e.stopPropagation();
-        var side = $(this).data('side');
-        handleVote(side);
-    });
-
-    // Start
-    nextMatchup();
-});
+})(jQuery);
