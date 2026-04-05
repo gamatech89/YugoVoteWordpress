@@ -41,175 +41,175 @@ function yuv_showdown_shortcode($atts) {
 
     ob_start();
     ?>
-    <div class="sd-page" 
-         id="yuv-showdown-arena"
-         data-showdown-id="<?php echo esc_attr($showdown_id); ?>"
-         data-status="<?php echo esc_attr($status); ?>"
-         data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
-         data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
-         style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>"
-         >
-        
-        <!-- Header -->
-        <header class="showdown-header" id="sd-header">
-            <div class="showdown-badge">
-                <i class="ri-sword-line"></i>
-                Showdown Arena
-            </div>
-            <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
-            <?php if ($showdown->post_content): ?>
-                <p class="showdown-subtitle"><?php echo esc_html($showdown->post_content); ?></p>
-            <?php endif; ?>
-        </header>
-
-        <!-- Progress -->
-        <div class="sd-progress" id="sd-progress" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
-            <div class="sd-progress__info">
-                <span class="sd-progress__round" id="sd-progress-round">Runda 1 od <?php echo count($items) - 1; ?></span>
-                <span class="sd-progress__remaining">Preostalo: <strong id="sd-progress-remaining"><?php echo count($items); ?></strong> učesnika</span>
-            </div>
-            <div class="sd-progress__bar">
-                <div class="sd-progress__fill" id="sd-progress-fill" style="width: 0%"></div>
-            </div>
-        </div>
-
-        <!-- Arena Background Glows -->
-        <div class="sd-arena-bg">
-            <div class="sd-arena-glow sd-arena-glow--a"></div>
-            <div class="sd-arena-glow sd-arena-glow--b"></div>
-        </div>
-
-        <!-- Arena (two cards side by side) -->
-        <div class="sd-arena" id="sd-arena" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+    <div class="showdown-wrap">
+        <div class="sd-page" 
+             id="yuv-showdown-arena"
+             data-showdown-id="<?php echo esc_attr($showdown_id); ?>"
+             data-status="<?php echo esc_attr($status); ?>"
+             data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
+             data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
+             style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>"
+             >
             
-            <!-- Fighter A -->
-            <div class="sd-fighter" id="sd-fighter-a" data-side="left">
-                <div class="sd-fighter__img-wrap">
-                    <img class="sd-fighter__img" id="sd-fighter-a-img" src="" alt="">
-                    <div class="sd-fighter__img-overlay"></div>
+            <!-- Header -->
+            <header class="showdown-header" id="sd-header">
+                <div class="showdown-badge">
+                    <i class="ri-sword-line"></i>
+                    Showdown Arena
                 </div>
-                <div class="sd-fighter__content">
-                    <div class="sd-fighter__info-drawer">
-                        <h2 class="sd-fighter__name" id="sd-fighter-a-name"></h2>
-                        <?php /* <p class="sd-fighter__desc" id="sd-fighter-a-desc"></p> */ ?>
-                        <button class="sd-fighter__pick" data-side="left">
-                            <i class="ri-trophy-line"></i> Izaberi
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VS Badge -->
-            <div class="sd-vs-wrap" id="sd-vs-wrap">
-                <div class="sd-vs-glow"></div>
-                <div class="sd-vs" id="sd-vs">VS</div>
-            </div>
-
-            <!-- Fighter B -->
-            <div class="sd-fighter" id="sd-fighter-b" data-side="right">
-                <div class="sd-fighter__img-wrap">
-                    <img class="sd-fighter__img" id="sd-fighter-b-img" src="" alt="">
-                    <div class="sd-fighter__img-overlay"></div>
-                </div>
-                <div class="sd-fighter__content">
-                    <div class="sd-fighter__info-drawer">
-                        <h2 class="sd-fighter__name" id="sd-fighter-b-name"></h2>
-                        <?php /* <p class="sd-fighter__desc" id="sd-fighter-b-desc"></p> */ ?>
-                        <button class="sd-fighter__pick" data-side="right">
-                            <i class="ri-trophy-line"></i> Izaberi
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Hint -->
-        <p class="sd-hint" id="sd-hint" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
-            <i class="ri-cursor-line"></i>
-            Klikni na karticu ili dugme da izabereš pobednika
-        </p>
-
-    </div><!-- /.sd-page -->
-
-    <!-- Results Screen (fixed overlay, light theme, matching mockup) -->
-    <div id="sd-results" class="sd-results-screen <?php echo ($has_played || $status === 'completed') ? 'sd-results-screen--visible' : ''; ?>">
-            
-            <?php if ($has_played || $status === 'completed'): ?>
-                <!-- Results Header -->
-                <header class="showdown-header sd-results-header">
-                    <div class="showdown-badge">
-                        <i class="ri-trophy-fill"></i>
-                        Rezultati
-                    </div>
-                    <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
-                    <p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>
-                </header>
-
-                <?php if (!empty($leaderboard)): ?>
-                    <!-- Podium (top 3) -->
-                    <section class="sd-podium">
-                        <?php 
-                        $podium_order = ['silver' => 1, 'gold' => 0, 'bronze' => 2];
-                        foreach ($podium_order as $class => $idx):
-                            if (!isset($leaderboard[$idx])) continue;
-                            $entry = $leaderboard[$idx];
-                            $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
-                        ?>
-                            <div class="sd-podium__item sd-podium__item--<?php echo $class; ?>">
-                                <div class="sd-podium__avatar-wrap">
-                                    <?php if ($class === 'gold'): ?>
-                                        <div class="sd-podium__crown">
-                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/></svg>
-                                        </div>
-                                    <?php endif; ?>
-                                    <div class="sd-podium__rank-badge"><?php echo $idx + 1; ?></div>
-                                    <?php if (!empty($entry['image'])): ?>
-                                        <img class="sd-podium__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="<?php echo esc_attr($entry['name']); ?>">
-                                    <?php endif; ?>
-                                    <div class="sd-podium__pct-badge"><?php echo $win_pct; ?>%</div>
-                                </div>
-                                <h3 class="sd-podium__name"><?php echo esc_html($entry['name']); ?></h3>
-                                <p class="sd-podium__stats"><?php echo $entry['wins']; ?> pobeda</p>
-                            </div>
-                        <?php endforeach; ?>
-                    </section>
-
-                    <!-- Ranked list (4th and below) -->
-                    <?php if (count($leaderboard) > 3): ?>
-                        <section class="sd-ranked">
-                            <h2 class="sd-ranked__title">Ostali plasmani</h2>
-                            <div class="sd-ranked__list">
-                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry): 
-                                    $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
-                                ?>
-                                    <div class="sd-ranked__item">
-                                        <span class="sd-ranked__rank">#<?php echo $rank + 4; ?></span>
-                                        <div class="sd-ranked__avatar-wrap">
-                                            <?php if (!empty($entry['image'])): ?>
-                                                <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="sd-ranked__info">
-                                            <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
-                                            <?php if (!empty($entry['description'])): ?>
-                                                <p class="sd-ranked__desc"><?php echo esc_html($entry['description']); ?></p>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="sd-ranked__score">
-                                            <span class="sd-ranked__pct"><?php echo $win_pct; ?>%</span>
-                                            <span class="sd-ranked__wins"><?php echo $entry['wins']; ?> pobeda</span>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </section>
-                    <?php endif; ?>
-
-
+                <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
+                <?php if ($showdown->post_content): ?>
+                    <p class="showdown-subtitle"><?php echo esc_html($showdown->post_content); ?></p>
                 <?php endif; ?>
-            <?php endif; ?>
+            </header>
+
+            <!-- Progress -->
+            <div class="sd-progress" id="sd-progress" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+                <div class="sd-progress__info">
+                    <span class="sd-progress__round" id="sd-progress-round">Runda 1 od <?php echo count($items) - 1; ?></span>
+                    <span class="sd-progress__remaining">Preostalo: <strong id="sd-progress-remaining"><?php echo count($items); ?></strong> učesnika</span>
+                </div>
+                <div class="sd-progress__bar">
+                    <div class="sd-progress__fill" id="sd-progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Arena Background Glows -->
+            <div class="sd-arena-bg">
+                <div class="sd-arena-glow sd-arena-glow--a"></div>
+                <div class="sd-arena-glow sd-arena-glow--b"></div>
+            </div>
+
+            <!-- Arena (two cards side by side) -->
+            <div class="sd-arena" id="sd-arena" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+                
+                <!-- Fighter A -->
+                <div class="sd-fighter" id="sd-fighter-a" data-side="left">
+                    <div class="sd-fighter__img-wrap">
+                        <img class="sd-fighter__img" id="sd-fighter-a-img" src="" alt="">
+                        <div class="sd-fighter__img-overlay"></div>
+                    </div>
+                    <div class="sd-fighter__content">
+                        <div class="sd-fighter__info-drawer">
+                            <h2 class="sd-fighter__name" id="sd-fighter-a-name"></h2>
+                            <?php /* <p class="sd-fighter__desc" id="sd-fighter-a-desc"></p> */ ?>
+                            <button class="sd-fighter__pick" data-side="left">
+                                <i class="ri-trophy-line"></i> Izaberi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VS Badge -->
+                <div class="sd-vs-wrap" id="sd-vs-wrap">
+                    <div class="sd-vs-glow"></div>
+                    <div class="sd-vs" id="sd-vs">VS</div>
+                </div>
+
+                <!-- Fighter B -->
+                <div class="sd-fighter" id="sd-fighter-b" data-side="right">
+                    <div class="sd-fighter__img-wrap">
+                        <img class="sd-fighter__img" id="sd-fighter-b-img" src="" alt="">
+                        <div class="sd-fighter__img-overlay"></div>
+                    </div>
+                    <div class="sd-fighter__content">
+                        <div class="sd-fighter__info-drawer">
+                            <h2 class="sd-fighter__name" id="sd-fighter-b-name"></h2>
+                            <?php /* <p class="sd-fighter__desc" id="sd-fighter-b-desc"></p> */ ?>
+                            <button class="sd-fighter__pick" data-side="right">
+                                <i class="ri-trophy-line"></i> Izaberi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Hint -->
+            <p class="sd-hint" id="sd-hint" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+                <i class="ri-cursor-line"></i>
+                Klikni na karticu ili dugme da izabereš pobednika
+            </p>
+
+        </div><!-- /.sd-page -->
+
+        <!-- Results Screen -->
+        <div id="sd-results" class="sd-results-screen <?php echo ($has_played || $status === 'completed') ? 'sd-results-screen--visible' : ''; ?>">
+                
+                <?php if ($has_played || $status === 'completed'): ?>
+                    <!-- Results Header -->
+                    <header class="showdown-header sd-results-header">
+                        <div class="showdown-badge">
+                            <i class="ri-trophy-fill"></i>
+                            Rezultati
+                        </div>
+                        <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
+                        <p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>
+                    </header>
+
+                    <?php if (!empty($leaderboard)): ?>
+                        <!-- Podium (top 3) -->
+                        <section class="sd-podium">
+                            <?php 
+                            $podium_order = ['silver' => 1, 'gold' => 0, 'bronze' => 2];
+                            foreach ($podium_order as $class => $idx):
+                                if (!isset($leaderboard[$idx])) continue;
+                                $entry = $leaderboard[$idx];
+                                $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
+                            ?>
+                                <div class="sd-podium__item sd-podium__item--<?php echo $class; ?>">
+                                    <div class="sd-podium__avatar-wrap">
+                                        <?php if ($class === 'gold'): ?>
+                                            <div class="sd-podium__crown">
+                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/></svg>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="sd-podium__rank-badge"><?php echo $idx + 1; ?></div>
+                                        <?php if (!empty($entry['image'])): ?>
+                                            <img class="sd-podium__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="<?php echo esc_attr($entry['name']); ?>">
+                                        <?php endif; ?>
+                                        <div class="sd-podium__pct-badge"><?php echo $win_pct; ?>%</div>
+                                    </div>
+                                    <h3 class="sd-podium__name"><?php echo esc_html($entry['name']); ?></h3>
+                                    <p class="sd-podium__stats"><?php echo $entry['wins']; ?> pobeda</p>
+                                </div>
+                            <?php endforeach; ?>
+                        </section>
+
+                        <!-- Ranked list (4th and below) -->
+                        <?php if (count($leaderboard) > 3): ?>
+                            <section class="sd-ranked">
+                                <h2 class="sd-ranked__title">Ostali plasmani</h2>
+                                <div class="sd-ranked__list">
+                                    <?php foreach (array_slice($leaderboard, 3) as $rank => $entry): 
+                                        $win_pct = $total_players > 0 ? round(($entry['wins'] / $total_players) * 100, 1) : 0;
+                                    ?>
+                                        <div class="sd-ranked__item">
+                                            <span class="sd-ranked__rank">#<?php echo $rank + 4; ?></span>
+                                            <div class="sd-ranked__avatar-wrap">
+                                                <?php if (!empty($entry['image'])): ?>
+                                                    <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="sd-ranked__info">
+                                                <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
+                                                <?php if (!empty($entry['description'])): ?>
+                                                    <p class="sd-ranked__desc"><?php echo esc_html($entry['description']); ?></p>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="sd-ranked__score">
+                                                <span class="sd-ranked__pct"><?php echo $win_pct; ?>%</span>
+                                                <span class="sd-ranked__wins"><?php echo $entry['wins']; ?> pobeda</span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </section>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php endif; ?>
         </div>
+    </div>
     <?php
     return ob_get_clean();
 }
