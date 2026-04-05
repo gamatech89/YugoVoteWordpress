@@ -510,22 +510,25 @@ button.ygv-header__search-trigger:hover,
 }
 
 .ygv-header__mascot {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ygv-header__mascot svg {
   width: 100%;
   height: 100%;
+  display: block;
 }
 
-.ygv-header__logo-text {
-  font-family: "Poppins", sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--ygv-text);
-  text-decoration: none;
+.ygv-header__logo-img {
+  height: 44px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 /* Menu area */
@@ -820,12 +823,12 @@ button.ygv-header__search-trigger:hover,
   }
 
   .ygv-header__mascot {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
   }
 
-  .ygv-header__logo-text {
-    font-size: 20px;
+  .ygv-header__logo-img {
+    height: 32px;
   }
 }
 
@@ -838,13 +841,13 @@ button.ygv-header__search-trigger:hover,
     border-radius: 16px;
   }
 
-  .ygv-header__logo-text {
-    display: none;
+  .ygv-header__mascot {
+    width: 50px;
+    height: 50px;
   }
 
-  .ygv-header__mascot {
-    width: 45px;
-    height: 45px;
+  .ygv-header__logo-img {
+    height: 28px;
   }
 
   /* Mobile search */
