@@ -59,5 +59,4 @@ foreach ($answers as $idx => $ans) {
         
         <!-- Hidden total votes per client request -->
     </div>
-    </div>
 </div>
