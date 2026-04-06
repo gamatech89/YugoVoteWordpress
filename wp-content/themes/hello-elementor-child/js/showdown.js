@@ -145,23 +145,28 @@
                 else { self.currentB = winner; }
 
                 // Populate the loser card with new challenger
-                self.renderFighter(loserSlot, newChallenger);
+                // We set opacity directly to 0 briefly to prevent the "flash" of old content
+                // as the class swaps from exit to enter
+                loserCard.style.opacity = "0";
+                
+                setTimeout(function() {
+                    self.renderFighter(loserSlot, newChallenger);
+                    self.updateProgress();
 
-                // Remove loser exit, add enter animation
-                loserCard.classList.remove(loserDir);
-                const enterDir = loserSlot === "a" ? "anim-enter-left" : "anim-enter-right";
-                loserCard.classList.add(enterDir);
-
-                self.updateProgress();
-
-                // Cleanup animations
-                setTimeout(function () {
-                    winnerCard.classList.remove("anim-winner");
-                    loserCard.classList.remove(enterDir);
-                    vs.classList.remove("anim-pulse");
-                    arena.classList.remove("sd-arena--locked");
-                    self.locked = false;
-                }, 500);
+                    loserCard.classList.remove(loserDir);
+                    const enterDir = loserSlot === "a" ? "anim-enter-left" : "anim-enter-right";
+                    loserCard.classList.add(enterDir);
+                    
+                    // Cleanup animations
+                    setTimeout(function () {
+                        winnerCard.classList.remove("anim-winner");
+                        loserCard.classList.remove(enterDir);
+                        loserCard.style.opacity = ""; // Restore
+                        vs.classList.remove("anim-pulse");
+                        arena.classList.remove("sd-arena--locked");
+                        self.locked = false;
+                    }, 500);
+                }, 50);
 
             }, 500);
         },
