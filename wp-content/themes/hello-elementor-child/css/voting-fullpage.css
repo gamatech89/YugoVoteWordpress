@@ -935,10 +935,10 @@
   }
 
   .vlp-item__buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(5, 32px);
     gap: 8px;
+    justify-content: start;
   }
 
   .vlp-panel {
@@ -973,6 +973,7 @@
   }
 
   .vlp-item__buttons {
-    gap: 4px;
+    grid-template-columns: repeat(5, 28px);
+    gap: 6px;
   }
 }
