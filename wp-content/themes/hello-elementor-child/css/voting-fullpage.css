@@ -909,16 +909,15 @@
   }
 
   .vlp-item__rank {
-    padding: 4px 8px;
-    min-width: 32px;
-  }
-
-  .vlp-item__rank-medal {
-    font-size: 14px;
+    padding: 0;
+    min-width: auto;
+    right: 5px;
+    top: -5px;
+    opacity: 0.12; /* Slightly more visible on mobile */
   }
 
   .vlp-item__rank-num {
-    font-size: 10px;
+    font-size: 70px;
   }
 
   .vlp-item__title {
@@ -936,9 +935,10 @@
   }
 
   .vlp-item__buttons {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
   }
 
   .vlp-panel {
