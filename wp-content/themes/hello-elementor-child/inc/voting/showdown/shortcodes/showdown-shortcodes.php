@@ -52,6 +52,10 @@ function yuv_showdown_shortcode($atts) {
         
         <!-- Header (hidden when showing results) -->
         <header class="showdown-header" id="sd-header" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+            <div class="showdown-badge">
+                <i class="ri-sword-line"></i>
+                Može biti samo jedan
+            </div>
             <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
             <?php if ($showdown->post_content): ?>
                 <p class="showdown-subtitle"><?php echo esc_html(wp_trim_words($showdown->post_content, 25)); ?></p>

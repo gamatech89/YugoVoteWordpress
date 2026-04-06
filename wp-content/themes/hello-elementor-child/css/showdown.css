@@ -232,10 +232,11 @@
 
 .showdown-title {
   font-family: var(--sd-font-heading);
-  font-size: 1.4rem;
+  font-size: 40px;
   color: #ffffff;
   margin-bottom: 2px;
   text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  line-height: 1.15;
 }
 
 .showdown-subtitle {
@@ -267,11 +268,11 @@
 }
 
 .sd-progress__remaining {
-  color: var(--sd-text-muted);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .sd-progress__remaining strong {
-  color: var(--sd-text);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -599,7 +600,7 @@
   text-align: center;
   padding: 10px 0 0;
   font-size: 0.72rem;
-  color: var(--sd-text-muted);
+  color: rgba(255, 255, 255, 0.45);
   flex-shrink: 0;
 }
 

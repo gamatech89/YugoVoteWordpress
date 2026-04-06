@@ -93,9 +93,13 @@ class YUV_Showdown_Manager
             if (empty($item['name']))
                 continue;
 
-            $image_url = $item['image_url'] ?? '';
-            if (!empty($item['image_id']) && !$image_url) {
-                $image_url = wp_get_attachment_image_url($item['image_id'], 'large');
+        $image_url = '';
+            // Always prefer image_id for proper size — stored image_url may be a small thumbnail crop
+            if (!empty($item['image_id'])) {
+                $image_url = wp_get_attachment_image_url($item['image_id'], 'full');
+            }
+            if (!$image_url) {
+                $image_url = $item['image_url'] ?? '';
             }
 
             $result[] = [
