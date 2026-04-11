@@ -98,9 +98,12 @@ while ($query->have_posts()) {
         $voting_list_id, $item_id
     ), ARRAY_A);
     
-    // Get how many other lists this item appears in
+    // Get how many other published lists this item appears in
     $other_lists_count = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(DISTINCT voting_list_id) FROM $table_name WHERE voting_item_id = %d AND voting_list_id != %d",
+        "SELECT COUNT(DISTINCT pivot.voting_list_id)
+         FROM $table_name pivot
+         INNER JOIN {$wpdb->posts} wpp ON wpp.ID = pivot.voting_list_id AND wpp.post_status = 'publish'
+         WHERE pivot.voting_item_id = %d AND pivot.voting_list_id != %d",
         $item_id, $voting_list_id
     )) ?: 0;
 

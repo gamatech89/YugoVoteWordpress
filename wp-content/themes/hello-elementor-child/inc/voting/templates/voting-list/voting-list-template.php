@@ -94,10 +94,11 @@ if (!empty($voting_items_ids)) {
     $pivot_data_cache = $pivot_results;
 
     $other_lists_query = $wpdb->prepare(
-        "SELECT voting_item_id, COUNT(DISTINCT voting_list_id) as other_lists_count
-         FROM $table_name 
-         WHERE voting_list_id != %d AND voting_item_id IN ($item_ids_placeholders)
-         GROUP BY voting_item_id",
+        "SELECT pivot.voting_item_id, COUNT(DISTINCT pivot.voting_list_id) as other_lists_count
+         FROM $table_name pivot
+         INNER JOIN {$wpdb->posts} wpp ON wpp.ID = pivot.voting_list_id AND wpp.post_status = 'publish'
+         WHERE pivot.voting_list_id != %d AND pivot.voting_item_id IN ($item_ids_placeholders)
+         GROUP BY pivot.voting_item_id",
         $voting_list_id,
         ...$voting_items_ids
     );
