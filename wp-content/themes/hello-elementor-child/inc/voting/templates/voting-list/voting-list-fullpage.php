@@ -174,14 +174,10 @@ if (!empty($voting_items_ids)) {
             $voting_list_id, $item_id
         ), ARRAY_A);
         
-        // Get how many other published lists this item appears in
-        $other_lists_count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT pivot.voting_list_id)
-             FROM $relations_table pivot
-             INNER JOIN {$wpdb->posts} wpp ON wpp.ID = pivot.voting_list_id AND wpp.post_status = 'publish'
-             WHERE pivot.voting_item_id = %d AND pivot.voting_list_id != %d",
-            $item_id, $voting_list_id
-        )) ?: 0;
+        // Count other published lists via _voting_items meta (matches single item page)
+        $other_lists_count = function_exists('yuv_get_other_lists_count')
+            ? yuv_get_other_lists_count($item_id, $voting_list_id)
+            : 0;
         
         $default_image = get_the_post_thumbnail_url($item_id, 'medium');
         $default_desc = get_post_meta($item_id, '_short_description', true);

@@ -93,16 +93,10 @@ if (!empty($voting_items_ids)) {
     $pivot_results = $wpdb->get_results($pivot_query, OBJECT_K);
     $pivot_data_cache = $pivot_results;
 
-    $other_lists_query = $wpdb->prepare(
-        "SELECT pivot.voting_item_id, COUNT(DISTINCT pivot.voting_list_id) as other_lists_count
-         FROM $table_name pivot
-         INNER JOIN {$wpdb->posts} wpp ON wpp.ID = pivot.voting_list_id AND wpp.post_status = 'publish'
-         WHERE pivot.voting_list_id != %d AND pivot.voting_item_id IN ($item_ids_placeholders)
-         GROUP BY pivot.voting_item_id",
-        $voting_list_id,
-        ...$voting_items_ids
-    );
-    $other_lists_results = $wpdb->get_results($other_lists_query, OBJECT_K);
+    // Count other published lists via _voting_items meta (matches single item page)
+    $other_lists_map = function_exists('yuv_get_other_lists_count_batch')
+        ? yuv_get_other_lists_count_batch($voting_items_ids, $voting_list_id)
+        : [];
 }
 
 if ($query->have_posts()) :
@@ -128,7 +122,7 @@ if ($query->have_posts()) :
         $image      = !empty($pivot_data) && !empty($pivot_data['custom_image_url']) ? $pivot_data['custom_image_url'] : $default_image;
         $video_url = !empty($pivot_data) && !empty($pivot_data['url']) ? $pivot_data['url'] : get_post_meta($item_id, '_item_url', true);
         
-        $other_lists_count = isset($other_lists_results[$item_id]) ? (int)$other_lists_results[$item_id]->other_lists_count : 0;
+        $other_lists_count = isset($other_lists_map[$item_id]) ? (int)$other_lists_map[$item_id] : 0;
 
 
         // Render voting card

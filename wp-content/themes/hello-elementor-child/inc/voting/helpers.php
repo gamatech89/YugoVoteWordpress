@@ -196,6 +196,73 @@ function get_voting_list_count_by_category($term_id)
 
 
 /**
+ * Count how many OTHER published voting lists an item appears in.
+ * Uses _voting_items post meta — same source as the single item page — so counts always match.
+ *
+ * @param int $item_id         ID of the voting item.
+ * @param int $current_list_id ID of the list currently being viewed (excluded from count).
+ * @return int
+ */
+function yuv_get_other_lists_count( $item_id, $current_list_id ) {
+    $query = new WP_Query( [
+        'post_type'      => 'voting_list',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+        'post__not_in'   => [ (int) $current_list_id ],
+        'meta_query'     => [ [
+            'key'     => '_voting_items',
+            'value'   => '"' . (int) $item_id . '"',
+            'compare' => 'LIKE',
+        ] ],
+    ] );
+    $count = (int) $query->found_posts;
+    wp_reset_postdata();
+    return $count;
+}
+
+/**
+ * Build an other-lists count map for multiple items in one go.
+ * Returns [ item_id => count, ... ] using _voting_items meta.
+ *
+ * @param int[]  $item_ids        IDs of voting items to count for.
+ * @param int    $current_list_id ID of the list currently being viewed (excluded).
+ * @return int[]
+ */
+function yuv_get_other_lists_count_batch( array $item_ids, $current_list_id ) {
+    if ( empty( $item_ids ) ) return [];
+
+    global $wpdb;
+
+    // Pull meta_value for every published voting_list except the current one
+    $lists = $wpdb->get_results( $wpdb->prepare(
+        "SELECT p.ID, pm.meta_value
+         FROM {$wpdb->posts} p
+         INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_voting_items'
+         WHERE p.post_type = 'voting_list'
+           AND p.post_status = 'publish'
+           AND p.ID != %d",
+        (int) $current_list_id
+    ) );
+
+    $counts = array_fill_keys( $item_ids, 0 );
+
+    foreach ( $lists as $list ) {
+        $stored = maybe_unserialize( $list->meta_value );
+        if ( ! is_array( $stored ) ) continue;
+        // Cast both sides to string for comparison (WP stores IDs as strings in serialised arrays)
+        $stored = array_map( 'strval', $stored );
+        foreach ( $item_ids as $item_id ) {
+            if ( in_array( (string) $item_id, $stored, true ) ) {
+                $counts[ $item_id ]++;
+            }
+        }
+    }
+
+    return $counts;
+}
+
+/**
  * Get featured posts for a specific category term (if set via meta field 'is_featured' = 1).
  *
  * @param int   $term_id    The term ID to pull featured posts from.
