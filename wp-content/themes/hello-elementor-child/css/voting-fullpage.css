@@ -424,6 +424,7 @@
 
 .vlp-item__desc-wrapper {
   margin-bottom: 0;
+  max-width: 85%;
 }
 
 .vlp-item__desc-wrapper .vlp-item__desc {
