@@ -287,7 +287,7 @@
                 if (normalize(window.location.href) !== normalize(showdownUrl)) {
                     html += '<section class="sd-ranked">';
                     html += '<div class="sd-ranked__expand">';
-                    html += '<a href="' + Showdown.escHtml(showdownUrl) + '" class="sd-btn sd-btn--outline sd-btn--full">';
+                    html += '<a href="' + Showdown.escHtml(showdownUrl) + '" class="sd-btn--cta">';
                     html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
                     html += '</a>';
                     html += '</div></section>';

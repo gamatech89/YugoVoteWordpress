@@ -172,7 +172,7 @@ function yuv_showdown_shortcode($atts) {
                     <?php if (get_the_ID() != $showdown_id): ?>
                         <section class="sd-ranked">
                             <div class="sd-ranked__expand">
-                                <a href="<?php echo esc_url(get_permalink($showdown_id)); ?>" class="sd-btn sd-btn--outline sd-btn--full">
+                                <a href="<?php echo esc_url(get_permalink($showdown_id)); ?>" class="sd-btn--cta">
                                     <i class="ri-bar-chart-2-line"></i>
                                     Pogledaj kompletan poredak
                                 </a>
