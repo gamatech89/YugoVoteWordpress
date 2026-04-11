@@ -238,20 +238,17 @@ function submit_vote() {
         'voting_item_id' => $voting_item_id 
     ]));
 
-    // Step C: Insert the new vote
-    $insert_data = array_merge($where_user_or_ip, [
+    // Step C: Insert the new vote — always include both user_id and ip_address
+    $insert_data = [
         'voting_list_id'  => $voting_list_id,
         'voting_item_id'  => $voting_item_id,
-        'base_vote_value' => $base_vote_value,  // What user selected (1-10)
-        'vote_value'      => $vote_value,       // Final value with bonus
-        'expert_bonus'    => $expert_bonus,     // Bonus applied (0-4+)
-        'created_at'      => current_time('mysql', 1) // GMT time
-    ]);
-    
-    // If it's a guest, user_id will not be in $where_user_or_ip, so add explicitly if it's 0 for the column
-    if ($user_id === 0) {
-        $insert_data['user_id'] = null; // Or 0, depending on your DB column definition for guest (NULL is better)
-    }
+        'base_vote_value' => $base_vote_value,
+        'vote_value'      => $vote_value,
+        'expert_bonus'    => $expert_bonus,
+        'ip_address'      => $ip_address,
+        'user_id'         => $user_id > 0 ? $user_id : null,
+        'created_at'      => current_time('mysql', 1)
+    ];
 
     $inserted = $wpdb->insert($table, $insert_data);
 

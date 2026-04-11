@@ -40,7 +40,8 @@
 }
 
 .sd-dark .sd-ranked__name {
-  color: var(--sd-text);
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .sd-dark .sd-ranked__desc {
@@ -52,7 +53,8 @@
 }
 
 .sd-dark .sd-ranked__stats {
-  color: var(--sd-text-muted);
+  color: var(--sd-green);
+  font-weight: 600;
 }
 
 .sd-dark .sd-ranked__item {
@@ -799,7 +801,8 @@
 .sd-podium__name {
   font-family: var(--sd-font-heading);
   font-size: 0.9rem;
-  color: var(--sd-text);
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.45);
 }
 
 .sd-podium__item--gold .sd-podium__name {
@@ -808,12 +811,12 @@
 
 .sd-podium__wins {
   font-size: 0.7rem;
-  color: var(--sd-text-muted);
+  color: rgba(255,255,255,0.6);
 }
 
 .sd-podium__wins strong {
-  color: var(--sd-green);
-  font-weight: 600;
+  color: #FD6555;
+  font-weight: 700;
 }
 
 /* ========== RANKED LIST ========== */
@@ -829,7 +832,37 @@
   color: var(--sd-text-muted);
   letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin: 20px 0 10px;
+}
+
+.sd-ranked__expand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sd-ranked__archive-link {
+  font-size: 0.85rem;
+  color: var(--sd-text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.sd-ranked__archive-link:hover {
+  color: var(--sd-gold);
+}
+
+.sd-ranked__archive-link i {
+  font-size: 1.1rem;
+}
+
+.sd-btn--full {
+  width: 100%;
 }
 
 .sd-ranked__list {

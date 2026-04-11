@@ -380,6 +380,22 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                 </div>
 
                 <ul class="cs-menu-list">
+                    <?php 
+                    // Add Top Navigation links to mobile menu
+                    $top_menu_items = wp_get_nav_menu_items(13);
+                    if ($top_menu_items) :
+                        foreach ($top_menu_items as $item) : ?>
+                            <li class="cs-menu-item cs-menu-item--topbar desktop-hide" style="--cat-color: var(--ygv-primary);">
+                                <div class="cs-mobile-link-wrapper">
+                                    <a href="<?php echo esc_url($item->url); ?>" class="cs-menu-link">
+                                        <span class="cs-link-text"><?php echo esc_html($item->title); ?></span>
+                                    </a>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                        <li class="cs-menu-divider desktop-hide"></li>
+                    <?php endif; ?>
+
                     <?php foreach ($parent_terms as $parent) : ?>
                         <?php
                         $parent_link = get_term_link($parent);

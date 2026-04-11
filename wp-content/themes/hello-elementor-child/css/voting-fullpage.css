@@ -878,7 +878,7 @@
 
 @media (max-width: 768px) {
   .vlp-hero {
-    padding: 40px 16px 60px;
+    padding: 30px 16px 50px;
   }
 
   .vlp-hero__title {
@@ -947,6 +947,11 @@
 
   .vlp-list-header {
     padding: 24px 20px;
+  }
+
+  .vlp-list-section {
+    padding: 0 12px 60px;
+    margin-top: -30px;
   }
 
   .vlp-list-header__title {

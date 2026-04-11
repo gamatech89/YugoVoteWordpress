@@ -607,7 +607,7 @@
           ) {
             response.data.forEach((vote) => {
               const itemId = parseInt(vote.voting_item_id, 10);
-              const voteVal = parseInt(vote.vote_value, 10);
+              const voteVal = parseInt(vote.base_vote_value, 10);
               this.assignedVoteValueToItem[String(voteVal)] = itemId;
               this.assignedItemToVoteValue[String(itemId)] = voteVal;
             });

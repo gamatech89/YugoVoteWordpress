@@ -41,9 +41,10 @@ function yuv_showdown_shortcode($atts) {
 
     ob_start();
     ?>
-    <div class="sd-page" 
+    <div class="sd-page"
          id="yuv-showdown-arena"
          data-showdown-id="<?php echo esc_attr($showdown_id); ?>"
+         data-showdown-url="<?php echo esc_url(get_permalink($showdown_id)); ?>"
          data-status="<?php echo esc_attr($status); ?>"
          data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
          data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
@@ -157,31 +158,24 @@ function yuv_showdown_shortcode($atts) {
                                     <?php endif; ?>
                                 </div>
                                 <h3 class="sd-podium__name"><?php echo esc_html($entry['name']); ?></h3>
-                                <p class="sd-podium__wins">Pobede: <strong><?php echo $entry['wins']; ?></strong></p>
+                                <p class="sd-podium__wins">
+                                    Pobede: <strong><?php 
+                                        $win_rate = $entry['sessions'] > 0 ? round(($entry['wins'] / $entry['sessions']) * 100) : 0;
+                                        echo $win_rate; 
+                                    ?>%</strong>
+                                </p>
                             </div>
                         <?php endforeach; ?>
                     </section>
 
-                    <!-- Ranked list (4th and below) -->
-                    <?php if (count($leaderboard) > 3): ?>
+                    <!-- Link to full results on showdown's own page -->
+                    <?php if (get_the_ID() != $showdown_id): ?>
                         <section class="sd-ranked">
-                            <h2 class="sd-ranked__title">Ostali plasmani</h2>
-                            <div class="sd-ranked__list">
-                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry): ?>
-                                    <div class="sd-ranked__item">
-                                        <span class="sd-ranked__rank"><?php echo $rank + 4; ?></span>
-                                        <?php if (!empty($entry['image'])): ?>
-                                            <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
-                                        <?php endif; ?>
-                                        <div class="sd-ranked__info">
-                                            <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
-                                            <?php if (!empty($entry['description'])): ?>
-                                                <p class="sd-ranked__desc"><?php echo esc_html(wp_trim_words($entry['description'], 10)); ?></p>
-                                            <?php endif; ?>
-                                        </div>
-                                        <span class="sd-ranked__stats">Pobede: <strong><?php echo $entry['wins']; ?></strong></span>
-                                    </div>
-                                <?php endforeach; ?>
+                            <div class="sd-ranked__expand">
+                                <a href="<?php echo esc_url(get_permalink($showdown_id)); ?>" class="sd-btn sd-btn--outline sd-btn--full">
+                                    <i class="ri-bar-chart-2-line"></i>
+                                    Pogledaj kompletan poredak
+                                </a>
                             </div>
                         </section>
                     <?php endif; ?>

@@ -541,10 +541,36 @@ button.ygv-header__search-trigger:hover,
 /* Override mega menu styles for frame layout */
 .ygv-header__menu .cs-mega-menu-wrapper {
   width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ygv-header__menu .cs-menu-list {
   justify-content: flex-end;
+}
+
+/* Mobile menu topbar links styles */
+.cs-menu-item--topbar .cs-menu-link {
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  opacity: 0.8;
+}
+
+.cs-menu-divider {
+  height: 1px;
+  background: var(--ygv-border, #e2e8f0);
+  margin: 10px 20px;
+  list-style: none;
+}
+
+.desktop-hide {
+  display: none !important;
+}
+
+@media (max-width: 991px) {
+  .desktop-hide {
+    display: block !important;
+  }
 }
 
 /* Search Overlay */

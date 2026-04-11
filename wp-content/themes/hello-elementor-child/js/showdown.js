@@ -58,6 +58,7 @@
 
             // Bind events
             this.bindPicks();
+            this.bindResults();
         },
 
         shuffleArray: function (arr) {
@@ -99,6 +100,10 @@
                 const slot = $(this).data("side") === "left" ? "a" : "b";
                 self.pickWinner(slot);
             });
+        },
+
+        bindResults: function () {
+            // no-op: expand button removed, full results linked to showdown page
         },
 
         pickWinner: function (winnerSlot) {
@@ -268,30 +273,25 @@
                 if (entry.image) html += '<img class="sd-podium__avatar" src="' + entry.image + '" alt="' + Showdown.escHtml(entry.name) + '">';
                 html += '</div>';
                 html += '<h3 class="sd-podium__name">' + Showdown.escHtml(entry.name) + '</h3>';
-                html += '<p class="sd-podium__wins">Pobede: <strong>' + entry.wins + '</strong></p>';
+                
+                const winRate = entry.sessions > 0 ? Math.round((entry.wins / entry.sessions) * 100) : 0;
+                html += '<p class="sd-podium__wins">Pobede: <strong>' + winRate + '%</strong></p>';
                 html += '</div>';
             }
             html += '</section>';
 
-            // Ranked list with staggered delays
-            if (leaderboard.length > 3) {
-                html += '<section class="sd-ranked">';
-                html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
-                html += '<div class="sd-ranked__list">';
-                for (let i = 3; i < leaderboard.length; i++) {
-                    const entry = leaderboard[i];
-                    const delay = 0.6 + (i - 3) * 0.08;
-                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
-                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
-                    if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
-                    html += '<div class="sd-ranked__info">';
-                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
-                    if (entry.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(entry.description) + '</p>';
-                    html += '</div>';
-                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + entry.wins + '</strong></span>';
-                    html += '</div>';
+            // Link to full results on showdown's own page
+            const showdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
+            if (showdownUrl) {
+                const normalize = function(u) { return u.replace(/\/+$/, ''); };
+                if (normalize(window.location.href) !== normalize(showdownUrl)) {
+                    html += '<section class="sd-ranked">';
+                    html += '<div class="sd-ranked__expand">';
+                    html += '<a href="' + Showdown.escHtml(showdownUrl) + '" class="sd-btn sd-btn--outline sd-btn--full">';
+                    html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
+                    html += '</a>';
+                    html += '</div></section>';
                 }
-                html += '</div></section>';
             }
 
             this.showResults($results, html);
@@ -333,26 +333,18 @@
             }
             html += '</section>';
 
-            // Ranked list with staggered delays
-            if (ranked.length > 3) {
-                html += '<section class="sd-ranked">';
-                html += '<h2 class="sd-ranked__title">Ostali plasmani</h2>';
-                html += '<div class="sd-ranked__list">';
-                for (let i = 3; i < ranked.length; i++) {
-                    const name = ranked[i];
-                    const item = Showdown.items.find(function (it) { return it.name === name; });
-                    const delay = 0.6 + (i - 3) * 0.08;
-                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
-                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
-                    if (item && (item.image_url || item.image)) {
-                        html += '<img class="sd-ranked__avatar" src="' + (item.image_url || item.image) + '" alt="">';
-                    }
-                    html += '<div class="sd-ranked__info">';
-                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
-                    html += '</div>';
-                    html += '</div>';
+            // Link to full results on showdown's own page
+            const localShowdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
+            if (localShowdownUrl) {
+                const normalize = function(u) { return u.replace(/\/+$/, ''); };
+                if (normalize(window.location.href) !== normalize(localShowdownUrl)) {
+                    html += '<section class="sd-ranked">';
+                    html += '<div class="sd-ranked__expand">';
+                    html += '<a href="' + Showdown.escHtml(localShowdownUrl) + '" class="sd-btn sd-btn--outline sd-btn--full">';
+                    html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
+                    html += '</a>';
+                    html += '</div></section>';
                 }
-                html += '</div></section>';
             }
 
             this.showResults($results, html);
