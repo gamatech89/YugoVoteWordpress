@@ -13,11 +13,22 @@ if (!defined('ABSPATH')) exit;
  * Shows the active showdown voting experience
  */
 function yuv_showdown_shortcode($atts) {
+    $atts = shortcode_atts(['id' => 0], $atts);
     $manager = new YUV_Showdown_Manager();
-    
-    // Try to get the active showdown
-    $showdown = $manager->get_active_showdown();
-    
+
+    // Load specific showdown by ID if provided (used by single-yuv_showdown.php)
+    $showdown = null;
+    if (!empty($atts['id'])) {
+        $candidate = get_post(intval($atts['id']));
+        if ($candidate && $candidate->post_type === 'yuv_showdown') {
+            $showdown = $candidate;
+        }
+    }
+
+    // Fall back to active → latest completed
+    if (!$showdown) {
+        $showdown = $manager->get_active_showdown();
+    }
     if (!$showdown) {
         $showdown = $manager->get_latest_completed();
         if (!$showdown) {
@@ -168,8 +179,35 @@ function yuv_showdown_shortcode($atts) {
                         <?php endforeach; ?>
                     </section>
 
-                    <!-- Link to full results on showdown's own page -->
-                    <?php if (get_the_ID() != $showdown_id): ?>
+                    <?php $is_own_page = (get_the_ID() == $showdown_id); ?>
+
+                    <?php if ($is_own_page && count($leaderboard) > 3): ?>
+                        <!-- Full ranked list — shown only on the showdown's own page -->
+                        <section class="sd-ranked">
+                            <h2 class="sd-ranked__title">Kompletni poredak</h2>
+                            <div class="sd-ranked__list">
+                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry):
+                                    $win_rate = $entry['sessions'] > 0 ? round(($entry['wins'] / $entry['sessions']) * 100) : 0;
+                                ?>
+                                    <div class="sd-ranked__item">
+                                        <span class="sd-ranked__rank"><?php echo $rank + 4; ?></span>
+                                        <?php if (!empty($entry['image'])): ?>
+                                            <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
+                                        <?php endif; ?>
+                                        <div class="sd-ranked__info">
+                                            <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
+                                            <?php if (!empty($entry['description'])): ?>
+                                                <p class="sd-ranked__desc"><?php echo esc_html(wp_trim_words($entry['description'], 10)); ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span class="sd-ranked__stats">Pobede: <strong><?php echo $win_rate; ?>%</strong></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+
+                    <?php elseif (!$is_own_page): ?>
+                        <!-- Redirect button — shown on homepage or any other page -->
                         <section class="sd-ranked">
                             <div class="sd-ranked__expand">
                                 <a href="<?php echo esc_url(get_permalink($showdown_id)); ?>" class="sd-btn--cta">

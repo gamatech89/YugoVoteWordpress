@@ -280,18 +280,37 @@
             }
             html += '</section>';
 
-            // Link to full results on showdown's own page
+            // Full list on own page, redirect button elsewhere
             const showdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            if (showdownUrl) {
-                const normalize = function(u) { return u.replace(/\/+$/, ''); };
-                if (normalize(window.location.href) !== normalize(showdownUrl)) {
-                    html += '<section class="sd-ranked">';
-                    html += '<div class="sd-ranked__expand">';
-                    html += '<a href="' + Showdown.escHtml(showdownUrl) + '" class="sd-btn--cta">';
-                    html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
-                    html += '</a>';
-                    html += '</div></section>';
+            const normalize = function(u) { return u.replace(/\/+$/, ''); };
+            const isOwnPage = showdownUrl && normalize(window.location.href) === normalize(showdownUrl);
+
+            if (isOwnPage && leaderboard.length > 3) {
+                html += '<section class="sd-ranked">';
+                html += '<h2 class="sd-ranked__title">Kompletni poredak</h2>';
+                html += '<div class="sd-ranked__list">';
+                for (let i = 3; i < leaderboard.length; i++) {
+                    const entry = leaderboard[i];
+                    const delay = 0.1 + (i - 3) * 0.05;
+                    const winRate = entry.sessions > 0 ? Math.round((entry.wins / entry.sessions) * 100) : 0;
+                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
+                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
+                    if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
+                    html += '<div class="sd-ranked__info">';
+                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
+                    if (entry.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(entry.description) + '</p>';
+                    html += '</div>';
+                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + winRate + '%</strong></span>';
+                    html += '</div>';
                 }
+                html += '</div></section>';
+            } else if (!isOwnPage && showdownUrl) {
+                html += '<section class="sd-ranked">';
+                html += '<div class="sd-ranked__expand">';
+                html += '<a href="' + Showdown.escHtml(showdownUrl) + '" class="sd-btn--cta">';
+                html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
+                html += '</a>';
+                html += '</div></section>';
             }
 
             this.showResults($results, html);
@@ -333,18 +352,37 @@
             }
             html += '</section>';
 
-            // Link to full results on showdown's own page
+            // Full list on own page, redirect button elsewhere
             const localShowdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            if (localShowdownUrl) {
-                const normalize = function(u) { return u.replace(/\/+$/, ''); };
-                if (normalize(window.location.href) !== normalize(localShowdownUrl)) {
-                    html += '<section class="sd-ranked">';
-                    html += '<div class="sd-ranked__expand">';
-                    html += '<a href="' + Showdown.escHtml(localShowdownUrl) + '" class="sd-btn sd-btn--outline sd-btn--full">';
-                    html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
-                    html += '</a>';
-                    html += '</div></section>';
+            const normalizeLocal = function(u) { return u.replace(/\/+$/, ''); };
+            const isOwnPageLocal = localShowdownUrl && normalizeLocal(window.location.href) === normalizeLocal(localShowdownUrl);
+
+            if (isOwnPageLocal && ranked.length > 3) {
+                html += '<section class="sd-ranked">';
+                html += '<h2 class="sd-ranked__title">Kompletni poredak</h2>';
+                html += '<div class="sd-ranked__list">';
+                for (let i = 3; i < ranked.length; i++) {
+                    const name = ranked[i];
+                    const item = Showdown.items.find(function (it) { return it.name === name; });
+                    const delay = 0.6 + (i - 3) * 0.08;
+                    html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
+                    html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
+                    if (item && (item.image_url || item.image)) {
+                        html += '<img class="sd-ranked__avatar" src="' + (item.image_url || item.image) + '" alt="">';
+                    }
+                    html += '<div class="sd-ranked__info">';
+                    html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
+                    html += '</div>';
+                    html += '</div>';
                 }
+                html += '</div></section>';
+            } else if (!isOwnPageLocal && localShowdownUrl) {
+                html += '<section class="sd-ranked">';
+                html += '<div class="sd-ranked__expand">';
+                html += '<a href="' + Showdown.escHtml(localShowdownUrl) + '" class="sd-btn--cta">';
+                html += '<i class="ri-bar-chart-2-line"></i> Pogledaj kompletan poredak';
+                html += '</a>';
+                html += '</div></section>';
             }
 
             this.showResults($results, html);
