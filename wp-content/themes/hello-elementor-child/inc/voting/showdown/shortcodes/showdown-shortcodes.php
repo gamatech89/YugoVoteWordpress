@@ -59,11 +59,11 @@ function yuv_showdown_shortcode($atts) {
          data-status="<?php echo esc_attr($status); ?>"
          data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
          data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
-         style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>"
+         style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>"
          >
         
         <!-- Header (hidden when showing results) -->
-        <header class="showdown-header" id="sd-header" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+        <header class="showdown-header" id="sd-header" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
             <div class="showdown-badge">
                 <i class="ri-sword-line"></i>
                 Može biti samo jedan
@@ -77,7 +77,7 @@ function yuv_showdown_shortcode($atts) {
         </header>
 
         <!-- Progress -->
-        <div class="sd-progress" id="sd-progress" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+        <div class="sd-progress" id="sd-progress" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
             <div class="sd-progress__info">
                 <span class="sd-progress__round" id="sd-progress-round">Runda 1 od <?php echo count($items) - 1; ?></span>
                 <span class="sd-progress__remaining">Preostalo: <strong id="sd-progress-remaining"><?php echo count($items); ?></strong> učesnika</span>
@@ -88,7 +88,7 @@ function yuv_showdown_shortcode($atts) {
         </div>
 
         <!-- Arena (two cards side by side) -->
-        <div class="sd-arena" id="sd-arena" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+        <div class="sd-arena" id="sd-arena" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
             
             <!-- Fighter A -->
             <div class="sd-fighter" id="sd-fighter-a" data-side="left">
@@ -128,7 +128,7 @@ function yuv_showdown_shortcode($atts) {
         </div>
 
         <!-- Hint -->
-        <p class="sd-hint" id="sd-hint" style="<?php echo ($has_played || $status === 'completed') ? 'display:none' : ''; ?>">
+        <p class="sd-hint" id="sd-hint" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
             <i class="ri-cursor-line"></i>
             Klikni na karticu ili dugme da izabereš pobednika
         </p>
@@ -136,14 +136,14 @@ function yuv_showdown_shortcode($atts) {
     </div><!-- /.sd-page -->
 
     <!-- Results Screen (fixed overlay, light theme, matching mockup) -->
-    <div id="sd-results" class="sd-results-screen <?php echo ($has_played || $status === 'completed') ? 'sd-results-screen--visible' : ''; ?>">
+    <div id="sd-results" class="sd-results-screen <?php echo ($status === 'completed') ? 'sd-results-screen--visible' : ''; ?>">
             
             <?php if ($has_played || $status === 'completed'): ?>
                 <!-- Results Header -->
                 <header class="showdown-header sd-results-header">
                     <div class="showdown-badge">
-                        <i class="ri-trophy-fill"></i>
-                        Rezultati
+                        <i class="ri-sword-line"></i>
+                        Može biti samo jedan
                     </div>
                     <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
                     <p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>
@@ -238,7 +238,7 @@ function yuv_showdown_archive_shortcode($atts) {
     $archive = $manager->get_archive(intval($atts['count']));
 
     if (empty($archive)) {
-        return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-archive-line"></i></div><h3 class="sd-empty__title">Nema prethodnih Showdown-ova</h3><p class="sd-empty__desc">Još uvek nema završenih takmičenja.</p></div></div>';
+        return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-archive-line"></i></div><h3 class="sd-empty__title">Nema prethodnih dvoboja</h3><p class="sd-empty__desc">Još uvek nema završenih takmičenja.</p></div></div>';
     }
 
     ob_start();
@@ -250,7 +250,7 @@ function yuv_showdown_archive_shortcode($atts) {
                 <i class="ri-archive-line"></i>
                 Arhiva
             </div>
-            <h1 class="showdown-title">Prethodni Showdown-ovi</h1>
+            <h1 class="showdown-title">Prethodni dvoboji</h1>
             <p class="showdown-subtitle">Pogledaj rezultate završenih takmičenja</p>
         </header>
 
@@ -286,10 +286,6 @@ function yuv_showdown_archive_shortcode($atts) {
                     <?php endif; ?>
 
                     <div class="sd-archive-card__footer">
-                        <span class="sd-archive-card__participants">
-                            <i class="ri-group-line"></i>
-                            <?php echo $item['total_sessions']; ?> glasača
-                        </span>
                         <a href="<?php echo esc_url(get_permalink($item['id'])); ?>" class="sd-archive-card__play">
                             Pogledaj <i class="ri-arrow-right-s-line"></i>
                         </a>
