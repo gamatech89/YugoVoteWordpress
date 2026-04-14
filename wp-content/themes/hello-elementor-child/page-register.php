@@ -76,7 +76,7 @@ wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templat
             <div class="ygv-auth-branding__logo">
                 <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="YugoVote Mascot" class="ygv-auth-mascot">
             </div>
-            <h1 class="ygv-auth-branding__title">YugoVote</h1>
+            <h1 class="ygv-auth-branding__title">Yu Go Vote</h1>
             <p class="ygv-auth-branding__tagline">Pridruži se zajednici glasača!</p>
             <div class="ygv-auth-branding__features">
                 <div class="ygv-auth-feature">
@@ -101,8 +101,8 @@ wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templat
             <div class="ygv-auth-form-card">
                 <!-- Mobile Logo -->
                 <div class="ygv-auth-mobile-logo">
-                    <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="YugoVote" width="60">
-                    <span>YugoVote</span>
+                    <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="Yu Go Vote" width="60">
+                    <span>Yu Go Vote</span>
                 </div>
                 
                 <h2 class="ygv-auth-form-title">Kreiraj nalog</h2>

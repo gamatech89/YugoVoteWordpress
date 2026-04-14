@@ -141,8 +141,8 @@
 }
 
 .sd-dark .sd-results-header .showdown-badge {
-  background: linear-gradient(135deg, var(--sd-gold) 0%, #f0a500 100%);
-  color: #0c1029;
+  background: #FD6555;
+  color: #fff;
 }
 
 .sd-dark .sd-archive-header .showdown-badge {
@@ -220,7 +220,7 @@
   background: var(--sd-secondary);
   color: #fff;
   font-family: var(--sd-font-heading);
-  font-size: 0.72rem;
+  font-size: 1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 4px 14px;
@@ -237,13 +237,13 @@
   font-size: 40px;
   color: #ffffff;
   margin-bottom: 2px;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   line-height: 1.15;
 }
 
 .showdown-subtitle {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ========== PROGRESS BAR ========== */
@@ -387,13 +387,11 @@
 .sd-fighter__img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(8, 10, 28, 0.96) 0%,
-    rgba(8, 10, 28, 0.55) 38%,
-    rgba(8, 10, 28, 0.1) 65%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(8, 10, 28, 0.96) 0%,
+      rgba(8, 10, 28, 0.55) 38%,
+      rgba(8, 10, 28, 0.1) 65%,
+      transparent 100%);
   pointer-events: none;
 }
 
@@ -686,7 +684,7 @@
    ==================================================== */
 
 .sd-results-header .showdown-badge {
-  background: linear-gradient(135deg, var(--sd-gold) 0%, #e88d00 100%);
+  background: #FD6555;
   color: #fff;
 }
 
@@ -802,7 +800,7 @@
   font-family: var(--sd-font-heading);
   font-size: 0.9rem;
   color: #ffffff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
 
 .sd-podium__item--gold .sd-podium__name {
@@ -811,7 +809,7 @@
 
 .sd-podium__wins {
   font-size: 0.7rem;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .sd-podium__wins strong {
@@ -1277,11 +1275,11 @@
 
   .sd-progress__round {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 255, 255, 0.9);
   }
 
   .sd-progress__remaining {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .sd-progress__remaining strong {
@@ -1293,8 +1291,11 @@
   }
 
   .sd-arena {
+    display: flex;
     flex-direction: column;
     gap: 0;
+    width: 100%;
+    align-items: center;
   }
 
   .sd-vs {
@@ -1306,7 +1307,7 @@
     width: 36px;
     height: 36px;
     font-size: 0.8rem;
-    box-shadow: 0 0 0 3px rgba(8,10,28,0.8), 0 2px 8px rgba(254, 101, 85, 0.3);
+    box-shadow: 0 0 0 3px rgba(8, 10, 28, 0.8), 0 2px 8px rgba(254, 101, 85, 0.3);
     order: 1;
     flex-shrink: 0;
     z-index: 10;
@@ -1321,7 +1322,8 @@
   }
 
   .sd-fighter {
-    min-height: 220px;
+    width: 100%;
+    min-height: 240px;
     border-radius: var(--sd-radius-sm);
   }
 
@@ -1361,7 +1363,7 @@
   .sd-hint {
     font-size: 0.68rem;
     padding: 6px 0 0;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .sd-hint i {

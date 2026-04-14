@@ -292,12 +292,19 @@ function submit_vote() {
         $voting_list_id, $voting_item_id
     ));
 
+    // Get updated grand total for the entire list
+    $new_list_total = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d",
+        $voting_list_id
+    ));
+
     // Return success with bonus info for UI feedback
     $response = [
         'message' => 'Vote submitted.',
         'base_vote' => $base_vote_value,
         'final_vote' => $vote_value,
         'new_total_score' => floatval($new_item_score ?: 0),
+        'new_list_total_score' => floatval($new_list_total ?: 0),
     ];
     
     if ($expert_bonus > 0) {
@@ -424,10 +431,17 @@ function remove_vote() {
             "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d AND voting_item_id = %d",
             $voting_list_id, $voting_item_id
         ));
-        
+
+        // Get updated grand total for the entire list
+        $new_list_total = $wpdb->get_var($wpdb->prepare(
+            "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d",
+            $voting_list_id
+        ));
+
         wp_send_json_success([
             "message" => "Vote removed.",
-            "new_total_score" => floatval($new_score ?: 0)
+            "new_total_score" => floatval($new_score ?: 0),
+            "new_list_total_score" => floatval($new_list_total ?: 0),
         ]);
     }
 }

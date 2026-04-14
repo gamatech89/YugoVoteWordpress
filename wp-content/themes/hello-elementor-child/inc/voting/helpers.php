@@ -217,7 +217,6 @@ function yuv_get_other_lists_count( $item_id, $current_list_id ) {
         ] ],
     ] );
     $count = (int) $query->found_posts;
-    wp_reset_postdata();
     return $count;
 }
 

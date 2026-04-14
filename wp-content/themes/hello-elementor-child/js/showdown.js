@@ -23,11 +23,51 @@
             if (!$page.length) return;
 
             this.showdownId = parseInt($page.data("showdown-id"));
-            const hasPlayed = $page.data("has-played") === 1 || $page.data("has-played") === "1";
             const status = $page.data("status");
 
-            if (hasPlayed || status === "completed") {
-                return;
+            // If it's already completed by status, server-side render is enough
+            if (status === "completed") return;
+
+            // If it's active, we double check via AJAX to bypass LiteSpeed cache issues for guests
+            this.checkStatusAndInit($page);
+        },
+
+        checkStatusAndInit: function ($page) {
+            const self = this;
+            
+            $.ajax({
+                url: yuvShowdown.ajaxurl,
+                method: "POST",
+                data: {
+                    action: "yuv_showdown_get_items",
+                    nonce: yuvShowdown.nonce,
+                    showdown_id: self.showdownId,
+                },
+                success: function (response) {
+                    if (response.success && response.data.has_played) {
+                        // User has played, show results immediately
+                        self.items = response.data.items;
+                        self.renderLeaderboard(
+                            response.data.leaderboard,
+                            response.data.total_players
+                        );
+                    } else {
+                        // User hasn't played, initialize the arena
+                        self.startArena($page);
+                    }
+                },
+                error: function () {
+                    // Fallback to local data if AJAX fails
+                    self.startArena($page);
+                }
+            });
+        },
+
+        startArena: function ($page) {
+            const hasPlayedServer = $page.data("has-played") === 1 || $page.data("has-played") === "1";
+            if (hasPlayedServer) {
+                // If even the server knows we played, and AJAX didn't catch it (rare), 
+                // we might want to hide, but usually we just start the arena if AJAX said OK.
             }
 
             try {
@@ -251,7 +291,7 @@
 
             let html = '';
             html += '<header class="showdown-header sd-results-header">';
-            html += '<div class="showdown-badge"><i class="ri-trophy-fill"></i> Rezultati</div>';
+            html += '<div class="showdown-badge"><i class="ri-sword-line"></i> Može biti samo jedan</div>';
             html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
             html += '<p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>';
             html += '</header>';
@@ -323,7 +363,7 @@
 
             let html = '';
             html += '<header class="showdown-header sd-results-header">';
-            html += '<div class="showdown-badge"><i class="ri-trophy-fill"></i> Tvoji Rezultati</div>';
+            html += '<div class="showdown-badge"><i class="ri-sword-line"></i> Može biti samo jedan</div>';
             html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
             html += '<p class="showdown-subtitle">Evo tvog ličnog poretka</p>';
             html += '</header>';

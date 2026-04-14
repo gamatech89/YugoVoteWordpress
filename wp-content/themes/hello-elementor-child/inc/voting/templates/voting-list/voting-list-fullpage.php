@@ -184,8 +184,8 @@ if (!empty($voting_items_ids)) {
         
         $items[] = [
             'id'          => $item_id,
-            'title'       => get_the_title(),
-            'permalink'   => get_permalink(),
+            'title'       => get_the_title($item_id),
+            'permalink'   => get_permalink($item_id),
             'image'       => (!empty($pivot_data['custom_image_url']) ? $pivot_data['custom_image_url'] : $default_image) ?: get_stylesheet_directory_uri() . '/assets/images/placeholder.jpg',
             'short_desc'  => !empty($pivot_data['short_description']) ? $pivot_data['short_description'] : $default_desc,
             'video_url'   => !empty($pivot_data['url']) ? $pivot_data['url'] : get_post_meta($item_id, '_item_url', true),
@@ -748,7 +748,7 @@ if (!empty($voting_items_ids)) {
                     <span class="vlp-stat__label">Itema</span>
                 </div>
                 <div class="vlp-stat">
-                    <span class="vlp-stat__value"><?php echo number_format($total_score); ?></span>
+                    <span class="vlp-stat__value" id="vlp-total-score"><?php echo number_format($total_score); ?></span>
                     <span class="vlp-stat__label">Ukupno poena</span>
                 </div>
                 <!-- Voter count hidden until numbers are respectable
@@ -1380,11 +1380,17 @@ if (!empty($voting_items_ids)) {
                     const newScore = Math.round(parseFloat(data.data.new_total_score));
                     scoreEl.textContent = newScore.toLocaleString();
                     scoreEl.dataset.score = newScore;
-                    
+
                     // Reorder items based on new scores
                     reorderItems();
                 }
-                
+
+                // Update hero total score
+                if (data.data.new_list_total_score !== undefined) {
+                    const totalEl = document.getElementById('vlp-total-score');
+                    if (totalEl) totalEl.textContent = Math.round(data.data.new_list_total_score).toLocaleString();
+                }
+
                 // Update panel
                 updatePanel(itemId, value, itemEl, oldValue === undefined);
                 
@@ -1454,12 +1460,18 @@ if (!empty($voting_items_ids)) {
                         const newScore = Math.round(parseFloat(data.data.new_total_score));
                         scoreEl.textContent = newScore.toLocaleString();
                         scoreEl.dataset.score = newScore;
-                        
+
                         // Reorder items based on new scores
                         reorderItems();
                     }
+
+                    // Update hero total score
+                    if (data.data.new_list_total_score !== undefined) {
+                        const totalEl = document.getElementById('vlp-total-score');
+                        if (totalEl) totalEl.textContent = Math.round(data.data.new_list_total_score).toLocaleString();
+                    }
                 }
-                
+
                 // Remove from panel
                 const panelItem = document.querySelector('.vlp-panel__item[data-item-id="' + itemId + '"]');
                 if (panelItem) {

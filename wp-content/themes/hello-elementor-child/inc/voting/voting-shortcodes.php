@@ -423,11 +423,11 @@ if (!function_exists('cs_voting_mega_menu_shortcode')) {
                             $placeholders = implode(',', array_fill(0, count($category_term_ids), '%d'));
                             
                             $top_voted_lists = $wpdb->get_results($wpdb->prepare(
-                                "SELECT p.ID, p.post_title, COUNT(v.id) as vote_count
+                                "SELECT p.ID, p.post_title, COALESCE(SUM(v.vote_value), 0) as vote_count
                                 FROM {$wpdb->posts} p
                                 INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
                                 LEFT JOIN {$votes_table} v ON p.ID = v.voting_list_id
-                                WHERE p.post_type = 'voting_list' 
+                                WHERE p.post_type = 'voting_list'
                                 AND p.post_status = 'publish'
                                 AND tr.term_taxonomy_id IN ($placeholders)
                                 GROUP BY p.ID
