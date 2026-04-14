@@ -76,25 +76,28 @@ function ygv_get_default_level_config(): array {
             ]
         ],
         // XP thresholds - XP required to reach each level
+        // Levels 1-10 are set explicitly; beyond that the exponential formula takes over.
         'xp_thresholds' => [
-            1 => 0,
-            2 => 50,
-            3 => 120,
-            4 => 210,
-            5 => 320,
-            6 => 450,
-            7 => 600,
-            8 => 780,
-            9 => 1000,
-            10 => 1250,
-            // After level 10, each level requires 300 more XP
-            // This continues programmatically
+            1  => 0,
+            2  => 150,
+            3  => 350,
+            4  => 600,
+            5  => 900,
+            6  => 1250,
+            7  => 1650,
+            8  => 2100,
+            9  => 2600,
+            10 => 3200,
         ],
-        'xp_per_level_after_10' => 300, // XP increase per level after 10
+        // Base XP cost for the first step after level 10 (Level 10 → 11).
+        // Each subsequent step costs (xp_level_growth_rate)% more than the previous.
+        'xp_per_level_after_10' => 500,
+        // Compound growth rate per level (%). 5 = each level costs 5% more than the last.
+        'xp_level_growth_rate' => 5,
         'max_level' => 100,
         // List creation requirements
         'list_creation_category_level' => 10, // Category level required to create lists in that category
-        'list_creation_global_level' => 5,    // Global level required to create any list
+        'list_creation_global_level' => 10,   // Global level required to create any list
         // XP rewards
         'xp_per_vote' => 2,              // XP earned per vote cast
         'daily_vote_limit' => 50,        // Maximum votes per day that earn XP
@@ -137,7 +140,8 @@ function ygv_sanitize_level_config($input): array {
     }
     
     // Sanitize other settings
-    $sanitized['xp_per_level_after_10'] = absint($input['xp_per_level_after_10'] ?? 300);
+    $sanitized['xp_per_level_after_10'] = absint($input['xp_per_level_after_10'] ?? 500);
+    $sanitized['xp_level_growth_rate']  = max(0, min(50, (int)($input['xp_level_growth_rate'] ?? 5)));
     $sanitized['max_level'] = absint($input['max_level'] ?? 100);
     $sanitized['list_creation_category_level'] = absint($input['list_creation_category_level'] ?? 10);
     $sanitized['list_creation_global_level'] = absint($input['list_creation_global_level'] ?? 5);
@@ -235,22 +239,32 @@ function ygv_render_level_settings_page() {
             
             <hr style="margin: 30px 0;">
             
-            <h2>XP Settings</h2>
+            <h2>XP Progression (Levels 11+)</h2>
+            <p class="description">After level 10 the cost of each level grows exponentially. Each step costs a fixed percentage more than the previous one.</p>
             <table class="form-table">
                 <tr>
-                    <th scope="row">XP per Level (after 10)</th>
+                    <th scope="row">Base Increment (Level 10→11)</th>
                     <td>
-                        <input type="number" name="ygv_level_config[xp_per_level_after_10]" 
-                               value="<?php echo esc_attr($config['xp_per_level_after_10']); ?>" 
-                               min="100" max="1000" step="50" style="width: 80px;">
-                        <p class="description">XP required for each level after level 10 (default: 300)</p>
+                        <input type="number" name="ygv_level_config[xp_per_level_after_10]"
+                               value="<?php echo esc_attr($config['xp_per_level_after_10'] ?? 500); ?>"
+                               min="100" max="5000" step="50" style="width: 90px;"> XP
+                        <p class="description">XP cost of the first step after level 10. Default: 500</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Growth Rate per Level</th>
+                    <td>
+                        <input type="number" name="ygv_level_config[xp_level_growth_rate]"
+                               value="<?php echo esc_attr($config['xp_level_growth_rate'] ?? 5); ?>"
+                               min="0" max="30" step="1" style="width: 70px;"> %
+                        <p class="description">Each level costs this % more than the previous. 5% means Level 11→12 costs 5% more than 10→11, compounding. Default: 5%</p>
                     </td>
                 </tr>
                 <tr>
                     <th scope="row">Maximum Level</th>
                     <td>
-                        <input type="number" name="ygv_level_config[max_level]" 
-                               value="<?php echo esc_attr($config['max_level']); ?>" 
+                        <input type="number" name="ygv_level_config[max_level]"
+                               value="<?php echo esc_attr($config['max_level']); ?>"
                                min="50" max="200" style="width: 80px;">
                         <p class="description">Maximum achievable level (default: 100)</p>
                     </td>
@@ -322,26 +336,88 @@ function ygv_render_level_settings_page() {
         
         <hr style="margin: 30px 0;">
         
-        <h2>Current System Overview</h2>
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; max-width: 600px;">
-            <h4 style="margin-top: 0;">How XP is Earned:</h4>
-            <ul>
-                <li>🎯 <strong>Quizzes:</strong> 5-50 XP based on score (in quiz's category)</li>
-                <li>🗳️ <strong>Voting:</strong> 2 XP per vote (max 50 votes = 100 XP/day)</li>
-                <li>📝 <strong>List Creation:</strong> 50 XP (in list's category)</li>
-                <li>🏆 <strong>Tournament Prediction:</strong> 10 XP</li>
-                <li>👥 <strong>Referral:</strong> 100 XP (global)</li>
+        <h2>Level Progression Preview</h2>
+        <p class="description">
+            Calculated from current settings. "Days (voting only)" assumes a user maxes out at
+            <strong><?php echo esc_html(($config['xp_per_vote'] ?? 2) * ($config['daily_vote_limit'] ?? 50)); ?> XP/day</strong>
+            (<?php echo esc_html($config['xp_per_vote'] ?? 2); ?> XP × <?php echo esc_html($config['daily_vote_limit'] ?? 50); ?> votes).
+            Quizzes and streaks accelerate progress.
+        </p>
+        <?php
+        // Build full threshold table using same logic as ProgressService::get_thresholds()
+        $prev_thresholds  = $config['xp_thresholds'] ?? [];
+        $base_inc         = (float)($config['xp_per_level_after_10'] ?? 500);
+        $growth           = ($config['xp_level_growth_rate'] ?? 5) / 100;
+        $max_lvl          = min((int)($config['max_level'] ?? 100), 60); // preview up to 60
+        $xp_per_day       = ($config['xp_per_vote'] ?? 2) * ($config['daily_vote_limit'] ?? 50);
+
+        $preview_thresholds = $prev_thresholds;
+        $last_thr = $prev_thresholds[10] ?? 3200;
+        $cur_inc  = $base_inc;
+        for ($l = 11; $l <= $max_lvl; $l++) {
+            $last_thr              += (int) round($cur_inc);
+            $preview_thresholds[$l] = $last_thr;
+            $cur_inc               *= (1 + $growth);
+        }
+
+        // Determine tier for a given level
+        $get_tier = function(int $lvl) use ($config): string {
+            foreach ($config['tiers'] as $tier) {
+                if ($lvl >= $tier['min_level'] && $lvl <= $tier['max_level']) {
+                    return $tier['title'];
+                }
+            }
+            return '';
+        };
+
+        $tier_colors = ['Rookie' => '#aaa', 'Fan' => '#4CAF50', 'Expert' => '#2196F3', 'Master' => '#9C27B0', 'Legend' => '#FF9800'];
+        ?>
+        <table class="wp-list-table widefat fixed striped" style="max-width: 620px;">
+            <thead>
+                <tr>
+                    <th style="width:70px;">Level</th>
+                    <th style="width:120px;">Tier</th>
+                    <th style="width:130px;">Total XP needed</th>
+                    <th style="width:120px;">XP this level</th>
+                    <th>Days (voting only)</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            $prev_xp = 0;
+            for ($l = 1; $l <= $max_lvl; $l++):
+                $xp    = $preview_thresholds[$l] ?? 0;
+                $delta = $l > 1 ? ($xp - $prev_xp) : 0;
+                $days  = $xp_per_day > 0 ? ceil($xp / $xp_per_day) : '—';
+                $tier  = $get_tier($l);
+                $color = $tier_colors[$tier] ?? '#aaa';
+                $prev_xp = $xp;
+                // Highlight tier boundaries
+                $tier_boundary = ($l === 1 || $get_tier($l) !== $get_tier($l - 1));
+                $row_style = $tier_boundary ? 'border-top: 2px solid ' . $color . ';' : '';
+            ?>
+                <tr style="<?php echo esc_attr($row_style); ?>">
+                    <td><strong><?php echo $l; ?></strong></td>
+                    <td><span style="color:<?php echo esc_attr($color); ?>;font-weight:600;"><?php echo esc_html($tier); ?></span></td>
+                    <td><?php echo number_format($xp); ?> XP</td>
+                    <td><?php echo $l > 1 ? '+' . number_format($delta) : '—'; ?></td>
+                    <td><?php echo is_numeric($days) ? $days . ' days' : $days; ?></td>
+                </tr>
+            <?php endfor; ?>
+            </tbody>
+        </table>
+        <p class="description" style="margin-top: 8px;">Showing levels 1–<?php echo $max_lvl; ?>. Full cap is <?php echo esc_html($config['max_level'] ?? 100); ?>.</p>
+
+        <h2 style="margin-top: 30px;">How XP is Earned</h2>
+        <div style="background: #f9f9f9; padding: 16px 20px; border-radius: 5px; max-width: 560px;">
+            <ul style="margin:0;">
+                <li><strong>Quizzes:</strong> XP based on score (in quiz's category)</li>
+                <li><strong>Voting:</strong> <?php echo esc_html($config['xp_per_vote'] ?? 2); ?> XP per vote, max <?php echo esc_html($config['daily_vote_limit'] ?? 50); ?> votes/day earning XP</li>
+                <li><strong>List Creation:</strong> <?php echo esc_html($config['xp_for_list_creation'] ?? 50); ?> XP (goes to that list's category)</li>
+                <li><strong>Streak bonuses:</strong> Up to +10 XP per vote for consecutive daily voting</li>
             </ul>
-            
-            <h4>Two Types of Levels:</h4>
-            <ul>
-                <li><strong>Global Level:</strong> Sum of all XP across categories</li>
-                <li><strong>Category Level:</strong> XP earned only in that category (Sport, Music, Film, etc.)</li>
-            </ul>
-            
-            <h4>Expert Vote Bonus:</h4>
-            <p>When voting on a list, your category level in that list's category determines your bonus.<br>
-            Example: Level 25 in Sport → +2 bonus → Your "8" vote counts as "10"</p>
+            <p style="margin-bottom:0;"><strong>Expert Vote Bonus:</strong> Your category level determines bonus vote weight.<br>
+            Example: Level 25 in Sport (Expert) → +2 → voting "8" counts as 10.</p>
         </div>
     </div>
     <?php

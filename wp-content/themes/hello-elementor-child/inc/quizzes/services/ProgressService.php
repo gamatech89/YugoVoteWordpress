@@ -62,18 +62,23 @@ class ProgressService {
         if (function_exists('ygv_get_level_config')) {
             $config = ygv_get_level_config();
             $thresholds = $config['xp_thresholds'] ?? [];
-            $xp_per_level = $config['xp_per_level_after_10'] ?? 300;
-            $max_level = $config['max_level'] ?? 100;
+            $base_increment = $config['xp_per_level_after_10'] ?? 500;
+            $growth_rate    = ($config['xp_level_growth_rate'] ?? 5) / 100; // e.g. 5% → 0.05
+            $max_level      = $config['max_level'] ?? 100;
 
-            $last_threshold = $thresholds[10] ?? 1250;
+            $last_threshold  = $thresholds[10] ?? 3200;
+            $cur_increment   = (float) $base_increment;
+
             for ($lvl = 11; $lvl <= $max_level; $lvl++) {
-                $last_threshold += $xp_per_level;
-                $thresholds[$lvl] = $last_threshold;
+                $last_threshold   += (int) round($cur_increment);
+                $thresholds[$lvl]  = $last_threshold;
+                $cur_increment    *= (1 + $growth_rate);
             }
             return $thresholds;
         }
 
-        return [1=>0, 2=>50, 3=>120, 4=>210, 5=>320, 6=>450, 7=>600, 8=>780, 9=>1000, 10=>1250];
+        // Fallback hardcoded thresholds (never used when admin settings exist)
+        return [1=>0, 2=>150, 3=>350, 4=>600, 5=>900, 6=>1250, 7=>1650, 8=>2100, 9=>2600, 10=>3200];
     }
 
     public function xp_to_level(int $xp, string $scope = 'category'): array {
