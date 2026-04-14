@@ -1195,7 +1195,7 @@
   gap: 4px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--sd-primary);
+  color: var(--sd-secondary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
