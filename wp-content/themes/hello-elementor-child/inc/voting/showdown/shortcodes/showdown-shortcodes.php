@@ -146,7 +146,6 @@ function yuv_showdown_shortcode($atts) {
                         Može biti samo jedan
                     </div>
                     <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
-                    <p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>
                 </header>
 
                 <?php if (!empty($leaderboard)): ?>
@@ -251,7 +250,6 @@ function yuv_showdown_archive_shortcode($atts) {
                 Arhiva
             </div>
             <h1 class="showdown-title">Prethodni dvoboji</h1>
-            <p class="showdown-subtitle">Pogledaj rezultate završenih takmičenja</p>
         </header>
 
         <!-- Grid -->

@@ -6,14 +6,14 @@
 
 /* ========== DARK THEME SCOPE ========== */
 .sd-dark {
-  --sd-bg: #0c1029;
-  --sd-bg-card: #151a3a;
-  --sd-bg-card-hover: #1c2348;
+  --sd-bg: #4355A4;
+  --sd-bg-card: #3448a0;
+  --sd-bg-card-hover: #2e3e96;
   --sd-text: #ffffff;
-  --sd-text-muted: #8892b0;
-  --sd-border: rgba(255, 255, 255, 0.08);
-  --sd-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --sd-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --sd-text-muted: rgba(255, 255, 255, 0.65);
+  --sd-border: rgba(255, 255, 255, 0.12);
+  --sd-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  --sd-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.3);
 
   background: var(--sd-bg);
   color: var(--sd-text);
@@ -683,7 +683,7 @@
    SINGLE SHOWDOWN PAGE
    ==================================================== */
 .ygv-sd-single {
-  background: #0c1029;
+  background: #4355A4;
   min-height: 80vh;
 }
 
@@ -694,8 +694,9 @@
 }
 
 .ygv-sd-single .showdown-wrap.sd-dark {
-  border-radius: 20px;
-  overflow: hidden;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
   padding-bottom: 48px;
 }
 
