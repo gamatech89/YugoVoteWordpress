@@ -978,11 +978,9 @@ button.ygv-header__search-trigger:hover,
 
 .ygv-cat-hero {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    var(--ygv-cat-color, var(--ygv-primary)) 0%,
-    #1e2a5e 100%
-  );
+  background: linear-gradient(135deg,
+      var(--ygv-cat-color, var(--ygv-primary)) 0%,
+      #1e2a5e 100%);
   padding: 60px 20px 100px;
   color: white;
   overflow: hidden;
@@ -1593,11 +1591,9 @@ button.ygv-header__search-trigger:hover,
 .ygv-trending-card-v2__placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    var(--cat-color, #4456a6) 0%,
-    #2d3a8c 100%
-  );
+  background: linear-gradient(135deg,
+      var(--cat-color, #4456a6) 0%,
+      #2d3a8c 100%);
 }
 
 .ygv-trending-card-v2__content {
@@ -1606,12 +1602,10 @@ button.ygv-header__search-trigger:hover,
   left: 0;
   right: 0;
   padding: 60px 16px 16px;
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.9) 0%,
-    rgba(0, 0, 0, 0.6) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(0deg,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      transparent 100%);
   z-index: 2;
 }
 
@@ -1859,11 +1853,9 @@ button.ygv-header__search-trigger:hover,
 .ygv-trend-card__placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    var(--cat-color, var(--ygv-primary)) 0%,
-    #1e2a5e 100%
-  );
+  background: linear-gradient(135deg,
+      var(--cat-color, var(--ygv-primary)) 0%,
+      #1e2a5e 100%);
 }
 
 .ygv-trend-card__content {
@@ -2129,12 +2121,10 @@ button.ygv-header__search-trigger:hover,
   left: 0;
   right: 0;
   padding: 60px 16px 16px;
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.4) 60%,
-    transparent 100%
-  );
+  background: linear-gradient(0deg,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.4) 60%,
+      transparent 100%);
   z-index: 2;
 }
 
@@ -2161,11 +2151,9 @@ button.ygv-header__search-trigger:hover,
 .ygv-trending-card__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--cat-color, var(--ygv-primary)) 0%,
-    #1e2a5e 100%
-  );
+  background: linear-gradient(135deg,
+      var(--cat-color, var(--ygv-primary)) 0%,
+      #1e2a5e 100%);
   opacity: 0.15;
   z-index: 1;
   pointer-events: none;
@@ -2429,6 +2417,14 @@ button.ygv-header__search-trigger:hover,
   margin: 0 0 24px;
 }
 
+.ygv-item-hero__desc a {
+  color: #fe6555;
+  font-weight: 700;
+  margin-top: 10px;
+  text-decoration: underline;
+  display: block;
+}
+
 .ygv-item-hero__stats {
   display: flex;
   gap: 32px;
@@ -2583,9 +2579,7 @@ button.ygv-header__search-trigger:hover,
   padding: 8px 32px 8px 12px;
   border: 1px solid var(--ygv-border);
   border-radius: 8px;
-  background: white
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")
-    no-repeat right 10px center;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
   font-size: 14px;
   cursor: pointer;
   -webkit-appearance: none;
@@ -2877,11 +2871,9 @@ button.ygv-quiz-card__btn:hover,
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9),
-    rgba(248, 250, 252, 0.8)
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(248, 250, 252, 0.8));
   border-radius: 12px;
   border: 1px solid var(--ygv-border);
   transition: all 0.2s;
@@ -3077,11 +3069,9 @@ button.ygv-quiz-card__btn:hover,
 }
 
 .ygv-quiz-mini-thumb--placeholder {
-  background: linear-gradient(
-    135deg,
-    var(--quiz-color, var(--ygv-primary)),
-    color-mix(in srgb, var(--quiz-color, var(--ygv-primary)) 70%, #000)
-  );
+  background: linear-gradient(135deg,
+      var(--quiz-color, var(--ygv-primary)),
+      color-mix(in srgb, var(--quiz-color, var(--ygv-primary)) 70%, #000));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3530,12 +3520,10 @@ button.ygv-quiz-card__btn:hover,
 /* Left Branding Side */
 .ygv-auth-branding {
   flex: 0 0 45%;
-  background: linear-gradient(
-    135deg,
-    var(--ygv-primary) 0%,
-    #1e2a5e 50%,
-    #0f172a 100%
-  );
+  background: linear-gradient(135deg,
+      var(--ygv-primary) 0%,
+      #1e2a5e 50%,
+      #0f172a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3551,20 +3539,20 @@ button.ygv-quiz-card__btn:hover,
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.05) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 60%);
   animation: pulse-bg 15s ease-in-out infinite;
 }
 
 @keyframes pulse-bg {
+
   0%,
   100% {
     transform: scale(1);
     opacity: 0.5;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.8;
@@ -3595,23 +3583,28 @@ button.ygv-quiz-card__btn:hover,
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes celebrate {
+
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
+
   25% {
     transform: translateY(-5px) rotate(-3deg);
   }
+
   75% {
     transform: translateY(-5px) rotate(3deg);
   }
