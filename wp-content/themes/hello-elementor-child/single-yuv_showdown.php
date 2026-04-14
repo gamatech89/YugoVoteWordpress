@@ -7,9 +7,9 @@ if (!defined('ABSPATH')) exit;
 
 get_header();
 ?>
-<main class="site-main" role="main">
-    <div style="margin-top: 60px; margin-bottom: 60px;">
-        <div style="max-width: 1200px; margin: 0 auto; background: #4456a6; padding: 60px 40px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+<main class="site-main ygv-sd-single" role="main">
+    <div class="ygv-sd-single__inner">
+        <div class="showdown-wrap sd-dark">
             <?php echo do_shortcode('[yuv_showdown id="' . intval(get_the_ID()) . '"]'); ?>
         </div>
     </div>

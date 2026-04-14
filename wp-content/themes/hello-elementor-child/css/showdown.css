@@ -680,6 +680,48 @@
 }
 
 /* ====================================================
+   SINGLE SHOWDOWN PAGE
+   ==================================================== */
+.ygv-sd-single {
+  background: #0c1029;
+  min-height: 80vh;
+}
+
+.ygv-sd-single__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.ygv-sd-single .showdown-wrap.sd-dark {
+  border-radius: 20px;
+  overflow: hidden;
+  padding-bottom: 48px;
+}
+
+/* Dark overrides for the results screen inside sd-dark scope */
+.sd-dark .sd-results-screen {
+  color: var(--sd-text);
+}
+
+.sd-dark .sd-ranked__item {
+  background: var(--sd-bg-card);
+  border-color: var(--sd-border);
+}
+
+.sd-dark .sd-ranked__item:hover {
+  background: var(--sd-bg-card-hover);
+}
+
+.sd-dark .sd-podium__name {
+  color: var(--sd-text);
+}
+
+.sd-dark .sd-podium__wins {
+  color: var(--sd-text-muted);
+}
+
+/* ====================================================
    RESULTS / LEADERBOARD
    ==================================================== */
 
