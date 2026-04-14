@@ -113,7 +113,7 @@ get_header();
                 
                 <?php if ($item_description): ?>
                 <div class="ygv-item-hero__desc">
-                    <?php echo wp_kses_post($item_description); ?>
+                    <?php echo preg_replace('/<a /i', '<a target="_blank" rel="noopener noreferrer" ', wp_kses_post($item_description)); ?>
                 </div>
                 <?php elseif ($item_excerpt): ?>
                 <p class="ygv-item-hero__desc">
