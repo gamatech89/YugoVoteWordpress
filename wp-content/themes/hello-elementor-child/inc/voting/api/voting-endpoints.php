@@ -267,7 +267,9 @@ function submit_vote() {
     }
     delete_transient('ygv_all_list_scores');
     delete_transient('ygv_mega_menu_html');
-    
+    // Purge LiteSpeed page cache for this list so refresh shows updated votes
+    do_action('litespeed_purge_post', $voting_list_id);
+
     // Award XP for voting (logged-in users only)
     $xp_awarded = 0;
     $votes_today = 0;
@@ -425,7 +427,9 @@ function remove_vote() {
         }
         delete_transient('ygv_all_list_scores');
         delete_transient('ygv_mega_menu_html');
-        
+        // Purge LiteSpeed page cache for this list so refresh shows updated votes
+        do_action('litespeed_purge_post', $voting_list_id);
+
         // Get updated score for this item on this list
         $new_score = $wpdb->get_var($wpdb->prepare(
             "SELECT SUM(vote_value) FROM $table WHERE voting_list_id = %d AND voting_item_id = %d",
