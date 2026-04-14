@@ -259,7 +259,6 @@ function yuv_showdown_archive_shortcode($atts) {
             <?php foreach ($archive as $item): ?>
                 <article class="sd-archive-card">
                     <div class="sd-archive-card__top">
-                        <span class="sd-archive-card__cat">Showdown</span>
                         <span class="sd-archive-card__date"><?php echo esc_html($item['date']); ?></span>
                     </div>
                     <h3 class="sd-archive-card__title"><?php echo esc_html($item['title']); ?></h3>

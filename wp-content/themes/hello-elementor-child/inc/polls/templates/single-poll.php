@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 $results_data = [];
 foreach ($answers as $idx => $ans) {
     $v = intval($ans['votes']);
-    $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+    $p = ($total > 0) ? round(($v / $total) * 100, 2) : 0;
     $results_data[$idx] = [
         'text' => esc_html($ans['text']),
         'votes' => $v,
@@ -44,7 +44,7 @@ foreach ($answers as $idx => $ans) {
     <div class="ygv-poll__results <?php echo !$has_voted ? 'ygv-hidden' : ''; ?>">
         <?php foreach ($answers as $idx => $ans) : 
             $v = intval($ans['votes']);
-            $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+            $p = ($total > 0) ? round(($v / $total) * 100, 2) : 0;
         ?>
             <div class="ygv-poll__result" data-index="<?php echo $idx; ?>">
                 <div class="ygv-poll__result-header">

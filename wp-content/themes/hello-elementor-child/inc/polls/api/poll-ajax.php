@@ -47,7 +47,7 @@ function cs_handle_poll_vote_ajax() {
         $results = [];
         foreach ($answers as $idx => $ans) {
             $v = intval($ans['votes']);
-            $p = ($total > 0) ? round(($v / $total) * 100) : 0;
+            $p = ($total > 0) ? round(($v / $total) * 100, 2) : 0;
             $results[] = [
                 'index' => $idx,
                 'text' => esc_html($ans['text']),
