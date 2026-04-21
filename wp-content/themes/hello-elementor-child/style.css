@@ -2522,7 +2522,7 @@ a {
 }
 
 .ygv-poll-card__votes {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 5px;
   font-size: 0.78rem;
