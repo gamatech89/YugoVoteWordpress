@@ -35,6 +35,9 @@ function cs_handle_poll_vote_ajax() {
 
         // Zabeleži Usera (Cookie 30 dana)
         setcookie('cs_poll_' . $poll_id, '1', time() + (86400 * 30), COOKIEPATH, COOKIE_DOMAIN);
+
+        // Purge LiteSpeed cache for the poll post so archive page re-renders
+        do_action('litespeed_purge_post', $poll_id);
         
         if (is_user_logged_in()) {
             $u_id = get_current_user_id();

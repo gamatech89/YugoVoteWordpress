@@ -92,6 +92,11 @@ function cs_poll_shortcode($atts) {
         $has_voted = true;
     }
 
+    // Tell LiteSpeed not to serve public cache to users who already voted via cookie
+    if ($has_voted && !is_user_logged_in()) {
+        do_action('litespeed_control_set_private', 'user_voted_poll_' . $poll_id);
+    }
+
     // Učitaj Template
     ob_start();
     $template = get_stylesheet_directory() . '/inc/polls/templates/single-poll.php';
