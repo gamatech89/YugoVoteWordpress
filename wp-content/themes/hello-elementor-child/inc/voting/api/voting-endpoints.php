@@ -223,20 +223,39 @@ function submit_vote() {
     $table = $wpdb->prefix . "voting_list_votes";
     $where_user_or_ip = ($user_id > 0) ? ['user_id' => $user_id] : ['ip_address' => $ip_address];
 
-    // Step A: Remove any previous assignment of this specific base vote value 
-    // by this user/IP on this $voting_list_id, regardless of the item it was on.
-    // Note: We match on base_vote_value since that's what the user selected (1-10)
-    $wpdb->delete($table, array_merge($where_user_or_ip, [
-        'voting_list_id'  => $voting_list_id,
-        'base_vote_value' => $base_vote_value 
-    ]));
+    // Check if this user has a temporary bypass on vote restrictions.
+    // Bypass users skip deduplication and get a unique fake IP per vote so
+    // the DB unique key never conflicts — allowing unlimited repeated voting.
+    $bypass_restrictions = false;
+    if ($user_id > 0) {
+        $bypass_until = get_user_meta($user_id, 'ygv_unrestricted_voter_until', true);
+        if ($bypass_until && strtotime($bypass_until) >= time()) {
+            $bypass_restrictions = true;
+        }
+    }
 
-    // Step B: Remove any other vote values this user/IP might have 
-    // previously assigned to the current $voting_item_id on this $voting_list_id.
-    $wpdb->delete($table, array_merge($where_user_or_ip, [
-        'voting_list_id' => $voting_list_id,
-        'voting_item_id' => $voting_item_id 
-    ]));
+    if (!$bypass_restrictions) {
+        // Step A: Remove any previous assignment of this specific base vote value
+        // by this user/IP on this $voting_list_id, regardless of the item it was on.
+        // Note: We match on base_vote_value since that's what the user selected (1-10)
+        $wpdb->delete($table, array_merge($where_user_or_ip, [
+            'voting_list_id'  => $voting_list_id,
+            'base_vote_value' => $base_vote_value
+        ]));
+
+        // Step B: Remove any other vote values this user/IP might have
+        // previously assigned to the current $voting_item_id on this $voting_list_id.
+        $wpdb->delete($table, array_merge($where_user_or_ip, [
+            'voting_list_id' => $voting_list_id,
+            'voting_item_id' => $voting_item_id
+        ]));
+    }
+
+    // In bypass mode each vote gets a unique fake IP so the DB unique key
+    // (list, item, user_id, ip_address, base_vote_value) never conflicts.
+    $effective_ip = $bypass_restrictions
+        ? sprintf('bypass_%d_%04d', time(), mt_rand(0, 9999))
+        : $ip_address;
 
     // Step C: Insert the new vote — always include both user_id and ip_address
     $insert_data = [
@@ -245,7 +264,7 @@ function submit_vote() {
         'base_vote_value' => $base_vote_value,
         'vote_value'      => $vote_value,
         'expert_bonus'    => $expert_bonus,
-        'ip_address'      => $ip_address,
+        'ip_address'      => $effective_ip,
         'user_id'         => $user_id > 0 ? $user_id : null,
         'created_at'      => current_time('mysql', 1)
     ];
@@ -478,6 +497,18 @@ function get_user_votes() {
         return;
     }
 
+    // Bypass users accumulate many rows per item — returning them would cause
+    // the JS to mark buttons as "already voted" and send remove_vote on the
+    // next click, wiping all accumulated votes. Return empty so every click
+    // is always treated as a fresh submit_vote.
+    if ($user_id > 0) {
+        $bypass_until = get_user_meta($user_id, 'ygv_unrestricted_voter_until', true);
+        if ($bypass_until && strtotime($bypass_until) >= time()) {
+            wp_send_json_success([]);
+            return;
+        }
+    }
+
     $table = $wpdb->prefix . "voting_list_votes";
     $params = [$voting_list_id];
     $sql_where_user = '';
@@ -491,7 +522,7 @@ function get_user_votes() {
     }
 
     $query = "SELECT voting_item_id, vote_value, base_vote_value, expert_bonus FROM {$table} WHERE voting_list_id = %d {$sql_where_user}";
-    
+
     $votes = $wpdb->get_results($wpdb->prepare($query, ...$params));
 
     if ($wpdb->last_error) {

@@ -72,7 +72,7 @@ function ygv_get_default_level_config(): array {
                 'min_level' => 40,
                 'max_level' => 100,
                 'title' => 'Legend',
-                'vote_bonus' => 4
+                'vote_bonus' => 10
             ]
         ],
         // XP thresholds - XP required to reach each level
