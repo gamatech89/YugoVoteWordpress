@@ -1004,6 +1004,10 @@
    ARCHIVE
    ==================================================== */
 
+.sd-archive-header {
+  padding-top: 40px;
+}
+
 .sd-archive-header .showdown-badge {
   background: var(--sd-bg-card);
   color: var(--sd-text-muted);
