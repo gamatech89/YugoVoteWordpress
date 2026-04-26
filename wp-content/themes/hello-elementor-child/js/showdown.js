@@ -431,7 +431,7 @@
 
         escHtml: function (str) {
             if (!str) return "";
-            return $("<div>").text(str).html();
+            return $("<div>").text($("<div>").html(str).text()).html();
         },
     };
 

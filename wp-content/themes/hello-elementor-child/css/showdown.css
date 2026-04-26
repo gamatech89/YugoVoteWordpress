@@ -58,7 +58,7 @@
 }
 
 .sd-dark .sd-ranked__stats strong {
-  color: #ffffff;
+  color: var(--sd-secondary);
 }
 
 .sd-dark .sd-ranked__item {
@@ -866,7 +866,7 @@
 
 /* ========== RANKED LIST ========== */
 .sd-ranked {
-  max-width: 1200px;
+  max-width: 960px;
   margin: 28px auto 0;
   padding: 0 24px;
 }
