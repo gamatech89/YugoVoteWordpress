@@ -195,9 +195,6 @@ function yuv_showdown_shortcode($atts) {
                                         <?php endif; ?>
                                         <div class="sd-ranked__info">
                                             <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
-                                            <?php if (!empty($entry['description'])): ?>
-                                                <p class="sd-ranked__desc"><?php echo esc_html(html_entity_decode($entry['description'], ENT_QUOTES | ENT_HTML5, 'UTF-8')); ?></p>
-                                            <?php endif; ?>
                                         </div>
                                         <span class="sd-ranked__stats">Pobede: <strong><?php echo $win_rate; ?>%</strong></span>
                                     </div>

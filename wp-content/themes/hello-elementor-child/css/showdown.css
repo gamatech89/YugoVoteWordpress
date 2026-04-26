@@ -860,7 +860,7 @@
 }
 
 .sd-podium__wins strong {
-  color: #ffffff;
+  color: var(--sd-secondary);
   font-weight: 700;
 }
 
@@ -979,14 +979,12 @@
 
 .sd-ranked__name {
   font-family: var(--sd-font-heading);
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: var(--sd-text);
 }
 
 .sd-ranked__desc {
-  font-size: 0.68rem;
-  color: var(--sd-text-muted);
-  margin-top: 0;
+  display: none;
 }
 
 .sd-ranked__stats {

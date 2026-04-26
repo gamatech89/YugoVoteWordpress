@@ -338,7 +338,6 @@
                     if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
-                    if (entry.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(entry.description) + '</p>';
                     html += '</div>';
                     html += '<span class="sd-ranked__stats">Pobede: <strong>' + winRate + '%</strong></span>';
                     html += '</div>';
@@ -412,7 +411,6 @@
                     }
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
-                    if (item && item.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(item.description) + '</p>';
                     html += '</div>';
                     html += '</div>';
                 }
