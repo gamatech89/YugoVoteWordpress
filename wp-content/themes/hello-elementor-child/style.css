@@ -2273,13 +2273,13 @@ a {
 
 /* Left Side - Image & Badge */
 .ygv-daily-poll__left {
-  flex: 0 0 400px;
+  flex: 0 0 300px;
   background: linear-gradient(
     135deg,
     var(--ygv-accent-color, #4456a6),
     #667eea
   );
-  padding: 30px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -2363,14 +2363,14 @@ a {
 /* Right Side - Poll Form */
 .ygv-daily-poll__right {
   flex: 1;
-  padding: 30px 40px;
+  padding: 22px 28px;
   display: flex;
   flex-direction: column;
 }
 
 .ygv-daily-poll__title {
-  margin: 0 0 24px 0;
-  font-size: 1.4rem;
+  margin: 0 0 16px 0;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--ygv-text-dark, #1a1a2e);
   line-height: 1.35;
@@ -2388,6 +2388,24 @@ a {
 
 .ygv-daily-poll__widget .ygv-poll__question {
   display: none;
+}
+
+.ygv-daily-poll__widget .ygv-poll__options {
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.ygv-daily-poll__widget .ygv-poll__option {
+  padding: 10px 14px;
+}
+
+.ygv-daily-poll__widget .ygv-poll__option-text {
+  font-size: 0.88rem;
+}
+
+.ygv-daily-poll__widget .ygv-btn {
+  padding: 11px 20px;
+  font-size: 14px;
 }
 
 /* Responsive - Stack on mobile */
