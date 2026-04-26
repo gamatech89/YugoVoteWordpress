@@ -43,7 +43,7 @@ $total_showdowns = wp_count_posts('yuv_showdown')->publish;
         </div>
         <div class="ygv-page-hero__wave">
             <svg viewBox="0 0 1440 48" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0,48 C360,0 1080,0 1440,48 L1440,48 L0,48 Z" fill="#4355A4"/>
+                <path d="M0,48 C360,0 1080,0 1440,48 L1440,48 L0,48 Z" fill="#f8fafc"/>
             </svg>
         </div>
     </section>

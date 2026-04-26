@@ -3025,14 +3025,22 @@ a {
   background: linear-gradient(135deg, #1e2b7a 0%, #2e3a8c 50%, #3748a0 100%);
 }
 
-/* Dvoboj archive page body (blue background continuing below hero) */
+/* Dvoboj archive page body */
 .ygv-sd-archive-page {
   min-height: 100vh;
+  background: #f8fafc;
 }
 
 .ygv-sd-archive-page__body {
-  background: #4355A4;
+  background: #f8fafc;
   padding-bottom: 60px;
+}
+
+/* Restore sd-dark background for showdown sections inside archive (not transparent like single page) */
+.ygv-sd-archive-page .showdown-wrap.sd-dark {
+  background: var(--sd-bg) !important;
+  border-radius: var(--sd-radius);
+  overflow: visible;
 }
 
 /* Responsive */
