@@ -53,8 +53,12 @@
 }
 
 .sd-dark .sd-ranked__stats {
-  color: var(--sd-green);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
+}
+
+.sd-dark .sd-ranked__stats strong {
+  color: #ffffff;
 }
 
 .sd-dark .sd-ranked__item {
@@ -173,7 +177,7 @@
 
   --sd-radius: 16px;
   --sd-radius-sm: 10px;
-  --sd-max-width: 900px;
+  --sd-max-width: 1400px;
 }
 
 /* ========== BASE ========== */
@@ -635,7 +639,7 @@
 }
 
 .sd-results-inner {
-  max-width: 700px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px 48px;
 }
@@ -688,7 +692,7 @@
 }
 
 .ygv-sd-single__inner {
-  max-width: 960px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 48px 24px 80px;
 }
@@ -733,7 +737,7 @@
 
 /* ========== PODIUM ========== */
 .sd-podium {
-  max-width: 700px;
+  max-width: 860px;
   margin: 28px auto 0;
   padding: 0 24px;
   display: flex;
@@ -856,13 +860,13 @@
 }
 
 .sd-podium__wins strong {
-  color: #FD6555;
+  color: #ffffff;
   font-weight: 700;
 }
 
 /* ========== RANKED LIST ========== */
 .sd-ranked {
-  max-width: 700px;
+  max-width: 1200px;
   margin: 28px auto 0;
   padding: 0 24px;
 }

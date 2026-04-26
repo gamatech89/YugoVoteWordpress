@@ -196,7 +196,7 @@ function yuv_showdown_shortcode($atts) {
                                         <div class="sd-ranked__info">
                                             <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
                                             <?php if (!empty($entry['description'])): ?>
-                                                <p class="sd-ranked__desc"><?php echo esc_html(wp_trim_words($entry['description'], 10)); ?></p>
+                                                <p class="sd-ranked__desc"><?php echo esc_html($entry['description']); ?></p>
                                             <?php endif; ?>
                                         </div>
                                         <span class="sd-ranked__stats">Pobede: <strong><?php echo $win_rate; ?>%</strong></span>
