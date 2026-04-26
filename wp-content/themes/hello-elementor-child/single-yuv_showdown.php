@@ -12,6 +12,13 @@ get_header();
         <div class="showdown-wrap sd-dark">
             <?php echo do_shortcode('[yuv_showdown id="' . intval(get_the_ID()) . '"]'); ?>
         </div>
+
+        <div class="sd-all-link">
+            <a href="<?php echo esc_url(get_post_type_archive_link('yuv_showdown')); ?>" class="sd-btn--cta">
+                <i class="ri-archive-line"></i>
+                Vidi sve dvoboje
+            </a>
+        </div>
     </div>
 </main>
 <?php

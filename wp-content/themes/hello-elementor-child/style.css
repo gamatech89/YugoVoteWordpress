@@ -2269,11 +2269,14 @@ a {
   border: 1px solid var(--ygv-border-color, #e5e7eb);
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(68, 86, 166, 0.08);
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Left Side - Image & Badge */
 .ygv-daily-poll__left {
-  flex: 0 0 300px;
+  flex: 0 0 400px;
   background: linear-gradient(
     135deg,
     var(--ygv-accent-color, #4456a6),

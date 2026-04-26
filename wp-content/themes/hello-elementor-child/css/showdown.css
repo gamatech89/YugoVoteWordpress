@@ -1536,6 +1536,12 @@
   }
 }
 
+/* ========== ARCHIVE LINK (single page footer) ========== */
+.sd-all-link {
+  text-align: center;
+  padding: 40px 0 20px;
+}
+
 /* ========== EMPTY STATE ========== */
 .sd-empty {
   max-width: 500px;
