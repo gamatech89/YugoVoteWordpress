@@ -1772,16 +1772,22 @@ a {
   height: 100%; /* Fill the grid row */
 }
 
-/* Standard Image: Fixed height */
+/* Standard Image: Grow to fill remaining space above content */
 .cs-lb-card--standard .cs-lb-media {
-  height: 150px; /* Fixed height! */
-  flex-shrink: 0;
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 /* Standard Title: Clamp to 2 lines */
 .cs-lb-card--standard .cs-lb-title {
   font-size: 1.1rem;
   -webkit-line-clamp: 2;
+}
+
+/* Standard Content: fixed size, don't compete with media for space */
+.cs-lb-card--standard .cs-lb-content {
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 /* Standard Excerpt: Hide to save space */
