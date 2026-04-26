@@ -3021,6 +3021,20 @@ a {
   background: linear-gradient(135deg, #6366f1 0%, #4338ca 70%, #3730a3 100%);
 }
 
+.ygv-page-hero--dvoboj {
+  background: linear-gradient(135deg, #1e2b7a 0%, #2e3a8c 50%, #3748a0 100%);
+}
+
+/* Dvoboj archive page body (blue background continuing below hero) */
+.ygv-sd-archive-page {
+  min-height: 100vh;
+}
+
+.ygv-sd-archive-page__body {
+  background: #4355A4;
+  padding-bottom: 60px;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .ygv-page-hero {
