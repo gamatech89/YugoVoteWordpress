@@ -387,7 +387,8 @@ a {
   text-decoration: none;
   color: #000;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 16px;
+  letter-spacing: 0.03em;
   padding: 20px 5px;
   display: flex;
   align-items: center;
@@ -2880,5 +2881,161 @@ a {
 
   .ygv-poll-panel__content {
     width: 100vw;
+  }
+}
+
+/* ==========================================================================
+   PAGE HERO — Shared system for Anketa, Kvizovi, Dvoboj hub pages
+   ========================================================================== */
+
+.ygv-page-hero {
+  position: relative;
+  padding: 72px 20px 108px;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Decorative blobs in background */
+.ygv-page-hero::before,
+.ygv-page-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.ygv-page-hero::before {
+  width: 500px;
+  height: 500px;
+  background: #fff;
+  top: -180px;
+  right: -100px;
+}
+
+.ygv-page-hero::after {
+  width: 320px;
+  height: 320px;
+  background: #fff;
+  bottom: 20px;
+  left: -80px;
+}
+
+.ygv-page-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.ygv-page-hero__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.ygv-page-hero__title {
+  font-family: "Jockey One", var(--primary-font, sans-serif);
+  font-size: clamp(34px, 5.5vw, 54px);
+  font-weight: 800;
+  margin: 0 0 16px;
+  line-height: 1.1;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ygv-page-hero__desc {
+  font-size: 17px;
+  line-height: 1.65;
+  opacity: 0.88;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.ygv-page-hero__stats {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.ygv-page-hero__stat {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  padding: 14px 28px;
+  border-radius: 14px;
+  text-align: center;
+  min-width: 110px;
+}
+
+.ygv-page-hero__stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  display: block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ygv-page-hero__stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.75;
+}
+
+/* Wave separator at bottom */
+.ygv-page-hero__wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  z-index: 2;
+}
+
+.ygv-page-hero__wave svg {
+  display: block;
+  width: 100%;
+  height: 48px;
+}
+
+/* Color variants */
+.ygv-page-hero--polls {
+  background: linear-gradient(135deg, #4456a6 0%, #2e3a8c 60%, #3d2fa0 100%);
+}
+
+.ygv-page-hero--quiz {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 70%, #3730a3 100%);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .ygv-page-hero {
+    padding: 56px 16px 88px;
+  }
+
+  .ygv-page-hero__title {
+    font-size: 30px;
+  }
+
+  .ygv-page-hero__desc {
+    font-size: 15px;
+  }
+
+  .ygv-page-hero__stat {
+    padding: 12px 20px;
   }
 }

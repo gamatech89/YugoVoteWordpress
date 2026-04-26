@@ -15,8 +15,49 @@ get_header();
 </style>
 
 <main class="ygv-page ygv-page--ankete">
+
+    <!-- ========== HERO ========== -->
+    <?php
+    $total_polls = wp_count_posts('voting_poll')->publish;
+    ?>
+    <section class="ygv-page-hero ygv-page-hero--polls">
+        <div class="ygv-page-hero__inner">
+            <div class="ygv-page-hero__label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Ankete
+            </div>
+            <h1 class="ygv-page-hero__title">Glasaj i iznesi mišljenje</h1>
+            <p class="ygv-page-hero__desc">
+                Svakodnevne ankete o temama koje su bitne. Glasaj, vidi rezultate i poredi se sa zajednicom.
+            </p>
+            <div class="ygv-page-hero__stats">
+                <div class="ygv-page-hero__stat">
+                    <span class="ygv-page-hero__stat-value"><?php echo intval($total_polls); ?></span>
+                    <span class="ygv-page-hero__stat-label">Anketa</span>
+                </div>
+                <?php if (get_current_user_id()):
+                    global $wpdb;
+                    $voted = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(DISTINCT poll_id) FROM {$wpdb->prefix}cs_poll_votes WHERE user_id = %d",
+                        get_current_user_id()
+                    ));
+                ?>
+                <div class="ygv-page-hero__stat">
+                    <span class="ygv-page-hero__stat-value"><?php echo intval($voted); ?></span>
+                    <span class="ygv-page-hero__stat-label">Tvojih glasova</span>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="ygv-page-hero__wave">
+            <svg viewBox="0 0 1440 48" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,48 C360,0 1080,0 1440,48 L1440,48 L0,48 Z" fill="#f8fafc"/>
+            </svg>
+        </div>
+    </section>
+
     <div class="ygv-container">
-        
+
         <!-- Latest Poll (Anketa Dana) -->
         <?php 
         $latest = new WP_Query([

@@ -32,7 +32,7 @@ function yuv_showdown_shortcode($atts) {
     if (!$showdown) {
         $showdown = $manager->get_latest_completed();
         if (!$showdown) {
-            return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-sword-line"></i></div><h3 class="sd-empty__title">Nema aktivnih Showdown-ova</h3><p class="sd-empty__desc">Trenutno nema aktivnih takmičenja. Navrati ponovo uskoro!</p></div></div>';
+            return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-sword-line"></i></div><h3 class="sd-empty__title">Nema aktivnih dvoboja</h3><p class="sd-empty__desc">Trenutno nema aktivnih takmičenja. Navrati ponovo uskoro!</p></div></div>';
         }
     }
 
@@ -41,7 +41,7 @@ function yuv_showdown_shortcode($atts) {
     $status = get_post_meta($showdown_id, '_yuv_showdown_status', true);
     
     if (count($items) < 2) {
-        return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-error-warning-line"></i></div><h3 class="sd-empty__title">Nedovoljno učesnika</h3><p class="sd-empty__desc">Showdown nema dovoljno učesnika za početak.</p></div></div>';
+        return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-error-warning-line"></i></div><h3 class="sd-empty__title">Nedovoljno učesnika</h3><p class="sd-empty__desc">Dvoboj nema dovoljno učesnika za početak.</p></div></div>';
     }
 
     $user_id = get_current_user_id();
@@ -327,7 +327,7 @@ function yuv_showdown_widget_shortcode($atts) {
     <div class="sd-widget sd-dark">
         <div class="sd-widget__badge">
             <i class="<?php echo $is_active ? 'ri-fire-line' : 'ri-flag-line'; ?>"></i>
-            <?php echo $is_active ? 'Aktivan Showdown' : 'Poslednji Showdown'; ?>
+            <?php echo $is_active ? 'Aktivan dvoboj' : 'Poslednji dvoboj'; ?>
         </div>
         <h3 class="sd-widget__title"><?php echo esc_html($showdown->post_title); ?></h3>
         <p class="sd-widget__desc">

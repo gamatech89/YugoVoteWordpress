@@ -6,23 +6,28 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 get_header();
-
-// We can just use the built-in shortcode to display the archive correctly
 ?>
-<main class="site-main" role="main">
-    <header class="page-header" style="text-align: center; padding: 40px 20px;">
-        <h1 class="page-title">Showdown Arena</h1>
-        <p>Glasaj za svog favorita u duelima 1 na 1!</p>
-    </header>
+<main class="site-main ygv-sd-single" role="main">
+    <div class="ygv-sd-single__inner">
 
-    <div class="page-content" style="max-width: 1200px; margin: 0 auto; padding: 0 20px 60px;">
+        <?php
+        // Show active dvoboj at the top if one exists
+        $manager = new YUV_Showdown_Manager();
+        $active  = $manager->get_active_showdown();
+        if ($active):
+        ?>
+        <div class="showdown-wrap sd-dark" style="margin-bottom: 40px; border-radius: var(--sd-radius);">
+            <?php echo do_shortcode('[yuv_showdown id="' . intval($active->ID) . '"]'); ?>
+        </div>
+        <?php endif; ?>
+
         <?php echo do_shortcode('[yuv_showdown_archive]'); ?>
+
     </div>
 </main>
-
 <?php
 get_footer();

@@ -242,7 +242,7 @@
 }
 
 .showdown-subtitle {
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.65);
 }
 
@@ -841,18 +841,18 @@
 
 .sd-podium__name {
   font-family: var(--sd-font-heading);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: #ffffff;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
 
 .sd-podium__item--gold .sd-podium__name {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
 }
 
 .sd-podium__wins {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  color: #ffffff;
 }
 
 .sd-podium__wins strong {
@@ -1450,11 +1450,11 @@
   }
 
   .sd-podium__name {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
   }
 
   .sd-podium__item--gold .sd-podium__name {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
   }
 
   /* Archive */

@@ -73,25 +73,36 @@ get_header();
 <div class="ygv-page ygv-quiz-archive-page">
     
     <!-- ========== HERO SECTION ========== -->
-    <section class="ygv-quiz-hero">
-        <div class="ygv-container">
-            <h1 class="ygv-quiz-hero__title">🧠 Testiraj svoje znanje</h1>
-            <p class="ygv-quiz-hero__desc">
+    <section class="ygv-page-hero ygv-page-hero--quiz">
+        <div class="ygv-page-hero__inner">
+            <div class="ygv-page-hero__label">
+                🧠 Kvizovi
+            </div>
+            <h1 class="ygv-page-hero__title">Testiraj svoje znanje</h1>
+            <p class="ygv-page-hero__desc">
                 Izaberi kviz, odgovori na pitanja i osvoji XP poene. Takmičite se sa prijateljima!
             </p>
-            
-            <?php if ($current_user_id): ?>
-            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 24px;">
-                <div style="background: rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 12px; text-align: center;">
-                    <span style="font-size: 24px; font-weight: 800; display: block;"><?php echo intval($user_completed); ?>/<?php echo $total_quizzes; ?></span>
-                    <span style="font-size: 12px; text-transform: uppercase; opacity: 0.8;">Završeno</span>
+            <div class="ygv-page-hero__stats">
+                <div class="ygv-page-hero__stat">
+                    <span class="ygv-page-hero__stat-value"><?php echo intval($total_quizzes); ?></span>
+                    <span class="ygv-page-hero__stat-label">Kvizova</span>
                 </div>
-                <div style="background: rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 12px; text-align: center;">
-                    <span style="font-size: 24px; font-weight: 800; display: block;"><?php echo number_format(intval($user_total_xp)); ?></span>
-                    <span style="font-size: 12px; text-transform: uppercase; opacity: 0.8;">Ukupno XP</span>
+                <?php if ($current_user_id): ?>
+                <div class="ygv-page-hero__stat">
+                    <span class="ygv-page-hero__stat-value"><?php echo intval($user_completed); ?>/<?php echo $total_quizzes; ?></span>
+                    <span class="ygv-page-hero__stat-label">Završeno</span>
                 </div>
+                <div class="ygv-page-hero__stat">
+                    <span class="ygv-page-hero__stat-value"><?php echo number_format(intval($user_total_xp)); ?></span>
+                    <span class="ygv-page-hero__stat-label">Ukupno XP</span>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php endif; ?>
+        </div>
+        <div class="ygv-page-hero__wave">
+            <svg viewBox="0 0 1440 48" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,48 C360,0 1080,0 1440,48 L1440,48 L0,48 Z" fill="#ffffff"/>
+            </svg>
         </div>
     </section>
     

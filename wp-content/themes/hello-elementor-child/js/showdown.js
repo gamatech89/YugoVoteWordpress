@@ -293,7 +293,7 @@
             html += '<header class="showdown-header sd-results-header">';
             html += '<div class="showdown-badge"><i class="ri-sword-line"></i> Može biti samo jedan</div>';
             html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
-            html += '<p class="showdown-subtitle">Showdown završen — evo konačnog poretka</p>';
+            html += '<p class="showdown-subtitle">Dvoboj završen — evo konačnog poretka</p>';
             html += '</header>';
 
             // Podium
@@ -412,6 +412,7 @@
                     }
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(name) + '</h4>';
+                    if (item && item.description) html += '<p class="sd-ranked__desc">' + Showdown.escHtml(item.description) + '</p>';
                     html += '</div>';
                     html += '</div>';
                 }
