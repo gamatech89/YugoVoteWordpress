@@ -754,3 +754,66 @@ function cs_voting_vip_lists_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('voting_vip_lists', 'cs_voting_vip_lists_shortcode');
+
+/**
+ * Shortcode: Spotlight Slider Widget
+ * Usage: [voting_spotlight_slider mode="spotlight" count="6" autoplay="true" category=""]
+ *
+ * Modes:
+ *   spotlight — lists manually marked as Spotlight (_is_spotlight = 1), fallback to latest
+ *   latest    — most recently published lists
+ *   trending  — most votes in the last 7 days
+ *   top       — highest all-time total score
+ */
+if (!function_exists('ygv_hero_slider_shortcode')) {
+    function ygv_hero_slider_shortcode($atts) {
+        $atts = shortcode_atts([
+            'mode'     => 'spotlight',
+            'count'    => 6,
+            'autoplay' => 'true',
+            'category' => 0,
+            'days'     => 7,
+        ], $atts, 'voting_hero_slider');
+
+        $count       = max(1, intval($atts['count']));
+        $category_id = intval($atts['category']);
+        $days        = max(1, intval($atts['days']));
+        $autoplay    = $atts['autoplay'] === 'true' || $atts['autoplay'] === '1';
+        $mode        = sanitize_key($atts['mode']);
+
+        switch ($mode) {
+            case 'latest':
+                $posts = ygv_get_latest_lists($count, $category_id);
+                break;
+            case 'trending':
+                $posts = ygv_get_trending_lists($count, $category_id, $days);
+                break;
+            case 'top':
+                $posts = ygv_get_top_lists($count, $category_id);
+                break;
+            default:
+                $posts = ygv_get_spotlight_lists($count, $category_id);
+                $mode  = 'spotlight';
+                break;
+        }
+
+        if (empty($posts)) return '';
+
+        wp_enqueue_style(
+            'ygv-spotlight-slider',
+            get_stylesheet_directory_uri() . '/css/spotlight-slider.css',
+            [],
+            HELLO_ELEMENTOR_CHILD_VERSION
+        );
+
+        set_query_var('ygv_slider_posts',    $posts);
+        set_query_var('ygv_slider_mode',     $mode);
+        set_query_var('ygv_slider_autoplay', $autoplay);
+
+        ob_start();
+        $tpl = get_stylesheet_directory() . '/inc/voting/templates/global/spotlight-slider.php';
+        if (file_exists($tpl)) include $tpl;
+        return ob_get_clean();
+    }
+    add_shortcode('voting_spotlight_slider', 'ygv_hero_slider_shortcode');
+}

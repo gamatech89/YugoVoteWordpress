@@ -458,3 +458,163 @@ function ygv_maybe_add_vip_rank_column() {
     update_option('ygv_vip_rank_column_added', 1);
 }
 add_action('admin_init', 'ygv_maybe_add_vip_rank_column');
+
+// ========================================
+// HERO SLIDER QUERY HELPERS
+// ========================================
+
+function ygv_slider_tax_query($category_id) {
+    if (!$category_id) return [];
+    return [[
+        'taxonomy' => 'voting_list_category',
+        'field'    => 'term_id',
+        'terms'    => intval($category_id),
+    ]];
+}
+
+/**
+ * Spotlight: lists manually marked with _is_spotlight = 1.
+ * Falls back to latest if fewer than $count results.
+ */
+function ygv_get_spotlight_lists($count = 6, $category_id = 0) {
+    $args = [
+        'post_type'      => 'voting_list',
+        'post_status'    => 'publish',
+        'posts_per_page' => $count,
+        'meta_query'     => [['key' => '_is_spotlight', 'value' => '1']],
+        'tax_query'      => ygv_slider_tax_query($category_id),
+    ];
+    $posts = get_posts($args);
+
+    if (count($posts) < $count) {
+        $exclude = wp_list_pluck($posts, 'ID');
+        $fallback = get_posts([
+            'post_type'      => 'voting_list',
+            'post_status'    => 'publish',
+            'posts_per_page' => $count - count($posts),
+            'post__not_in'   => $exclude ?: [0],
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'tax_query'      => ygv_slider_tax_query($category_id),
+        ]);
+        $posts = array_merge($posts, $fallback);
+    }
+
+    return $posts;
+}
+
+/**
+ * Latest: most recently published voting lists.
+ */
+function ygv_get_latest_lists($count = 6, $category_id = 0) {
+    return get_posts([
+        'post_type'      => 'voting_list',
+        'post_status'    => 'publish',
+        'posts_per_page' => $count,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'tax_query'      => ygv_slider_tax_query($category_id),
+    ]);
+}
+
+/**
+ * Trending: lists with the most votes in the last $days days.
+ * Uses a transient (10 min TTL) keyed by days + count + category.
+ */
+function ygv_get_trending_lists($count = 6, $category_id = 0, $days = 7) {
+    $cache_key = 'ygv_trending_' . $days . 'd_' . $count . '_cat' . intval($category_id);
+    $cached = get_transient($cache_key);
+    if ($cached !== false) {
+        return $cached;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'voting_list_votes';
+
+    $rows = $wpdb->get_results($wpdb->prepare(
+        "SELECT voting_list_id, SUM(vote_value) AS recent_score
+         FROM {$table}
+         WHERE created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)
+         GROUP BY voting_list_id
+         ORDER BY recent_score DESC
+         LIMIT %d",
+        $days,
+        $count * 3
+    ), ARRAY_A);
+
+    if (empty($rows)) {
+        $result = ygv_get_latest_lists($count, $category_id);
+        set_transient($cache_key, $result, 10 * MINUTE_IN_SECONDS);
+        return $result;
+    }
+
+    $ordered_ids = array_column($rows, 'voting_list_id');
+
+    // Filter by category if needed
+    if ($category_id) {
+        $term_lists = get_posts([
+            'post_type'      => 'voting_list',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'tax_query'      => ygv_slider_tax_query($category_id),
+        ]);
+        $ordered_ids = array_values(array_intersect($ordered_ids, $term_lists));
+    }
+
+    $top_ids = array_slice($ordered_ids, 0, $count);
+
+    if (empty($top_ids)) {
+        $result = ygv_get_latest_lists($count, $category_id);
+        set_transient($cache_key, $result, 10 * MINUTE_IN_SECONDS);
+        return $result;
+    }
+
+    $result = get_posts([
+        'post_type'      => 'voting_list',
+        'post_status'    => 'publish',
+        'posts_per_page' => $count,
+        'post__in'       => $top_ids,
+        'orderby'        => 'post__in',
+    ]);
+
+    // Attach recent_score as a property so template can display delta
+    $score_map = array_column($rows, 'recent_score', 'voting_list_id');
+    foreach ($result as $post) {
+        $post->ygv_recent_score = isset($score_map[$post->ID]) ? intval($score_map[$post->ID]) : 0;
+    }
+
+    set_transient($cache_key, $result, 10 * MINUTE_IN_SECONDS);
+    return $result;
+}
+
+/**
+ * Top: lists with the highest all-time total score.
+ */
+function ygv_get_top_lists($count = 6, $category_id = 0) {
+    $all_scores = ygv_get_all_list_scores();
+
+    if ($category_id) {
+        $term_ids = get_posts([
+            'post_type'      => 'voting_list',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'tax_query'      => ygv_slider_tax_query($category_id),
+        ]);
+        $all_scores = array_intersect_key($all_scores, array_flip($term_ids));
+    }
+
+    arsort($all_scores);
+    $top_ids = array_slice(array_keys($all_scores), 0, $count);
+
+    if (empty($top_ids)) return [];
+
+    return get_posts([
+        'post_type'      => 'voting_list',
+        'post_status'    => 'publish',
+        'posts_per_page' => $count,
+        'post__in'       => $top_ids,
+        'orderby'        => 'post__in',
+    ]);
+}

@@ -58,9 +58,10 @@ function voting_list_metabox_callback($post) {
 
     wp_nonce_field('save_voting_list_meta', 'voting_list_meta_nonce');
     
-    $featured = get_post_meta($post->ID, '_is_featured', true);
+    $featured    = get_post_meta($post->ID, '_is_featured', true);
+    $is_spotlight = get_post_meta($post->ID, '_is_spotlight', true);
     ?>
-    
+
 
 
     <p>
@@ -68,6 +69,14 @@ function voting_list_metabox_callback($post) {
             <input type="checkbox" name="voting_list_is_featured" value="1" <?php checked($featured, '1'); ?> />
             <strong>Mark this list as Featured</strong>
         </label>
+    </p>
+
+    <p>
+        <label>
+            <input type="checkbox" name="voting_list_is_spotlight" value="1" <?php checked($is_spotlight, '1'); ?> />
+            <strong>Spotlight</strong>
+        </label>
+        <br><small>Prikazuje se u Slider widgetu na početnoj strani.</small>
     </p>
 
     <!-- VIP List Section -->
@@ -206,6 +215,12 @@ function save_voting_list_data($post_id) {
         update_post_meta($post_id, '_is_featured', '1');
     } else {
         delete_post_meta($post_id, '_is_featured');
+    }
+
+    if (isset($_POST['voting_list_is_spotlight'])) {
+        update_post_meta($post_id, '_is_spotlight', '1');
+    } else {
+        delete_post_meta($post_id, '_is_spotlight');
     }
 
     // VIP List fields

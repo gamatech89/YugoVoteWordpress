@@ -719,8 +719,8 @@
   position: relative;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 70px;
-  overflow: hidden; /* ✅ CRITICAL: Hide cards outside visible area */
+  padding: 12px 70px;
+  overflow: hidden;
 }
 
 /* Carousel Track (scrollable container) */
