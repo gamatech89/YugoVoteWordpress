@@ -121,6 +121,7 @@ jQuery(document).ready(function() {
     if (!el) return;
     new Swiper(el, {
         loop: true,
+        loopAdditionalSlides: 4,
         speed: 600,
         autoplay: <?php echo $autoplay ? '{ delay: 5000, disableOnInteraction: true }' : 'false'; ?>,
         slidesPerView: 1.2,
