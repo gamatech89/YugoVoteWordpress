@@ -694,19 +694,29 @@
               }
             });
 
-            // Scroll to the item the user just voted on so they can see its new position
+            // Scroll to the item the user just voted on so they can see its new position.
+            // Two rAFs ensure the browser has finished layout after append() before we
+            // read offset().top, so the scroll target is accurate.
             if (this.lastVotedItemId) {
               const votedInstance = this.items.find(
                 (vi) => vi.id === this.lastVotedItemId
               );
               this.lastVotedItemId = null;
               if (votedInstance && votedInstance.$element.length) {
-                setTimeout(() => {
-                  votedInstance.$element[0].scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
+                const $el = votedInstance.$element;
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    const elementTop = $el.offset().top;
+                    const scrollTarget =
+                      elementTop -
+                      $(window).height() / 2 +
+                      $el.outerHeight() / 2;
+                    $("html, body").animate(
+                      { scrollTop: Math.max(0, scrollTarget) },
+                      400
+                    );
                   });
-                }, 50);
+                });
               }
             }
           } else {
