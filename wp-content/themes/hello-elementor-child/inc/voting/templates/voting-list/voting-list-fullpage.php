@@ -1382,7 +1382,7 @@ if (!empty($voting_items_ids)) {
                     scoreEl.dataset.score = newScore;
 
                     // Reorder items based on new scores
-                    reorderItems();
+                    reorderItems(itemEl);
                 }
 
                 // Update hero total score
@@ -1462,7 +1462,7 @@ if (!empty($voting_items_ids)) {
                         scoreEl.dataset.score = newScore;
 
                         // Reorder items based on new scores
-                        reorderItems();
+                        reorderItems(itemEl);
                     }
 
                     // Update hero total score
@@ -1557,27 +1557,41 @@ if (!empty($voting_items_ids)) {
     // ========================================
     // REORDER ITEMS WITH ANIMATION
     // ========================================
-    function reorderItems() {
+    function scrollToItem(el) {
+        const rect = el.getBoundingClientRect();
+        const docTop = rect.top + window.scrollY;
+        const target = Math.max(0, docTop - window.innerHeight / 2 + el.offsetHeight / 2);
+        console.log('[scroll] scrollToItem docTop:', docTop, 'target:', target, 'current scrollY:', window.scrollY);
+        window.scrollTo({ top: target, behavior: 'smooth' });
+    }
+
+    function reorderItems(targetEl) {
         const container = document.querySelector('.vlp-items');
         if (!container) return;
-        
+
         const items = Array.from(container.querySelectorAll('.vlp-item'));
         if (items.length < 2) return;
-        
-        // Store current positions
+
+        console.log('[reorder] called, targetEl id:', targetEl ? targetEl.dataset.itemId : 'none');
+
+        // Store positions as document-relative (top + scrollY) so that any
+        // scroll jump caused by appendChild() doesn't corrupt the FLIP deltas.
         const oldPositions = new Map();
         items.forEach(item => {
             const rect = item.getBoundingClientRect();
-            oldPositions.set(item, { top: rect.top, left: rect.left });
+            oldPositions.set(item, {
+                top:  rect.top  + window.scrollY,
+                left: rect.left + window.scrollX
+            });
         });
-        
+
         // Sort by score (descending)
         items.sort((a, b) => {
             const aScore = parseInt(a.querySelector('.vlp-item__score-value')?.dataset.score) || 0;
             const bScore = parseInt(b.querySelector('.vlp-item__score-value')?.dataset.score) || 0;
             return bScore - aScore;
         });
-        
+
         // Check if order changed
         const currentOrder = Array.from(container.querySelectorAll('.vlp-item'));
         let orderChanged = false;
@@ -1587,18 +1601,24 @@ if (!empty($voting_items_ids)) {
                 break;
             }
         }
-        
-        if (!orderChanged) return;
-        
+
+        if (!orderChanged) {
+            console.log('[reorder] order unchanged, scrolling to target only');
+            if (targetEl) scrollToItem(targetEl);
+            return;
+        }
+
+        console.log('[reorder] order changed, reordering DOM');
+
         // Reorder DOM
         items.forEach(item => container.appendChild(item));
-        
+
         // Update rankings
         items.forEach((item, index) => {
             const rank = index + 1;
             const rankNum = item.querySelector('.vlp-item__rank-num');
             if (rankNum) rankNum.textContent = '#' + rank;
-            
+
             // Update medal
             const rankMedal = item.querySelector('.vlp-item__rank-medal');
             if (rank <= 3) {
@@ -1618,32 +1638,37 @@ if (!empty($voting_items_ids)) {
                 item.classList.remove('vlp-item--rank-1', 'vlp-item--rank-2', 'vlp-item--rank-3');
             }
         });
-        
-        // Animate to new positions
+
+        // FLIP: animate each item from its old document position to its new one.
+        // We use document-relative positions for both measurements so scroll
+        // position changes between the two getBoundingClientRect() calls don't
+        // corrupt the delta.
         items.forEach(item => {
-            const oldPos = oldPositions.get(item);
-            const newRect = item.getBoundingClientRect();
-            
-            const deltaY = oldPos.top - newRect.top;
-            const deltaX = oldPos.left - newRect.left;
-            
+            const oldDocTop  = oldPositions.get(item).top;
+            const oldDocLeft = oldPositions.get(item).left;
+            const newRect    = item.getBoundingClientRect();
+            const newDocTop  = newRect.top  + window.scrollY;
+            const newDocLeft = newRect.left + window.scrollX;
+
+            const deltaY = oldDocTop  - newDocTop;
+            const deltaX = oldDocLeft - newDocLeft;
+
             if (Math.abs(deltaY) > 5 || Math.abs(deltaX) > 5) {
-                // Start from old position
                 item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                 item.style.transition = 'none';
-                
-                // Force reflow
-                item.offsetHeight;
-                
-                // Animate to new position
+                item.offsetHeight; // force reflow
                 item.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                 item.style.transform = '';
-                
-                // Add highlight effect for moved items
                 item.classList.add('vlp-item--moved');
                 setTimeout(() => item.classList.remove('vlp-item--moved'), 600);
             }
         });
+
+        // After animation finishes, scroll to the voted item
+        if (targetEl) {
+            console.log('[reorder] will scroll to item', targetEl.dataset.itemId, 'in 550ms');
+            setTimeout(() => scrollToItem(targetEl), 550);
+        }
     }
     
     function updateCounts(delta) {
