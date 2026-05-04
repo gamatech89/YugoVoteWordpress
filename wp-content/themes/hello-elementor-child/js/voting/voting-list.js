@@ -238,6 +238,7 @@
       this.refreshAllButtonStates(); // Update UI based on potentially changed local state
 
       if (proceedWithServerAction) {
+        this.lastVotedItemId = itemId;
         this.sendVoteUpdateRequest(serverAction, serverDataPayload);
       }
     }
@@ -692,6 +693,22 @@
                 votingItemInstance.updateRankDisplay(index + 1);
               }
             });
+
+            // Scroll to the item the user just voted on so they can see its new position
+            if (this.lastVotedItemId) {
+              const votedInstance = this.items.find(
+                (vi) => vi.id === this.lastVotedItemId
+              );
+              this.lastVotedItemId = null;
+              if (votedInstance && votedInstance.$element.length) {
+                setTimeout(() => {
+                  votedInstance.$element[0].scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }, 50);
+              }
+            }
           } else {
             console.warn(
               "Could not load item scores or invalid data format from server.",
