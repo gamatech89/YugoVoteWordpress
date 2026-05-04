@@ -55,17 +55,33 @@ jQuery(document).ready(function ($) {
     });
 
     // ✅ Restore Selected Questions on Edit
-    // function restoreSelectedQuestions() {
-    //     let savedQuestions = hiddenField.val();
- 
-    //     if (savedQuestions) {
-    //         let questionIds = JSON.parse(savedQuestions);
-    //         questionIds.forEach((id) => {
-    //             let title = questionSelect.find(`option[value='${id}']`).text();
-             
-    //         });
-    //     }
-    // }
+    function restoreSelectedQuestions() {
+        var savedQuestions = hiddenField.val();
+        if (!savedQuestions) return;
+
+        var questionIds;
+        try {
+            questionIds = JSON.parse(savedQuestions);
+        } catch (e) {
+            return;
+        }
+
+        if (!Array.isArray(questionIds) || questionIds.length === 0) return;
+
+        questionIds.forEach(function (id) {
+            id = String(id);
+            if (questionTable.find("tr[data-id='" + id + "']").length) return;
+            var title = questionSelect.find("option[value='" + id + "']").text() || ("Question #" + id);
+            var row = $(
+                '<tr data-id="' + id + '">' +
+                    '<td>' + title + '</td>' +
+                    '<td><button type="button" class="remove-question button button-small">Remove</button></td>' +
+                '</tr>'
+            );
+            questionTable.append(row);
+        });
+        // Hidden field already has the correct PHP-rendered value; no need to overwrite it
+    }
 
     // ✅ Add Question to Table
     addQuestionBtn.on("click", function () {
@@ -107,6 +123,5 @@ jQuery(document).ready(function ($) {
         hiddenField.val(JSON.stringify(questionIds));
     }
 
-    // ✅ Restore Questions on Load
-    // restoreSelectedQuestions();
+    // restoreSelectedQuestions() is called inside fetchQuestions() after the dropdown is populated
 });
