@@ -694,30 +694,40 @@
               }
             });
 
-            // Scroll to the item the user just voted on so they can see its new position.
-            // Two rAFs ensure the browser has finished layout after append() before we
-            // read offset().top, so the scroll target is accurate.
+            // --- SCROLL DEBUG ---
+            console.log("[scroll] lastVotedItemId:", this.lastVotedItemId);
+            console.log("[scroll] items in list:", this.items.map(vi => vi.id));
+
             if (this.lastVotedItemId) {
               const votedInstance = this.items.find(
                 (vi) => vi.id === this.lastVotedItemId
               );
+              console.log("[scroll] votedInstance found:", votedInstance ? votedInstance.id : "NOT FOUND");
+
               this.lastVotedItemId = null;
               if (votedInstance && votedInstance.$element.length) {
                 const $el = votedInstance.$element;
+                console.log("[scroll] element in DOM:", $.contains(document, $el[0]));
+                console.log("[scroll] element tag/class:", $el[0].tagName, $el[0].className);
                 requestAnimationFrame(() => {
                   requestAnimationFrame(() => {
                     const elementTop = $el.offset().top;
-                    const scrollTarget =
-                      elementTop -
-                      $(window).height() / 2 +
-                      $el.outerHeight() / 2;
+                    const windowHeight = $(window).height();
+                    const elHeight = $el.outerHeight();
+                    const scrollTarget = elementTop - windowHeight / 2 + elHeight / 2;
+                    console.log("[scroll] elementTop:", elementTop, "windowHeight:", windowHeight, "elHeight:", elHeight);
+                    console.log("[scroll] scrollTarget:", scrollTarget, "current scrollTop:", $(window).scrollTop());
                     $("html, body").animate(
                       { scrollTop: Math.max(0, scrollTarget) },
                       400
                     );
                   });
                 });
+              } else {
+                console.warn("[scroll] votedInstance not found or element empty — no scroll");
               }
+            } else {
+              console.log("[scroll] lastVotedItemId is null/undefined — skipping scroll");
             }
           } else {
             console.warn(
