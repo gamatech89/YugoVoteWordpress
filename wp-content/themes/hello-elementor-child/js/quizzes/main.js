@@ -292,7 +292,7 @@ class Quiz {
 
   async fetchQuizData() {
     try {
-      const response = await fetch(`${this.apiUrl}/quiz/${this.quizId}`);
+      const response = await fetch(`${this.apiUrl}/quiz/${this.quizId}?_=${Date.now()}`);
       const data = await response.json();
 
       if (!data.success || !data.questions?.length) {
