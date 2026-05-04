@@ -1610,8 +1610,18 @@ if (!empty($voting_items_ids)) {
 
         console.log('[reorder] order changed, reordering DOM');
 
+        // Save scroll position — browser scroll anchor fires during appendChild
+        // and can jump the page; we restore it immediately so the FLIP animation
+        // starts from the right viewport state, and our intentional scroll wins.
+        const savedScrollY = window.scrollY;
+
         // Reorder DOM
         items.forEach(item => container.appendChild(item));
+
+        // Restore scroll position synchronously (before next paint)
+        if (window.scrollY !== savedScrollY) {
+            window.scrollTo(window.scrollX, savedScrollY);
+        }
 
         // Update rankings
         items.forEach((item, index) => {
