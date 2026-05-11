@@ -339,6 +339,8 @@ function submit_vote() {
         $response['xp_awarded'] = $xp_awarded;
         $response['votes_today'] = $votes_today;
         $response['xp_limit_reached'] = $limit_reached;
+        $response['new_overall_xp'] = $xp_result['new_overall_xp'] ?? null;
+        $response['new_overall_level'] = $xp_result['new_overall_level'] ?? null;
         
         // Add streak info
         if ($streak_info) {

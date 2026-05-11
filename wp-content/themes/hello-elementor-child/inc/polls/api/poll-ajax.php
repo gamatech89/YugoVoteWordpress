@@ -70,3 +70,50 @@ function cs_handle_poll_vote_ajax() {
 }
 add_action('wp_ajax_cs_vote_poll', 'cs_handle_poll_vote_ajax');
 add_action('wp_ajax_nopriv_cs_vote_poll', 'cs_handle_poll_vote_ajax');
+
+// Load more polls for infinite scroll
+function cs_load_more_polls_ajax() {
+    check_ajax_referer('cs_load_more_polls', 'nonce');
+
+    $page     = max(1, intval($_POST['page'] ?? 1));
+    $per_page = 9;
+    // Page 1 of archive skips the latest post (offset 1); subsequent pages shift accordingly
+    $offset   = 1 + ($page - 1) * $per_page;
+
+    $query = new WP_Query([
+        'post_type'      => 'voting_poll',
+        'post_status'    => 'publish',
+        'posts_per_page' => $per_page,
+        'offset'         => $offset,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    ]);
+
+    if (!$query->have_posts()) {
+        wp_send_json_success(['html' => '', 'has_more' => false]);
+    }
+
+    $total_archive = max(0, wp_count_posts('voting_poll')->publish - 1);
+    $max_pages     = (int) ceil($total_archive / $per_page);
+
+    ob_start();
+    $card_template = get_stylesheet_directory() . '/inc/polls/templates/poll-card.php';
+    while ($query->have_posts()) {
+        $query->the_post();
+        $poll_id     = get_the_ID();
+        $date        = get_the_date('d. M Y.');
+        $img_url     = get_the_post_thumbnail_url($poll_id, 'medium_large');
+        $total_votes = (int) get_post_meta($poll_id, '_cs_poll_total_votes', true);
+        include $card_template;
+    }
+    wp_reset_postdata();
+    $html = ob_get_clean();
+
+    wp_send_json_success([
+        'html'     => $html,
+        'has_more' => $page < $max_pages,
+        'page'     => $page,
+    ]);
+}
+add_action('wp_ajax_cs_load_more_polls', 'cs_load_more_polls_ajax');
+add_action('wp_ajax_nopriv_cs_load_more_polls', 'cs_load_more_polls_ajax');

@@ -3046,12 +3046,27 @@ a {
   background: linear-gradient(135deg, #4456a6 0%, #2e3a8c 60%, #3d2fa0 100%);
 }
 
+.ygv-page-hero--polls .ygv-page-hero__label {
+  background: var(--red-color);
+  border-color: var(--red-color);
+}
+
 .ygv-page-hero--quiz {
   background: linear-gradient(135deg, #6366f1 0%, #4338ca 70%, #3730a3 100%);
 }
 
+.ygv-page-hero--quiz .ygv-page-hero__label {
+  background: var(--red-color);
+  border-color: var(--red-color);
+}
+
 .ygv-page-hero--dvoboj {
   background: linear-gradient(135deg, #1e2b7a 0%, #2e3a8c 50%, #3748a0 100%);
+}
+
+.ygv-page-hero--dvoboj .ygv-page-hero__label {
+  background: var(--red-color);
+  border-color: var(--red-color);
 }
 
 /* Dvoboj archive page body */
@@ -3090,4 +3105,26 @@ a {
   .ygv-page-hero__stat {
     padding: 12px 20px;
   }
+}
+
+/* ========== FOOTER LOGO ========== */
+.cs-footer-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18em;
+  font-family: "Jockey One", var(--primary-font, sans-serif);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.cs-footer-logo span:nth-child(1),
+.cs-footer-logo span:nth-child(2) {
+  color: var(--red-color);
+}
+
+.cs-footer-logo span:nth-child(3) {
+  color: var(--primary-color);
 }

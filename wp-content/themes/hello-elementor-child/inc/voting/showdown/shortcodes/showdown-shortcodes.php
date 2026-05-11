@@ -47,7 +47,7 @@ function yuv_showdown_shortcode($atts) {
     $user_id = get_current_user_id();
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $has_played = $manager->has_user_played($showdown_id, $user_id, $ip);
-    $leaderboard = $has_played || $status === 'completed' ? $manager->get_leaderboard($showdown_id) : [];
+    $leaderboard = $has_played ? $manager->get_leaderboard($showdown_id) : [];
     $total_players = $manager->get_session_count($showdown_id);
 
     ob_start();
@@ -59,16 +59,15 @@ function yuv_showdown_shortcode($atts) {
          data-status="<?php echo esc_attr($status); ?>"
          data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
          data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
-         style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>"
          >
-        
+
         <!-- Header (hidden when showing results) -->
-        <header class="showdown-header" id="sd-header" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
+        <header class="showdown-header" id="sd-header">
             <div class="showdown-badge">
                 <i class="ri-sword-line"></i>
                 Može biti samo jedan
             </div>
-            <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
+            <h2 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h2>
             <?php if ($showdown->post_content): ?>
                 <p class="showdown-subtitle"><?php echo esc_html(wp_trim_words($showdown->post_content, 25)); ?></p>
             <?php else: ?>
@@ -77,7 +76,7 @@ function yuv_showdown_shortcode($atts) {
         </header>
 
         <!-- Progress -->
-        <div class="sd-progress" id="sd-progress" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
+        <div class="sd-progress" id="sd-progress">
             <div class="sd-progress__info">
                 <span class="sd-progress__round" id="sd-progress-round">Runda 1 od <?php echo count($items) - 1; ?></span>
                 <span class="sd-progress__remaining">Preostalo: <strong id="sd-progress-remaining"><?php echo count($items); ?></strong> učesnika</span>
@@ -88,7 +87,7 @@ function yuv_showdown_shortcode($atts) {
         </div>
 
         <!-- Arena (two cards side by side) -->
-        <div class="sd-arena" id="sd-arena" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
+        <div class="sd-arena" id="sd-arena">
             
             <!-- Fighter A -->
             <div class="sd-fighter" id="sd-fighter-a" data-side="left">
@@ -128,7 +127,7 @@ function yuv_showdown_shortcode($atts) {
         </div>
 
         <!-- Hint -->
-        <p class="sd-hint" id="sd-hint" style="<?php echo ($status === 'completed') ? 'display:none' : ''; ?>">
+        <p class="sd-hint" id="sd-hint">
             <i class="ri-cursor-line"></i>
             Klikni na karticu ili dugme da izabereš pobednika
         </p>
@@ -136,16 +135,16 @@ function yuv_showdown_shortcode($atts) {
     </div><!-- /.sd-page -->
 
     <!-- Results Screen (fixed overlay, light theme, matching mockup) -->
-    <div id="sd-results" class="sd-results-screen <?php echo ($status === 'completed') ? 'sd-results-screen--visible' : ''; ?>">
-            
-            <?php if ($has_played || $status === 'completed'): ?>
+    <div id="sd-results" class="sd-results-screen <?php echo $has_played ? 'sd-results-screen--visible' : ''; ?>">
+
+            <?php if ($has_played): ?>
                 <!-- Results Header -->
                 <header class="showdown-header sd-results-header">
                     <div class="showdown-badge">
                         <i class="ri-sword-line"></i>
                         Može biti samo jedan
                     </div>
-                    <h1 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h1>
+                    <h2 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h2>
                 </header>
 
                 <?php if (!empty($leaderboard)): ?>
@@ -180,29 +179,7 @@ function yuv_showdown_shortcode($atts) {
 
                     <?php $is_own_page = (get_the_ID() == $showdown_id); ?>
 
-                    <?php if ($is_own_page && count($leaderboard) > 3): ?>
-                        <!-- Full ranked list — shown only on the showdown's own page -->
-                        <section class="sd-ranked">
-                            <h2 class="sd-ranked__title">Kompletni poredak</h2>
-                            <div class="sd-ranked__list">
-                                <?php foreach (array_slice($leaderboard, 3) as $rank => $entry):
-                                    $win_rate = $entry['sessions'] > 0 ? round(($entry['wins'] / $entry['sessions']) * 100) : 0;
-                                ?>
-                                    <div class="sd-ranked__item">
-                                        <span class="sd-ranked__rank"><?php echo $rank + 4; ?></span>
-                                        <?php if (!empty($entry['image'])): ?>
-                                            <img class="sd-ranked__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="">
-                                        <?php endif; ?>
-                                        <div class="sd-ranked__info">
-                                            <h4 class="sd-ranked__name"><?php echo esc_html($entry['name']); ?></h4>
-                                        </div>
-                                        <span class="sd-ranked__stats">Pobede: <strong><?php echo $win_rate; ?>%</strong></span>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </section>
-
-                    <?php elseif (!$is_own_page): ?>
+                    <?php if (!$is_own_page): ?>
                         <!-- Redirect button — shown on homepage or any other page -->
                         <section class="sd-ranked">
                             <div class="sd-ranked__expand">
@@ -229,13 +206,16 @@ add_shortcode('yuv_showdown', 'yuv_showdown_shortcode');
  */
 function yuv_showdown_archive_shortcode($atts) {
     $atts = shortcode_atts(['count' => 20], $atts);
-    
+
     $manager = new YUV_Showdown_Manager();
     $archive = $manager->get_archive(intval($atts['count']));
 
     if (empty($archive)) {
         return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-archive-line"></i></div><h3 class="sd-empty__title">Nema prethodnih dvoboja</h3><p class="sd-empty__desc">Još uvek nema završenih takmičenja.</p></div></div>';
     }
+
+    $user_id = get_current_user_id();
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
     ob_start();
     ?>
@@ -246,15 +226,21 @@ function yuv_showdown_archive_shortcode($atts) {
                 <i class="ri-archive-line"></i>
                 Arhiva
             </div>
-            <h1 class="showdown-title">Prethodni dvoboji</h1>
+            <h2 class="showdown-title">Prethodni dvoboji</h2>
         </header>
 
         <!-- Grid -->
         <div class="sd-archive-grid">
             <?php foreach ($archive as $item): ?>
-                <article class="sd-archive-card">
+                <?php $voted = $manager->has_user_played($item['id'], $user_id, $ip); ?>
+                <article class="sd-archive-card<?php echo $voted ? ' sd-archive-card--voted' : ''; ?>">
                     <div class="sd-archive-card__top">
                         <span class="sd-archive-card__date"><?php echo esc_html($item['date']); ?></span>
+                        <?php if ($voted): ?>
+                            <span class="sd-archive-card__voted-badge">
+                                <i class="ri-check-line"></i> Glasao si
+                            </span>
+                        <?php endif; ?>
                     </div>
                     <h3 class="sd-archive-card__title"><?php echo esc_html($item['title']); ?></h3>
                     

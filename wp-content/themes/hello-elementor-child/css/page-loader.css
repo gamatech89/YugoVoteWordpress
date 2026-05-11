@@ -1,0 +1,35 @@
+/* Page Loader / Transition Overlay */
+
+#ygv-page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+#ygv-page-loader.ygv-loader--hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Spinner */
+.ygv-loader__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    border-top-color: var(--ygv-primary, #2D3A8C);
+    border-radius: 50%;
+    animation: ygv-spin 0.7s linear infinite;
+}
+
+@keyframes ygv-spin {
+    to { transform: rotate(360deg); }
+}

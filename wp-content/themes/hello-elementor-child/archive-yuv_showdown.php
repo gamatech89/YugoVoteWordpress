@@ -24,9 +24,9 @@ $total_showdowns = wp_count_posts('yuv_showdown')->publish;
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
                 Dvoboj
             </div>
-            <h1 class="ygv-page-hero__title">Arena Dvoboja</h1>
+            <h1 class="ygv-page-hero__title">1 na 1</h1>
             <p class="ygv-page-hero__desc">
-                Glasaj za svog favorita u duelima 1 na 1 — gubitnik ispada, može biti samo jedan!
+                There can be only one
             </p>
             <div class="ygv-page-hero__stats">
                 <div class="ygv-page-hero__stat">

@@ -233,6 +233,8 @@ class ProgressService {
             $result['base_xp'] = $base_xp;
             $result['streak_bonus_xp'] = $streak_bonus_xp;
             $result['level_ups'] = $xp_result['level_ups'] ?? [];
+            $result['new_overall_xp'] = $xp_result['overall']['xp'] ?? 0;
+            $result['new_overall_level'] = $xp_result['overall']['level'] ?? 1;
         }
         
         $result['streak'] = $streak_info;

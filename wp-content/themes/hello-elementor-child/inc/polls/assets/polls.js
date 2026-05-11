@@ -159,11 +159,92 @@
     }, 3000);
   }
 
+  // ── Infinite scroll for poll archive ──────────────────────────────────
+  function initInfiniteScroll() {
+    const grid     = document.getElementById("ygv-poll-grid");
+    const sentinel = document.getElementById("ygv-poll-sentinel");
+    if (!grid || !sentinel) return;
+
+    let loading = false;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting || loading) return;
+        loadMorePolls();
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(sentinel);
+
+    function loadMorePolls() {
+      const currentPage = parseInt(grid.dataset.page, 10);
+      const maxPages    = parseInt(grid.dataset.maxPages, 10);
+      const nextPage    = currentPage + 1;
+
+      if (nextPage > maxPages) {
+        observer.disconnect();
+        sentinel.style.display = "none";
+        return;
+      }
+
+      loading = true;
+      sentinel.classList.add("ygv-poll-archive__sentinel--loading");
+
+      fetch(grid.dataset.ajaxUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          action: "cs_load_more_polls",
+          nonce:  grid.dataset.nonce,
+          page:   nextPage,
+        }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.success) return;
+
+          const { html, has_more } = data.data;
+
+          if (html) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = html;
+            const newCards = Array.from(tmp.children);
+            newCards.forEach((card) => {
+              grid.appendChild(card);
+              const poll = card.querySelector(".ygv-poll");
+              if (poll) initPoll(poll.closest(".ygv-poll") || poll);
+            });
+            // Re-init polls inside newly appended cards
+            grid.querySelectorAll(".ygv-poll:not([data-init])").forEach((p) => {
+              p.dataset.init = "1";
+              initPoll(p);
+            });
+          }
+
+          grid.dataset.page = nextPage;
+
+          if (!has_more) {
+            observer.disconnect();
+            sentinel.style.display = "none";
+          }
+        })
+        .catch((err) => console.error("Load more polls error:", err))
+        .finally(() => {
+          loading = false;
+          sentinel.classList.remove("ygv-poll-archive__sentinel--loading");
+        });
+    }
+  }
+
   // Initialize on DOM ready
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initPolls);
+    document.addEventListener("DOMContentLoaded", () => {
+      initPolls();
+      initInfiniteScroll();
+    });
   } else {
     initPolls();
+    initInfiniteScroll();
   }
 
   // Export for external use

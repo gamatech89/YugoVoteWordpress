@@ -83,15 +83,15 @@
 
 .ygv-header__topnav a,
 .ygv-header__topnav .menu-item a {
-  font-size: 13px;
-  color: var(--ygv-text-muted);
+  font-size: 16px;
+  color: var(--ygv-primary);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .ygv-header__topnav a:hover,
 .ygv-header__topnav .menu-item a:hover {
-  color: var(--ygv-text);
+  color: var(--red-color);
 }
 
 /* Reset ul/li from wp_nav_menu */
@@ -3189,6 +3189,34 @@ button.ygv-quiz-card__btn:hover,
   background: var(--ygv-primary);
   color: white;
   border-color: var(--ygv-primary);
+}
+
+/* Poll archive infinite scroll sentinel */
+.ygv-poll-archive__sentinel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0 20px;
+  min-height: 80px;
+}
+
+.ygv-poll-archive__spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--ygv-border);
+  border-top-color: var(--ygv-primary);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ygv-poll-archive__sentinel--loading .ygv-poll-archive__spinner {
+  opacity: 1;
+  animation: ygv-spin 0.7s linear infinite;
+}
+
+@keyframes ygv-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ========================================

@@ -23,18 +23,14 @@
             if (!$page.length) return;
 
             this.showdownId = parseInt($page.data("showdown-id"));
-            const status = $page.data("status");
 
-            // If it's already completed by status, server-side render is enough
-            if (status === "completed") return;
-
-            // If it's active, we double check via AJAX to bypass LiteSpeed cache issues for guests
+            // Always check via AJAX to bypass LiteSpeed cache and get real has_played state
             this.checkStatusAndInit($page);
         },
 
         checkStatusAndInit: function ($page) {
             const self = this;
-            
+
             $.ajax({
                 url: yuvShowdown.ajaxurl,
                 method: "POST",
@@ -193,15 +189,15 @@
                 // We set opacity directly to 0 briefly to prevent the "flash" of old content
                 // as the class swaps from exit to enter
                 loserCard.style.opacity = "0";
-                
-                setTimeout(function() {
+
+                setTimeout(function () {
                     self.renderFighter(loserSlot, newChallenger);
                     self.updateProgress();
 
                     loserCard.classList.remove(loserDir);
                     const enterDir = loserSlot === "a" ? "anim-enter-left" : "anim-enter-right";
                     loserCard.classList.add(enterDir);
-                    
+
                     // Cleanup animations
                     setTimeout(function () {
                         winnerCard.classList.remove("anim-winner");
@@ -293,7 +289,7 @@
             html += '<header class="showdown-header sd-results-header">';
             html += '<div class="showdown-badge"><i class="ri-sword-line"></i> Može biti samo jedan</div>';
             html += '<h1 class="showdown-title">' + Showdown.escHtml(title) + '</h1>';
-            html += '<p class="showdown-subtitle">Dvoboj završen — evo konačnog poretka</p>';
+            html += '<p class="showdown-subtitle">Trenutni poredak</p>';
             html += '</header>';
 
             // Podium
@@ -313,7 +309,7 @@
                 if (entry.image) html += '<img class="sd-podium__avatar" src="' + entry.image + '" alt="' + Showdown.escHtml(entry.name) + '">';
                 html += '</div>';
                 html += '<h3 class="sd-podium__name">' + Showdown.escHtml(entry.name) + '</h3>';
-                
+
                 const winRate = entry.sessions > 0 ? Math.round((entry.wins / entry.sessions) * 100) : 0;
                 html += '<p class="sd-podium__wins">Pobede: <strong>' + winRate + '%</strong></p>';
                 html += '</div>';
@@ -322,12 +318,11 @@
 
             // Full list on own page, redirect button elsewhere
             const showdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            const normalize = function(u) { return u.replace(/\/+$/, ''); };
+            const normalize = function (u) { return u.replace(/\/+$/, ''); };
             const isOwnPage = showdownUrl && normalize(window.location.href) === normalize(showdownUrl);
 
             if (isOwnPage && leaderboard.length > 3) {
                 html += '<section class="sd-ranked">';
-                html += '<h2 class="sd-ranked__title">Kompletni poredak</h2>';
                 html += '<div class="sd-ranked__list">';
                 for (let i = 3; i < leaderboard.length; i++) {
                     const entry = leaderboard[i];
@@ -393,12 +388,11 @@
 
             // Full list on own page, redirect button elsewhere
             const localShowdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            const normalizeLocal = function(u) { return u.replace(/\/+$/, ''); };
+            const normalizeLocal = function (u) { return u.replace(/\/+$/, ''); };
             const isOwnPageLocal = localShowdownUrl && normalizeLocal(window.location.href) === normalizeLocal(localShowdownUrl);
 
             if (isOwnPageLocal && ranked.length > 3) {
                 html += '<section class="sd-ranked">';
-                html += '<h2 class="sd-ranked__title">Kompletni poredak</h2>';
                 html += '<div class="sd-ranked__list">';
                 for (let i = 3; i < ranked.length; i++) {
                     const name = ranked[i];

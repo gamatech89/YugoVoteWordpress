@@ -23,15 +23,6 @@ $section_label = $mode_labels[$mode] ?? 'Liste';
 ?>
 
 <section class="ygv-spotlight-section">
-    <div class="ygv-spotlight-head cs-container">
-        <h2 class="ygv-spotlight-title">
-            <?php if ($mode === 'trending') : ?>
-            <svg class="ygv-spotlight-title-icon" width="22" height="22" viewBox="0 0 14 14" fill="none"><path d="M1 10L5 6L8 9L13 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3H13V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <?php endif; ?>
-            <?php echo esc_html($section_label); ?>
-        </h2>
-    </div>
-
     <div class="ygv-spotlight-carousel-wrap">
         <div class="swiper ygv-spotlight-swiper" id="<?php echo esc_attr($slider_id); ?>">
             <div class="swiper-wrapper">

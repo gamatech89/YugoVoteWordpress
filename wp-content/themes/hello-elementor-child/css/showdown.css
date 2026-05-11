@@ -10,7 +10,7 @@
   --sd-bg-card: #3448a0;
   --sd-bg-card-hover: #2e3e96;
   --sd-text: #ffffff;
-  --sd-text-muted: rgba(255, 255, 255, 0.65);
+  --sd-text-muted: rgba(255, 255, 255, 1);
   --sd-border: rgba(255, 255, 255, 0.12);
   --sd-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   --sd-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.3);
@@ -36,7 +36,7 @@
 }
 
 .sd-dark .sd-podium__wins {
-  color: var(--sd-text-muted);
+  color: #fff;
 }
 
 .sd-dark .sd-ranked__name {
@@ -53,7 +53,7 @@
 }
 
 .sd-dark .sd-ranked__stats {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 1);
   font-weight: 600;
 }
 
@@ -150,9 +150,9 @@
 }
 
 .sd-dark .sd-archive-header .showdown-badge {
-  background: var(--sd-bg-card);
-  color: var(--sd-text-muted);
-  border: 1px solid var(--sd-border);
+  background: var(--red-color);
+  color: #fff;
+  border: 1px solid var(--red-color);
 }
 
 /* ========== DESIGN TOKENS ========== */
@@ -239,10 +239,10 @@
 .showdown-title {
   font-family: var(--sd-font-heading);
   font-size: 40px;
+  font-weight: 400;
   color: #ffffff;
-  margin-bottom: 2px;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-  line-height: 1.15;
+  line-height: 40px;
+  letter-spacing: 1px;
 }
 
 .showdown-subtitle {
@@ -716,7 +716,8 @@
 }
 
 .sd-dark .sd-podium__wins {
-  color: var(--sd-text-muted);
+  color: #fff;
+
 }
 
 /* ====================================================
@@ -838,28 +839,35 @@
 
 .sd-podium__name {
   font-family: var(--sd-font-heading);
-  font-size: 1rem;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
   color: #ffffff;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 2.5em;
+  margin: 0 0 16px 0;
 }
 
 .sd-podium__item--gold .sd-podium__name {
-  font-size: 1.15rem;
+  font-size: 20px;
 }
 
 .sd-podium__wins {
-  font-size: 0.85rem;
+  display: inline-block;
+  font-size: 1rem;
   color: #ffffff;
+  background: var(--sd-secondary);
+  border-radius: 100px;
+  padding: 3px 10px;
+  font-weight: 600;
 }
 
 .sd-podium__wins strong {
-  color: var(--sd-secondary);
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -957,15 +965,16 @@
 
 .sd-ranked__rank {
   font-family: var(--sd-font-heading);
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   color: var(--sd-text-muted);
   min-width: 18px;
   text-align: center;
+  font-weight: 600;
 }
 
 .sd-ranked__avatar {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -978,7 +987,9 @@
 
 .sd-ranked__name {
   font-family: var(--sd-font-heading);
-  font-size: 1rem;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
   color: var(--sd-text);
 }
 
@@ -987,10 +998,11 @@
 }
 
 .sd-ranked__stats {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--sd-text-muted);
   text-align: right;
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .sd-ranked__stats strong {
@@ -1006,9 +1018,9 @@
 }
 
 .sd-archive-header .showdown-badge {
-  background: var(--sd-bg-card);
-  color: var(--sd-text-muted);
-  border: 1px solid var(--sd-border);
+  background: var(--red-color);
+  color: #fff;
+  border: 1px solid var(--red-color);
 }
 
 .sd-archive-grid {
@@ -1057,6 +1069,34 @@
 .sd-archive-card__date {
   font-size: 0.78rem;
   color: var(--sd-text-muted);
+}
+
+.sd-archive-card__voted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+.sd-dark .sd-archive-card__voted-badge {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.2);
+}
+
+.sd-archive-card--voted {
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+.sd-dark .sd-archive-card--voted {
+  border-color: rgba(74, 222, 128, 0.15);
 }
 
 .sd-archive-card__title {
@@ -1305,7 +1345,7 @@
   }
 
   .showdown-title {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
   }
 
   .showdown-subtitle {
@@ -1455,11 +1495,11 @@
   }
 
   .sd-podium__name {
-    font-size: 0.95rem;
+    font-size: 1.2rem;
   }
 
   .sd-podium__item--gold .sd-podium__name {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
   }
 
   /* Archive */

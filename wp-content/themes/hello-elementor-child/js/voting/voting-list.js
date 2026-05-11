@@ -520,6 +520,18 @@
                 this._showToast(feedbackMsg, "success", 3500);
               }
 
+              // Update stats bar XP display in real-time
+              if (response.data.new_overall_xp != null) {
+                document.querySelectorAll(".ygv-stats-xp .ygv-stats-value").forEach((el) => {
+                  el.textContent = response.data.new_overall_xp.toLocaleString("sr-RS");
+                });
+                if (response.data.new_overall_level != null) {
+                  document.querySelectorAll(".ygv-stats-level-badge").forEach((el) => {
+                    el.textContent = response.data.new_overall_level;
+                  });
+                }
+              }
+
               // Handle level-ups (show popup with mascot)
               if (
                 response.data.level_ups &&
