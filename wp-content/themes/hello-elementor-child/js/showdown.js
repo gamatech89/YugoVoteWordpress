@@ -310,8 +310,7 @@
                 html += '</div>';
                 html += '<h3 class="sd-podium__name">' + Showdown.escHtml(entry.name) + '</h3>';
 
-                const winRate = entry.sessions > 0 ? Math.round((entry.wins / entry.sessions) * 100) : 0;
-                html += '<p class="sd-podium__wins">Pobede: <strong>' + winRate + '%</strong></p>';
+                html += '<p class="sd-podium__wins">Pobede: <strong>' + entry.wins + '</strong></p>';
                 html += '</div>';
             }
             html += '</section>';
@@ -327,14 +326,13 @@
                 for (let i = 3; i < leaderboard.length; i++) {
                     const entry = leaderboard[i];
                     const delay = 0.1 + (i - 3) * 0.05;
-                    const winRate = entry.sessions > 0 ? Math.round((entry.wins / entry.sessions) * 100) : 0;
                     html += '<div class="sd-ranked__item" style="transition-delay:' + delay + 's">';
                     html += '<span class="sd-ranked__rank">' + (i + 1) + '</span>';
                     if (entry.image) html += '<img class="sd-ranked__avatar" src="' + entry.image + '" alt="">';
                     html += '<div class="sd-ranked__info">';
                     html += '<h4 class="sd-ranked__name">' + Showdown.escHtml(entry.name) + '</h4>';
                     html += '</div>';
-                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + winRate + '%</strong></span>';
+                    html += '<span class="sd-ranked__stats">Pobede: <strong>' + entry.wins + '</strong></span>';
                     html += '</div>';
                 }
                 html += '</div></section>';
