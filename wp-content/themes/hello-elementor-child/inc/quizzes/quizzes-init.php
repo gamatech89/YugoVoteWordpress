@@ -43,6 +43,10 @@ if (file_exists($levels_sc)) require_once $levels_sc;
 $quiz_grid_sc = $quizzes_inc_path . 'shortcodes/quiz-grid-shortcode.php';
 if (file_exists($quiz_grid_sc)) require_once $quiz_grid_sc;
 
+// Quiz Slider Shortcode [quiz_slider]
+$quiz_slider_sc = $quizzes_inc_path . 'shortcodes/quiz-slider-shortcode.php';
+if (file_exists($quiz_slider_sc)) require_once $quiz_slider_sc;
+
 // ✅ NEW: Quiz Grid AJAX Handler
 $quiz_ajax_grid = $quizzes_inc_path . 'api/quiz-ajax-grid.php';
 if (file_exists($quiz_ajax_grid)) require_once $quiz_ajax_grid;

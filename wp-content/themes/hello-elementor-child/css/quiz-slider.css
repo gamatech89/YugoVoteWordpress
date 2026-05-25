@@ -1,0 +1,36 @@
+/* ===========================================
+   Quiz Slider Widget — [quiz_slider]
+   =========================================== */
+
+.ygv-quiz-slider-section {
+    position: relative;
+    width: 100%;
+    padding: 0 0 8px;
+}
+
+/* Carousel: same wrapper/arrow pattern as spotlight slider */
+.ygv-quiz-slider-swiper {
+    overflow: hidden;
+}
+
+/* Ensure cards fill the slide height uniformly */
+.ygv-quiz-slider-swiper .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+.ygv-quiz-slider-swiper .swiper-slide .ygv-quiz-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.ygv-quiz-slider-swiper .swiper-slide .ygv-quiz-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ygv-quiz-slider-swiper .swiper-slide .ygv-quiz-card__btn {
+    margin-top: auto;
+}
