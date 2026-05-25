@@ -35,6 +35,7 @@ class QuizMetaBox {
         $quiz_token_cost     = (int) get_post_meta($post->ID, '_quiz_token_cost', true) ?: 8;
         $quiz_xp_value       = (int) get_post_meta($post->ID, '_quiz_xp_value', true) ?: 20;
         $allow_guest_play    = get_post_meta($post->ID, '_allow_guest_play', true);
+        $quiz_featured       = get_post_meta($post->ID, '_quiz_featured', true);
 
         $categories = get_terms([
             'taxonomy'   => 'question_category',
@@ -81,6 +82,13 @@ class QuizMetaBox {
                 <strong><?php esc_html_e('Allow Guest Play', 'hello-elementor-child'); ?></strong>
             </label>
             <p class="description"><?php esc_html_e('Allow non-logged-in users to play this quiz (scores will not be saved).', 'hello-elementor-child'); ?></p>
+            <br><br>
+
+            <label>
+                <input type="checkbox" name="quiz_featured" value="1" <?php checked($quiz_featured, '1'); ?>>
+                <strong>⭐ <?php esc_html_e('Featured Quiz', 'hello-elementor-child'); ?></strong>
+            </label>
+            <p class="description"><?php esc_html_e('Mark this quiz as featured — it will appear in the [quiz_slider featured="true"] widget.', 'hello-elementor-child'); ?></p>
             <br><br>
 
             <label><strong><?php esc_html_e('Quiz Difficulty', 'hello-elementor-child'); ?>:</strong></label>
@@ -207,6 +215,12 @@ class QuizMetaBox {
             update_post_meta($post_id, '_allow_guest_play', '1');
         } else {
             delete_post_meta($post_id, '_allow_guest_play');
+        }
+
+        if (isset($_POST['quiz_featured'])) {
+            update_post_meta($post_id, '_quiz_featured', '1');
+        } else {
+            delete_post_meta($post_id, '_quiz_featured');
         }
     }
 }
