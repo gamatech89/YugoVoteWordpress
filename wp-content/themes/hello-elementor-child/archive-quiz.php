@@ -358,7 +358,9 @@ get_header();
                 </div>
             </div>
 
-            <div id="ygv-archive-pagination"></div>
+            <div id="ygv-archive-pagination"
+                 data-current="<?php echo esc_attr($paged); ?>"
+                 data-total="<?php echo esc_attr($quizzes_query->max_num_pages); ?>"></div>
 
         </section>
         <?php

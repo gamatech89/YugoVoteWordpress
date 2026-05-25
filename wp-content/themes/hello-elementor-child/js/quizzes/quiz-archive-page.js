@@ -148,6 +148,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ── Init: load if URL already has filters (e.g. back-navigation) ──────
-    // (initial render is PHP so no AJAX needed on first load)
+    // ── Init: render pagination from PHP data attributes ──────────────────
+    if (pagWrap) {
+        const initTotal   = parseInt(pagWrap.dataset.total,   10) || 1;
+        const initCurrent = parseInt(pagWrap.dataset.current, 10) || 1;
+        renderPagination(initCurrent, initTotal);
+    }
 });
