@@ -42,9 +42,11 @@ function enqueue_quizzes_assets() {
     );
 
     wp_localize_script('quizzes-js', 'quizSettings', [
-        'apiUrl'    => esc_url_raw( rest_url('yugovote/v1') ),
-        'soundPath' => get_stylesheet_directory_uri() . '/assets/sounds/',
-        'nonce'     => wp_create_nonce('wp_rest'),
+        'apiUrl'      => esc_url_raw( rest_url('yugovote/v1') ),
+        'soundPath'   => get_stylesheet_directory_uri() . '/assets/sounds/',
+        'nonce'       => wp_create_nonce('wp_rest'),
+        'loginUrl'    => wp_login_url( get_permalink() ),
+        'registerUrl' => wp_registration_url(),
     ]);
 
     // ✅ Localize ajaxurl for AJAX requests

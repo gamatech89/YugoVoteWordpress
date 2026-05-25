@@ -250,10 +250,17 @@ get_header();
                         ];
                         $diff_color = $diff_colors[strtolower($quiz_difficulty_slug)] ?? '#6366f1';
 
+                        // Lock state
+                        $is_locked = !$current_user_id
+                            && get_post_meta($quiz_id, '_allow_guest_play', true) !== '1';
+
                         // Status badge
                         $status_badge = '';
                         $status_class = '';
-                        if ($is_completed && $best_percent >= 80) {
+                        if ($is_locked) {
+                            $status_badge = '🔒 Prijavi se';
+                            $status_class = 'ygv-status-locked';
+                        } elseif ($is_completed && $best_percent >= 80) {
                             $status_badge = '✓ Odličan rezultat';
                             $status_class = 'ygv-status-excellent';
                         } elseif ($is_completed) {
@@ -264,7 +271,8 @@ get_header();
                             $status_class = 'ygv-status-new';
                         }
                         ?>
-                        <article class="ygv-quiz-card" style="--card-color: <?php echo esc_attr($cat_color); ?>;">
+                        <article class="ygv-quiz-card <?php echo $is_locked ? 'ygv-quiz-card--locked' : ''; ?>"
+                            style="--card-color: <?php echo esc_attr($cat_color); ?>;">
                             <div class="ygv-quiz-card__image">
                                 <?php if (has_post_thumbnail()): ?>
                                     <?php the_post_thumbnail('medium_large'); ?>
@@ -285,8 +293,11 @@ get_header();
                                     <?php echo esc_html($status_badge); ?>
                                 </span>
 
-                                <?php if ($is_completed): ?>
-                                    <!-- Progress overlay for completed quizzes -->
+                                <?php if ($is_locked): ?>
+                                    <div class="ygv-quiz-card__lock-overlay">
+                                        <?php ygv_icon_e('lock', 28); ?>
+                                    </div>
+                                <?php elseif ($is_completed): ?>
                                     <div class="ygv-quiz-card__overlay">
                                         <div class="ygv-quiz-card__checkmark">
                                             <?php ygv_icon_e('check', 32); ?>
@@ -329,10 +340,17 @@ get_header();
                                     </div>
                                 <?php endif; ?>
 
-                                <button type="button" class="ygv-quiz-card__btn ygv-quiz-start-btn"
-                                    data-quiz-id="<?php echo $quiz_id; ?>">
-                                    <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
-                                    <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
+                                <button type="button"
+                                    class="ygv-quiz-card__btn ygv-quiz-start-btn <?php echo $is_locked ? 'ygv-quiz-btn--locked' : ''; ?>"
+                                    data-quiz-id="<?php echo $quiz_id; ?>"
+                                    <?php echo $is_locked ? 'data-locked="true"' : ''; ?>>
+                                    <?php if ($is_locked): ?>
+                                        <?php ygv_icon_e('lock', 16); ?>
+                                        <span>Prijavi se da igraš</span>
+                                    <?php else: ?>
+                                        <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
+                                        <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
+                                    <?php endif; ?>
                                 </button>
                             </div>
                         </article>

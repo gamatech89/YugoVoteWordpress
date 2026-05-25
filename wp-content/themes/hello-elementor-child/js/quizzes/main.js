@@ -643,6 +643,11 @@ document.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
 
+  if (btn.dataset.locked === "true") {
+    ygvShowLoginModal();
+    return;
+  }
+
   const quizId = btn.dataset.quizId;
   if (!quizId || !window.Quiz || !window.quizSettings?.apiUrl) return;
   if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
@@ -653,3 +658,44 @@ document.addEventListener("click", (e) => {
     console.error("Quiz launch error:", err);
   }
 });
+
+function ygvShowLoginModal() {
+  let modal = document.getElementById("ygv-login-modal");
+
+  if (!modal) {
+    const loginUrl    = window.quizSettings?.loginUrl    || "/wp-login.php";
+    const registerUrl = window.quizSettings?.registerUrl || "/wp-login.php?action=register";
+
+    modal = document.createElement("div");
+    modal.id = "ygv-login-modal";
+    modal.innerHTML = `
+      <div class="ygv-lm__backdrop"></div>
+      <div class="ygv-lm__box" role="dialog" aria-modal="true">
+        <button class="ygv-lm__close" aria-label="Zatvori">✕</button>
+        <div class="ygv-lm__icon">🔒</div>
+        <h3 class="ygv-lm__title">Potrebna prijava</h3>
+        <p class="ygv-lm__text">
+          Prijavite se ili kreirajte nalog kako biste igrali kvizove,
+          čuvali rezultate i osvajali XP.
+        </p>
+        <div class="ygv-lm__actions">
+          <a href="${loginUrl}"    class="ygv-lm__btn ygv-lm__btn--primary">Prijavi se</a>
+          <a href="${registerUrl}" class="ygv-lm__btn ygv-lm__btn--secondary">Registruj se</a>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector(".ygv-lm__backdrop").addEventListener("click", () =>
+      modal.classList.remove("is-open")
+    );
+    modal.querySelector(".ygv-lm__close").addEventListener("click", () =>
+      modal.classList.remove("is-open")
+    );
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") modal.classList.remove("is-open");
+    });
+  }
+
+  modal.classList.add("is-open");
+}

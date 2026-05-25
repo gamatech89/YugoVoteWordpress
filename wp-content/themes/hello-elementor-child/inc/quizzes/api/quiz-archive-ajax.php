@@ -90,7 +90,12 @@ function ygv_archive_filter_ajax() {
                 }
             }
 
-            if ($is_completed && $best_percent >= 80) {
+            $is_locked = !$user_id
+                && get_post_meta($quiz_id, '_allow_guest_play', true) !== '1';
+
+            if ($is_locked) {
+                $status_badge = '🔒 Prijavi se';      $status_class = 'ygv-status-locked';
+            } elseif ($is_completed && $best_percent >= 80) {
                 $status_badge = '✓ Odličan rezultat'; $status_class = 'ygv-status-excellent';
             } elseif ($is_completed) {
                 $status_badge = '✓ Odigrano';         $status_class = 'ygv-status-played';
@@ -98,7 +103,8 @@ function ygv_archive_filter_ajax() {
                 $status_badge = '☆ Nije igrano';      $status_class = 'ygv-status-new';
             }
             ?>
-            <article class="ygv-quiz-card" style="--card-color: <?php echo esc_attr($cat_color); ?>;">
+            <article class="ygv-quiz-card <?php echo $is_locked ? 'ygv-quiz-card--locked' : ''; ?>"
+                style="--card-color: <?php echo esc_attr($cat_color); ?>;">
                 <div class="ygv-quiz-card__image">
                     <?php if (has_post_thumbnail()): ?>
                         <?php the_post_thumbnail('medium_large'); ?>
@@ -114,7 +120,11 @@ function ygv_archive_filter_ajax() {
                     <span class="ygv-quiz-card__status <?php echo esc_attr($status_class); ?>">
                         <?php echo esc_html($status_badge); ?>
                     </span>
-                    <?php if ($is_completed): ?>
+                    <?php if ($is_locked): ?>
+                        <div class="ygv-quiz-card__lock-overlay">
+                            <?php ygv_icon_e('lock', 28); ?>
+                        </div>
+                    <?php elseif ($is_completed): ?>
                         <div class="ygv-quiz-card__overlay">
                             <div class="ygv-quiz-card__checkmark"><?php ygv_icon_e('check', 32); ?></div>
                             <span class="ygv-quiz-card__percent"><?php echo $best_percent; ?>%</span>
@@ -134,7 +144,11 @@ function ygv_archive_filter_ajax() {
                             </span>
                         <?php endif; ?>
                     </div>
-                    <?php if ($is_completed): ?>
+                    <?php if ($is_locked): ?>
+                        <div class="ygv-quiz-card__new-badge">
+                            <?php ygv_icon_e('lock', 14); ?> Registracija potrebna
+                        </div>
+                    <?php elseif ($is_completed): ?>
                         <div class="ygv-quiz-card__result">
                             <span class="ygv-quiz-card__score-badge"
                                 style="color:<?php echo $best_percent >= 80 ? '#10b981' : ($best_percent >= 50 ? '#f59e0b' : '#ef4444'); ?>;">
@@ -149,10 +163,17 @@ function ygv_archive_filter_ajax() {
                             <?php ygv_icon_e('sparkles', 14); ?> Novi kviz za tebe!
                         </div>
                     <?php endif; ?>
-                    <button type="button" class="ygv-quiz-card__btn ygv-quiz-start-btn"
-                        data-quiz-id="<?php echo $quiz_id; ?>">
-                        <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
-                        <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
+                    <button type="button"
+                        class="ygv-quiz-card__btn ygv-quiz-start-btn <?php echo $is_locked ? 'ygv-quiz-btn--locked' : ''; ?>"
+                        data-quiz-id="<?php echo $quiz_id; ?>"
+                        <?php echo $is_locked ? 'data-locked="true"' : ''; ?>>
+                        <?php if ($is_locked): ?>
+                            <?php ygv_icon_e('lock', 16); ?>
+                            <span>Prijavi se da igraš</span>
+                        <?php else: ?>
+                            <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
+                            <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
+                        <?php endif; ?>
                     </button>
                 </div>
             </article>
