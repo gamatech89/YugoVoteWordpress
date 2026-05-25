@@ -5,7 +5,6 @@
 
 $query    = get_query_var('ygv_quiz_slider_query');
 $autoplay = get_query_var('ygv_quiz_slider_autoplay');
-$title    = get_query_var('ygv_quiz_slider_title') ?: 'Kvizovi';
 
 if (!$query || !$query->have_posts()) return;
 
@@ -27,15 +26,6 @@ $diff_colors = [
 ?>
 
 <section class="ygv-quiz-slider-section">
-
-    <div class="ygv-spotlight-head">
-        <h2 class="ygv-spotlight-title">
-            <span class="ygv-spotlight-title-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </span>
-            <?php echo esc_html($title); ?>
-        </h2>
-    </div>
 
     <div class="ygv-spotlight-carousel-wrap">
         <div class="swiper ygv-quiz-slider-swiper" id="<?php echo esc_attr($slider_id); ?>">

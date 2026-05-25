@@ -7,8 +7,9 @@
  *   autoplay   - 'true'|'false' (default 'true')
  *   category   - quiz_category slug to filter (default '')
  *   difficulty - quiz_levels post ID to filter (default 0)
- *   title      - section heading (default 'Kvizovi')
  *   orderby    - latest|popular|random (default 'latest')
+ *   ids        - comma-separated post IDs for spotlight/handpicked mode
+ *   guest_only - 'true' to show only quizzes with _allow_guest_play = '1'
  */
 
 if (!function_exists('ygv_quiz_slider_shortcode')) {
@@ -18,16 +19,20 @@ if (!function_exists('ygv_quiz_slider_shortcode')) {
             'autoplay'   => 'true',
             'category'   => '',
             'difficulty' => 0,
-            'title'      => 'Kvizovi',
             'orderby'    => 'latest',
+            'ids'        => '',
+            'guest_only' => 'false',
         ], $atts, 'quiz_slider');
 
         $count      = max(1, intval($atts['count']));
         $autoplay   = $atts['autoplay'] === 'true' || $atts['autoplay'] === '1';
         $category   = sanitize_text_field($atts['category']);
         $difficulty = intval($atts['difficulty']);
-        $title      = sanitize_text_field($atts['title']);
         $orderby    = sanitize_key($atts['orderby']);
+        $guest_only = $atts['guest_only'] === 'true' || $atts['guest_only'] === '1';
+
+        // Parse handpicked IDs
+        $ids = array_filter(array_map('intval', explode(',', $atts['ids'])));
 
         $query_args = [
             'post_type'      => 'quiz',
@@ -35,18 +40,24 @@ if (!function_exists('ygv_quiz_slider_shortcode')) {
             'post_status'    => 'publish',
         ];
 
-        switch ($orderby) {
-            case 'popular':
-                $query_args['meta_key'] = '_quiz_play_count';
-                $query_args['orderby']  = 'meta_value_num';
-                $query_args['order']    = 'DESC';
-                break;
-            case 'random':
-                $query_args['orderby'] = 'rand';
-                break;
-            default:
-                $query_args['orderby'] = 'date';
-                $query_args['order']   = 'DESC';
+        if (!empty($ids)) {
+            // Spotlight/handpicked mode — respect given order
+            $query_args['post__in'] = $ids;
+            $query_args['orderby']  = 'post__in';
+        } else {
+            switch ($orderby) {
+                case 'popular':
+                    $query_args['meta_key'] = '_quiz_play_count';
+                    $query_args['orderby']  = 'meta_value_num';
+                    $query_args['order']    = 'DESC';
+                    break;
+                case 'random':
+                    $query_args['orderby'] = 'rand';
+                    break;
+                default:
+                    $query_args['orderby'] = 'date';
+                    $query_args['order']   = 'DESC';
+            }
         }
 
         if ($category) {
@@ -57,13 +68,27 @@ if (!function_exists('ygv_quiz_slider_shortcode')) {
             ]];
         }
 
+        $meta_query = [];
+
         if ($difficulty) {
-            $query_args['meta_query'] = [[
+            $meta_query[] = [
                 'key'     => '_quiz_difficulty',
                 'value'   => $difficulty,
                 'compare' => '=',
                 'type'    => 'NUMERIC',
-            ]];
+            ];
+        }
+
+        if ($guest_only) {
+            $meta_query[] = [
+                'key'     => '_allow_guest_play',
+                'value'   => '1',
+                'compare' => '=',
+            ];
+        }
+
+        if (!empty($meta_query)) {
+            $query_args['meta_query'] = $meta_query;
         }
 
         $query = new WP_Query($query_args);
@@ -91,7 +116,6 @@ if (!function_exists('ygv_quiz_slider_shortcode')) {
 
         set_query_var('ygv_quiz_slider_query',    $query);
         set_query_var('ygv_quiz_slider_autoplay', $autoplay);
-        set_query_var('ygv_quiz_slider_title',    $title);
 
         ob_start();
         $tpl = get_stylesheet_directory() . '/inc/quizzes/templates/quiz-slider.php';
