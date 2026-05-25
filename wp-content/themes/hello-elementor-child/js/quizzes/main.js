@@ -635,3 +635,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ Expose Quiz class globally for quiz grid and other integrations
 window.Quiz = Quiz;
+
+// Global handler for .ygv-quiz-start-btn — works on homepage, archive, everywhere
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".ygv-quiz-start-btn");
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  const quizId = btn.dataset.quizId;
+  if (!quizId || !window.Quiz || !window.quizSettings?.apiUrl) return;
+  if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
+
+  try {
+    window.currentQuiz = new window.Quiz(window.quizSettings.apiUrl, quizId);
+  } catch (err) {
+    console.error("Quiz launch error:", err);
+  }
+});
