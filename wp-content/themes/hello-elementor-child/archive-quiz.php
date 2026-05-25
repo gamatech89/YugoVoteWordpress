@@ -24,7 +24,17 @@ if (is_wp_error($quiz_categories))
     $quiz_categories = [];
 
 // Get filter from URL
-$active_category = isset($_GET['cat']) ? sanitize_text_field($_GET['cat']) : '';
+$active_category   = isset($_GET['cat'])  ? sanitize_text_field($_GET['cat'])  : '';
+$active_difficulty = isset($_GET['diff']) ? intval($_GET['diff'])               : 0;
+
+// Get quiz levels for difficulty filter
+$quiz_levels = get_posts([
+    'post_type'   => 'quiz_levels',
+    'numberposts' => -1,
+    'post_status' => 'publish',
+    'orderby'     => 'menu_order title',
+    'order'       => 'ASC',
+]);
 
 // Stats
 $total_quizzes = wp_count_posts('quiz')->publish;
@@ -60,8 +70,19 @@ if ($active_category) {
     $query_args['tax_query'] = [
         [
             'taxonomy' => 'quiz_category',
-            'field' => 'slug',
-            'terms' => $active_category,
+            'field'    => 'slug',
+            'terms'    => $active_category,
+        ]
+    ];
+}
+
+if ($active_difficulty) {
+    $query_args['meta_query'] = [
+        [
+            'key'     => '_quiz_difficulty',
+            'value'   => $active_difficulty,
+            'compare' => '=',
+            'type'    => 'NUMERIC',
         ]
     ];
 }
@@ -136,14 +157,39 @@ get_header();
                             </a>
                         <?php endforeach; ?>
                     </div>
-                    <div class="ygv-sort-wrapper">
-                        <label for="ygv-sort"><?php ygv_icon_e('sort', 16); ?> Sortiraj:</label>
-                        <select id="ygv-sort" class="ygv-sort-select">
-                            <option value="latest">Najnovije</option>
-                            <option value="popular">Popularni</option>
-                            <option value="az">A-Z</option>
-                        </select>
+                    <?php if (!empty($quiz_levels)): ?>
+                    <div class="ygv-diff-filter">
+                        <?php
+                        $diff_colors_map = [
+                            'beginner'     => '#10b981',
+                            'easy'         => '#10b981',
+                            'lako'         => '#10b981',
+                            'intermediate' => '#f59e0b',
+                            'medium'       => '#f59e0b',
+                            'srednje'      => '#f59e0b',
+                            'expert'       => '#ef4444',
+                            'hard'         => '#ef4444',
+                            'tesko'        => '#ef4444',
+                            'teško'        => '#ef4444',
+                        ];
+                        ?>
+                        <a href="<?php echo esc_url(remove_query_arg('diff')); ?>"
+                            class="ygv-filter-btn <?php echo !$active_difficulty ? 'active' : ''; ?>">
+                            Sve težine
+                        </a>
+                        <?php foreach ($quiz_levels as $level):
+                            $level_slug  = $level->post_name;
+                            $level_color = $diff_colors_map[strtolower($level_slug)] ?? '#6366f1';
+                            $is_active   = $active_difficulty === $level->ID;
+                        ?>
+                        <a href="<?php echo esc_url(add_query_arg('diff', $level->ID)); ?>"
+                            class="ygv-filter-btn <?php echo $is_active ? 'active' : ''; ?>"
+                            style="<?php echo $is_active ? "background:{$level_color};border-color:{$level_color};" : ""; ?>">
+                            <?php echo esc_html($level->post_title); ?>
+                        </a>
+                        <?php endforeach; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>

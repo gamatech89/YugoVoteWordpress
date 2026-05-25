@@ -2563,28 +2563,11 @@ button.ygv-header__search-trigger:hover,
   background: rgba(255, 255, 255, 0.2);
 }
 
-.ygv-sort-wrapper {
+.ygv-diff-filter {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  color: var(--ygv-text-muted);
-}
-
-.ygv-sort-wrapper .ygv-icon {
-  opacity: 0.6;
-}
-
-.ygv-sort-select {
-  padding: 8px 32px 8px 12px;
-  border: 1px solid var(--ygv-border);
-  border-radius: 8px;
-  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
-  font-size: 14px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  flex-wrap: wrap;
 }
 
 /* Quiz Section */
