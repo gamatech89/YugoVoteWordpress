@@ -51,6 +51,10 @@ if (file_exists($quiz_slider_sc)) require_once $quiz_slider_sc;
 $quiz_ajax_grid = $quizzes_inc_path . 'api/quiz-ajax-grid.php';
 if (file_exists($quiz_ajax_grid)) require_once $quiz_ajax_grid;
 
+// Quiz Archive AJAX Filter
+$quiz_archive_ajax = $quizzes_inc_path . 'api/quiz-archive-ajax.php';
+if (file_exists($quiz_archive_ajax)) require_once $quiz_archive_ajax;
+
 // Accessors
 if (!function_exists('ygv_tokens')) {
     function ygv_tokens(): HelloElementorChild\Quizzes\Services\TokenService {

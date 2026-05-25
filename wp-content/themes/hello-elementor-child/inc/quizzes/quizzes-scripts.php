@@ -52,6 +52,18 @@ function enqueue_quizzes_assets() {
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce'   => wp_create_nonce('yuv_quiz_archive'),
     ]);
+
+    // Quiz archive page AJAX filter
+    wp_enqueue_script(
+        'quiz-archive-page',
+        get_stylesheet_directory_uri() . '/js/quizzes/quiz-archive-page.js',
+        ['quizzes-js'],
+        defined('HELLO_ELEMENTOR_CHILD_VERSION') ? HELLO_ELEMENTOR_CHILD_VERSION : '1.0.0',
+        true
+    );
+    wp_localize_script('quiz-archive-page', 'ygvArchivePage', [
+        'ajaxurl' => admin_url('admin-ajax.php'),
+    ]);
 }
 add_action('wp_enqueue_scripts', 'enqueue_quizzes_assets');
 

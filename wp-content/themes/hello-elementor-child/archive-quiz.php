@@ -136,22 +136,27 @@ get_header();
     <?php if (!empty($quiz_categories)): ?>
         <section class="ygv-quiz-filters">
             <div class="ygv-container">
-                <div class="ygv-filter-row">
+                <div class="ygv-filter-row"
+                    id="ygv-archive-filters"
+                    data-nonce="<?php echo wp_create_nonce('ygv_archive_filter'); ?>">
                     <div class="ygv-filter-buttons">
-                        <a href="<?php echo remove_query_arg('cat'); ?>"
-                            class="ygv-filter-btn <?php echo empty($active_category) ? 'active' : ''; ?>">
+                        <a href="#"
+                            class="ygv-filter-btn <?php echo empty($active_category) ? 'active' : ''; ?>"
+                            data-cat="">
                             <?php ygv_icon_e('grid', 16); ?>
                             Svi Kvizovi
                         </a>
                         <?php foreach ($quiz_categories as $cat):
-                            // Use unified color helper for filter pills too
                             $cat_color = function_exists('ygv_get_unified_category_color')
                                 ? ygv_get_unified_category_color($cat->term_id)
                                 : '#6366f1';
+                            $is_active = $active_category === $cat->slug;
                             ?>
-                            <a href="<?php echo add_query_arg('cat', $cat->slug); ?>"
-                                class="ygv-filter-btn <?php echo $active_category === $cat->slug ? 'active' : ''; ?>"
-                                style="<?php echo $active_category === $cat->slug ? "background: {$cat_color}; border-color: {$cat_color};" : ''; ?>">
+                            <a href="#"
+                                class="ygv-filter-btn <?php echo $is_active ? 'active' : ''; ?>"
+                                data-cat="<?php echo esc_attr($cat->slug); ?>"
+                                data-color="<?php echo esc_attr($cat_color); ?>"
+                                style="<?php echo $is_active ? "background:{$cat_color};border-color:{$cat_color};" : ''; ?>">
                                 <?php echo esc_html($cat->name); ?>
                                 <span class="ygv-filter-count"><?php echo $cat->count; ?></span>
                             </a>
@@ -159,35 +164,14 @@ get_header();
                     </div>
                     <?php if (!empty($quiz_levels)): ?>
                     <div class="ygv-diff-filter">
-                        <?php
-                        $diff_colors_map = [
-                            'beginner'     => '#10b981',
-                            'easy'         => '#10b981',
-                            'lako'         => '#10b981',
-                            'intermediate' => '#f59e0b',
-                            'medium'       => '#f59e0b',
-                            'srednje'      => '#f59e0b',
-                            'expert'       => '#ef4444',
-                            'hard'         => '#ef4444',
-                            'tesko'        => '#ef4444',
-                            'teško'        => '#ef4444',
-                        ];
-                        ?>
-                        <a href="<?php echo esc_url(remove_query_arg('diff')); ?>"
-                            class="ygv-filter-btn <?php echo !$active_difficulty ? 'active' : ''; ?>">
-                            Sve težine
-                        </a>
-                        <?php foreach ($quiz_levels as $level):
-                            $level_slug  = $level->post_name;
-                            $level_color = $diff_colors_map[strtolower($level_slug)] ?? '#6366f1';
-                            $is_active   = $active_difficulty === $level->ID;
-                        ?>
-                        <a href="<?php echo esc_url(add_query_arg('diff', $level->ID)); ?>"
-                            class="ygv-filter-btn <?php echo $is_active ? 'active' : ''; ?>"
-                            style="<?php echo $is_active ? "background:{$level_color};border-color:{$level_color};" : ""; ?>">
-                            <?php echo esc_html($level->post_title); ?>
-                        </a>
-                        <?php endforeach; ?>
+                        <select id="ygv-diff-select" class="ygv-diff-select">
+                            <option value="">Sve težine</option>
+                            <?php foreach ($quiz_levels as $level): ?>
+                            <option value="<?php echo $level->ID; ?>" <?php selected($active_difficulty, $level->ID); ?>>
+                                <?php echo esc_html($level->post_title); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -197,9 +181,9 @@ get_header();
 
     <!-- ========== QUIZ GRID ========== -->
     <?php if ($quizzes_query->have_posts()): ?>
-        <section class="ygv-quiz-section">
+        <section class="ygv-quiz-section" id="ygv-quiz-section">
             <div class="ygv-container">
-                <div class="ygv-quiz-grid">
+                <div class="ygv-quiz-grid" id="ygv-archive-grid">
                     <?php while ($quizzes_query->have_posts()):
                         $quizzes_query->the_post();
                         $quiz_id = get_the_ID();
@@ -356,63 +340,7 @@ get_header();
                 </div>
             </div>
 
-            <?php
-            // Pagination
-            $total_pages = $quizzes_query->max_num_pages;
-            if ($total_pages > 1):
-                ?>
-                <nav class="ygv-pagination"
-                    style="max-width: 1200px; margin: 40px auto 0; display: flex; justify-content: center; gap: 8px;">
-                    <?php
-                    echo paginate_links([
-                        'total' => $total_pages,
-                        'current' => $paged,
-                        'prev_text' => '‹ Prethodna',
-                        'next_text' => 'Sledeća ›',
-                        'type' => 'list',
-                    ]);
-                    ?>
-                </nav>
-                <style>
-                    .ygv-pagination ul {
-                        list-style: none;
-                        padding: 0;
-                        margin: 0;
-                        display: flex;
-                        gap: 8px;
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    }
-
-                    .ygv-pagination li {
-                        display: inline;
-                    }
-
-                    .ygv-pagination a,
-                    .ygv-pagination span {
-                        padding: 10px 16px;
-                        background: white;
-                        border: 1px solid var(--ygv-border);
-                        border-radius: 8px;
-                        text-decoration: none;
-                        color: var(--ygv-text);
-                        font-weight: 500;
-                        transition: all 0.2s;
-                    }
-
-                    .ygv-pagination a:hover {
-                        background: var(--ygv-primary);
-                        color: white;
-                        border-color: var(--ygv-primary);
-                    }
-
-                    .ygv-pagination .current {
-                        background: var(--ygv-primary);
-                        color: white;
-                        border-color: var(--ygv-primary);
-                    }
-                </style>
-            <?php endif; ?>
+            <div id="ygv-archive-pagination"></div>
 
         </section>
         <?php
@@ -435,45 +363,5 @@ get_header();
     <?php endif; ?>
 
 </div>
-
-<script>
-    // Quiz start button handler for archive page
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.ygv-quiz-start-btn, .ygv-quiz-card__btn').forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                var quizId = this.getAttribute('data-quiz-id');
-                if (!quizId) {
-                    console.error('Quiz ID missing from button');
-                    return;
-                }
-
-                if (!window.Quiz) {
-                    console.error('Quiz class not loaded');
-                    return;
-                }
-
-                if (!window.quizSettings || !window.quizSettings.apiUrl) {
-                    console.error('Quiz settings not available');
-                    return;
-                }
-
-                // Close existing quiz if any
-                if (window.currentQuiz && window.currentQuiz.closeQuiz) {
-                    window.currentQuiz.closeQuiz();
-                }
-
-                // Launch quiz
-                try {
-                    window.currentQuiz = new window.Quiz(window.quizSettings.apiUrl, quizId);
-                } catch (error) {
-                    console.error('Failed to launch quiz:', error);
-                }
-            });
-        });
-    });
-</script>
 
 <?php get_footer(); ?>
