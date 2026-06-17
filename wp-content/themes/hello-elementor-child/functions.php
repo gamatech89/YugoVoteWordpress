@@ -56,6 +56,37 @@ add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts');
 // Load Custom Features
 require_once get_stylesheet_directory() . '/inc/init.php';
 
+// ---- KONTAKT FORM AJAX HANDLER ----
+function ygv_kontakt_submit_handler() {
+    check_ajax_referer('ygv_kontakt_nonce', 'ygv_kontakt_nonce_field');
+
+    $ime    = sanitize_text_field($_POST['ime'] ?? '');
+    $email  = sanitize_email($_POST['email'] ?? '');
+    $tema   = sanitize_text_field($_POST['tema'] ?? 'Opšto pitanje');
+    $poruka = sanitize_textarea_field($_POST['poruka'] ?? '');
+
+    if (!$ime || !is_email($email) || !$poruka) {
+        wp_send_json_error(['message' => 'Nedostaju obavezna polja.']);
+    }
+
+    $subject = '[YugoVote Kontakt] ' . $tema . ' — ' . $ime;
+    $body    = "Ime: {$ime}\nE-mail: {$email}\nTema: {$tema}\n\nPoruka:\n{$poruka}";
+    $headers = [
+        'Content-Type: text/plain; charset=UTF-8',
+        'Reply-To: ' . $ime . ' <' . $email . '>',
+    ];
+
+    $sent = wp_mail('office@yugovote.com', $subject, $body, $headers);
+
+    if ($sent) {
+        wp_send_json_success(['message' => 'Poruka poslata.']);
+    } else {
+        wp_send_json_error(['message' => 'Greška pri slanju.']);
+    }
+}
+add_action('wp_ajax_ygv_kontakt_submit',        'ygv_kontakt_submit_handler');
+add_action('wp_ajax_nopriv_ygv_kontakt_submit', 'ygv_kontakt_submit_handler');
+
 // ---- PAGE LOADER ----
 // CSS + JS both inline in <head> at priority 1 — runs before any template or
 // Elementor hook, so it works on every page including the homepage canvas template
