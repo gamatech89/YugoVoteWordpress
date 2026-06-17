@@ -39,16 +39,16 @@ get_header();
         <!-- ========== SLOGANI ========== -->
         <section class="ygv-ona-slogans">
             <div class="ygv-ona-slogan">
-                <span class="ygv-ona-slogan__icon">&#128150;</span>
+                <img class="ygv-ona-slogan__icon" src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/images/king-head.svg" alt="" width="48" height="48">
                 <p>Svi su mladi i lepi na yugovote.com</p>
             </div>
             <div class="ygv-ona-slogan">
-                <span class="ygv-ona-slogan__icon">&#9878;</span>
+                <img class="ygv-ona-slogan__icon" src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/images/king-head.svg" alt="" width="48" height="48">
                 <p>Sve naše je najlepše i najbolje na yugovote.com</p>
             </div>
             <div class="ygv-ona-slogan">
-                <span class="ygv-ona-slogan__icon">&#128373;</span>
-                <p>Na yugovote.com svačiji glas ne vredi isto — napokon.</p>
+                <img class="ygv-ona-slogan__icon" src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/images/king-head.svg" alt="" width="48" height="48">
+                <p>Na yugovote.com svačiji glas ne vredi isto. Napokon.</p>
             </div>
         </section>
 
@@ -101,6 +101,50 @@ get_header();
                     Naš algoritam eliminiše evidentne nelogičnosti i zlonamerne pokušaje narušavanja integriteta.
                 </p>
             </div>
+        </section>
+
+        <!-- ========== UREĐIVAČKA NAČELA ========== -->
+        <section class="ygv-ona-section ygv-ona-section--nacela">
+            <div class="ygv-ona-section__badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Uređivačka načela
+            </div>
+            <h2 class="ygv-ona-section__title">Kako radimo</h2>
+            <ul class="ygv-ona-nacela">
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Stručnjaci postavljaju početni okvir rang-lista, a publika svojim glasovima određuje njihov dalji poredak.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Objavljujemo samo sadržaj koji je istražen, proveren i urednički pregledan.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Greške priznajemo i ispravljamo brzo i transparentno.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Sponzorisani sadržaj je jasno označen i odvojen od uredničkog dela.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Na naše uredničke odluke ne utiču oglašivači niti komercijalni interesi.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Rang-liste i članci nastaju nezavisno od poslovnih partnerstava.
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Ne prihvatamo promociju proizvoda i usluga koji su obmanjujući, nepošteni ili potencijalno štetni za korisnike.
+                </li>
+            </ul>
         </section>
 
         <!-- ========== KO GLASA ========== -->

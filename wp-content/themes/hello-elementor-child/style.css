@@ -3147,8 +3147,9 @@ a {
 }
 
 .ygv-ona-slogan__icon {
-  font-size: 32px;
-  line-height: 1;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
 .ygv-ona-slogan p {
@@ -3207,6 +3208,37 @@ a {
 
 .ygv-ona-section--community .ygv-ona-section__text {
   max-width: 100%;
+}
+
+/* Editorial principles list */
+.ygv-ona-nacela {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+}
+
+.ygv-ona-nacela li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.ygv-ona-nacela li svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #2e3a8c;
+}
+
+@media (max-width: 768px) {
+  .ygv-ona-nacela {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ygv-ona-quote {
