@@ -164,6 +164,9 @@ get_header();
                 srpskih i bosanskih pesnika. Termin Hrvata i hrvatski nije sinonim. Takođe, teško je poverovati
                 — Elvis Prisli nije Srbin (svi ostali jesu).
             </p>
+            <blockquote class="ygv-ona-quote">
+                To je logika i nepromenljiva je. Ako vam se sviđa — glasajte.
+            </blockquote>
         </section>
 
         <!-- ========== CTA ========== -->
