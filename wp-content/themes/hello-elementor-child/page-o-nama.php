@@ -40,7 +40,7 @@ get_header();
         <section class="ygv-ona-slogans">
             <div class="ygv-ona-slogan">
                 <img class="ygv-ona-slogan__icon" src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/images/king-head.svg" alt="" width="48" height="48">
-                <p>Svi su zauvek mladi i lepi na yugovote.com</p>
+                <p>Svi su zauvek mladi i lepi na<br>yugovote.com</p>
             </div>
             <div class="ygv-ona-slogan">
                 <img class="ygv-ona-slogan__icon" src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/images/king-head.svg" alt="" width="48" height="48">
