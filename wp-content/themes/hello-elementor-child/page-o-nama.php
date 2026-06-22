@@ -166,6 +166,7 @@ get_header();
             </p>
             <blockquote class="ygv-ona-quote">
                 To je logika i nepromenljiva je. Ako vam se sviđa — glasajte.
+                Ako se palite na tzv. pseudostručnjake — molimo, napustite sajt.
             </blockquote>
         </section>
 
