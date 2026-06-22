@@ -106,7 +106,7 @@ get_header();
                     <div class="ygv-kontakt-form__field">
                         <label for="ygv-tema">Tema</label>
                         <select id="ygv-tema" name="tema">
-                            <option value="Opšto pitanje">Opšto pitanje</option>
+                            <option value="Opšte pitanje">Opšte pitanje</option>
                             <option value="Prijava greške">Prijava greške</option>
                             <option value="Predlog za sadržaj">Predlog za sadržaj</option>
                             <option value="Saradnja">Saradnja</option>
