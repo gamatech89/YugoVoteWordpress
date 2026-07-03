@@ -108,7 +108,7 @@ const Templates = {
     </div>
   `,
 
-  summaryScreen: (score, total, isGuest = false) => {
+  summaryScreen: (score, total, isGuest = false, quizId = null) => {
     const percent = (score / total) * 100;
     let icon, iconClass, title;
 
@@ -150,7 +150,7 @@ const Templates = {
           : ""
       }
       
-      <button class="ygv-btn-primary" onclick="window.location.reload()" style="background-color: var(--quiz-primary-color); margin-top: 20px;">
+      <button class="ygv-btn-primary" onclick="window.ygvRestartQuiz('${quizId}')" style="background-color: var(--quiz-primary-color); margin-top: 20px;">
         Pokušaj ponovo
       </button>
     </div>
@@ -271,6 +271,11 @@ class Quiz {
 
   closeQuiz() {
     clearInterval(this.controller.timer);
+
+    if (this.controller?.sounds?.background) {
+      this.controller.sounds.background.pause();
+      this.controller.sounds.background.currentTime = 0;
+    }
 
     const quizElement = document.querySelector(".cs-quiz");
     if (quizElement) {
@@ -594,7 +599,8 @@ class QuizController {
     this.container.innerHTML = Templates.summaryScreen(
       this.quiz.score,
       this.quiz.quizData.length,
-      this.quiz.isGuest
+      this.quiz.isGuest,
+      this.quiz.quizId
     );
     this.sounds.background.pause();
   }
@@ -699,3 +705,10 @@ function ygvShowLoginModal() {
 
   modal.classList.add("is-open");
 }
+
+window.ygvRestartQuiz = function (quizId) {
+  if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
+  if (quizId && window.Quiz && window.quizSettings?.apiUrl) {
+    window.currentQuiz = new window.Quiz(window.quizSettings.apiUrl, quizId);
+  }
+};
