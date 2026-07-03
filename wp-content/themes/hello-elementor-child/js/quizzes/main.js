@@ -266,16 +266,23 @@ class Quiz {
 
     // Attach close event listener
     this.closeButton = this.wrapper.querySelector(".cs-close-button");
-    this.closeButton.addEventListener("click", () => this.closeQuiz());
+    this.closeButton.addEventListener("click", () => {
+      this.stopSounds();
+      this.closeQuiz();
+    });
+  }
+
+  stopSounds() {
+    if (this.controller?.sounds) {
+      Object.values(this.controller.sounds).forEach((s) => {
+        s.pause();
+        s.currentTime = 0;
+      });
+    }
   }
 
   closeQuiz() {
     clearInterval(this.controller.timer);
-
-    if (this.controller?.sounds?.background) {
-      this.controller.sounds.background.pause();
-      this.controller.sounds.background.currentTime = 0;
-    }
 
     const quizElement = document.querySelector(".cs-quiz");
     if (quizElement) {
@@ -630,6 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
       anchor.classList.add("is-busy");
 
       // close any running quiz instance
+      if (window.currentQuiz?.stopSounds) window.currentQuiz.stopSounds();
       if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
 
       window.currentQuiz = new Quiz(quizSettings.apiUrl, quizId);
@@ -656,6 +664,7 @@ document.addEventListener("click", (e) => {
 
   const quizId = btn.dataset.quizId;
   if (!quizId || !window.Quiz || !window.quizSettings?.apiUrl) return;
+  if (window.currentQuiz?.stopSounds) window.currentQuiz.stopSounds();
   if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
 
   try {
@@ -707,6 +716,7 @@ function ygvShowLoginModal() {
 }
 
 window.ygvRestartQuiz = function (quizId) {
+  if (window.currentQuiz?.stopSounds) window.currentQuiz.stopSounds();
   if (window.currentQuiz?.closeQuiz) window.currentQuiz.closeQuiz();
   if (quizId && window.Quiz && window.quizSettings?.apiUrl) {
     window.currentQuiz = new window.Quiz(window.quizSettings.apiUrl, quizId);
