@@ -89,8 +89,37 @@ svoje kuće; ništa ne glumi stvarni snimak pa nema šta da se ne poklopi; tamni
 televizora je prirodno mjesto za tekst, pa overlay ne izgleda nalijepljeno.
 
 Tipografija: pitanje bijelo, teško, centrirano preko ekrana TV-a; odgovori u četiri
-reda ispod. Tajmer je tanak prsten koji se prazni, u narandžastoj — akcentnoj boji
-sajta, da post i odredišna stranica izgledaju kao ista stvar.
+reda ispod.
+
+### Boje
+
+Brend nose dvije boje iz logotipa — **plava `#4457a5`** i **crvena `#e65552`**.
+One su primarne u svakom postu i drže nalog prepoznatljivim kroz sve kategorije.
+
+Koriste se semantički, ne dekorativno:
+
+- **Plava** — tajmer dok teče, i sve dok je pitanje otvoreno
+- **Crvena** — trenutak isteka i otkrivanja odgovora
+- **Boja kategorije** — samo kao tanka oznaka kategorije u uglu i akcenat na
+  završnoj kartici
+
+Tako brend boje nose radnju umjesto da stoje sa strane, a gledalac uči da crveno
+znači "gotovo je" prije nego pročita ijednu riječ.
+
+Boje kategorija preuzete su sa sajta (CSS varijabla `--cat-color`), ne izmišljene:
+
+| Kategorija | Boja |
+|---|---|
+| Sport | `#36c43f` |
+| Biznis | `#4457a5` |
+| Muzika | `#b0b9dd` |
+| Film i TV | `#e65552` |
+| Culture Club | `#e9e33a` |
+| Trendy / Lifestyle | `#f599e9` |
+
+Napomena: Biznis i Film i TV koriste iste vrijednosti kao brend plava i crvena. Za
+te dvije kategorije oznaka kategorije se stapa sa brendom, što nije greška ali
+znači da oznaka tu ne nosi dodatnu informaciju.
 
 Završna kartica: logo, `yugovote.com`, i stvarna brojka **6.482 pitanja te čeka**
 (zbir po kategorijama: 701 + 1.704 + 1.301 + 976 + 1.250 + 550). Za nov nalog je
@@ -98,7 +127,7 @@ korisnije pokazati da iza stoji nešto veliko nego glumiti postojeću publiku.
 
 ## Proizvodnja
 
-Ključna odluka: **tekst crta ffmpeg lokalno iz baze, ne generativni model.**
+Ključna odluka: **tekst se crta lokalno iz baze, ne generativnim modelom.**
 
 Dva razloga. Pitanja su puna dijakritike — Čolić, Šerifović, Đorđe, Dragojević — a
 generativni modeli to prije ili kasnije zgužvaju; jedan pogrešan znak u imenu je
@@ -106,10 +135,21 @@ tačno ono što nostalgična publika kažnjava. I drugo, ako se tekst crta skrip
 baze, pedeseti post košta koliko i drugi: povučeš pitanje po ID-u, skripta ispljune
 video.
 
+Lanac je **SVG → `rsvg-convert` → PNG sa alfom → ffmpeg `overlay`**.
+
+Razlog zašto ne ffmpeg `drawtext`, kako je prvobitno zamišljeno: lokalni ffmpeg
+(Homebrew 8.1.2_1) build je bez `libfreetype`, pa filtera `drawtext` jednostavno
+nema, a nema ni `libass`. Provjereno na `configuration:` liniji builda.
+
+Ispalo je da je SVG ionako bolji izbor: nosi prelom teksta u više redova, prsten
+tajmera i završnu karticu — dakle sve što `drawtext` ne bi mogao ni da je bio tu.
+Provjereno je i da `rsvg-convert` ispravno iscrtava našu dijakritiku i navodnike
+(`Čolić, Šerifović, Đorđe, žćčđš, „ ”`) i da daje PNG sa alfa kanalom.
+
 | Sloj | Alat | Učestalost |
 |---|---|---|
 | Pozadinski video (soba, TV, spori dolly-in) | Higgsfield `generate_image` → `generate_video` | Jednom po kategoriji, reciklira se |
-| Pitanje, odgovori, tajmer, završna kartica | ffmpeg, iz baze | Svaki post, automatski |
+| Pitanje, odgovori, tajmer, završna kartica | SVG → `rsvg-convert` → ffmpeg `overlay` | Svaki post, automatski |
 | Zvuk (tik tajmera, buzz) | lokalni SFX | Jednom, reciklira se |
 
 Higgsfield se troši praktično samo na početku. Za svaku kategoriju se pravi 5–6
