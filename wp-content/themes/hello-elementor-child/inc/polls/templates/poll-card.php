@@ -1,6 +1,6 @@
 <?php
 if (!defined('ABSPATH')) exit;
-// Expected vars: $poll_id (int), $date (string), $img_url (string|false), $total_votes (int)
+// Expected vars: $poll_id (int), $img_url (string|false), $total_votes (int)
 ?>
 <article class="ygv-poll-card">
     <div class="ygv-poll-card__image">
@@ -16,17 +16,8 @@ if (!defined('ABSPATH')) exit;
         <?php endif; ?>
     </div>
     <div class="ygv-poll-card__body">
-        <div class="ygv-poll-card__meta">
-            <time class="ygv-poll-card__date">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <?php echo esc_html($date); ?>
-            </time>
-            <?php if ($total_votes > 0): ?>
+        <?php if ($total_votes > 0): ?>
+            <div class="ygv-poll-card__meta">
                 <span class="ygv-poll-card__votes">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -36,9 +27,14 @@ if (!defined('ABSPATH')) exit;
                     </svg>
                     <?php echo number_format_i18n($total_votes); ?> glasova
                 </span>
-            <?php endif; ?>
-        </div>
+            </div>
+        <?php endif; ?>
         <h3 class="ygv-poll-card__title"><?php echo esc_html(get_the_title($poll_id)); ?></h3>
+        <?php
+        $poll_desc = wp_strip_all_tags(get_post_field('post_content', $poll_id));
+        if ($poll_desc): ?>
+            <p class="ygv-poll-card__desc"><?php echo esc_html(wp_trim_words($poll_desc, 28, '…')); ?></p>
+        <?php endif; ?>
         <div class="ygv-poll-card__content">
             <?php echo do_shortcode('[voting_poll id="' . $poll_id . '"]'); ?>
         </div>

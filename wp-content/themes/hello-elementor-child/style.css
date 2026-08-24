@@ -2568,6 +2568,13 @@ a {
   line-height: 1.45;
 }
 
+.ygv-poll-card__desc {
+  margin: -8px 0 16px 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.55;
+}
+
 .ygv-poll-card__content {
   flex: 1;
 }

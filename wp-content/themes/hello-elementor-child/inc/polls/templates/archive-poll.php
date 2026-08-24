@@ -15,26 +15,19 @@ if (!defined('ABSPATH')) exit;
     </div>
     
     <div class="ygv-poll-archive__grid">
-        <?php while ($query->have_posts()) : $query->the_post(); 
+        <?php while ($query->have_posts()) : $query->the_post();
             $poll_id = get_the_ID();
             $total_votes = (int) get_post_meta($poll_id, '_cs_poll_total_votes', true);
-            $date = get_the_date('d. M Y.');
         ?>
             <article class="ygv-poll-card">
-                <div class="ygv-poll-card__header">
-                    <time class="ygv-poll-card__date">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
-                        </svg>
-                        <?php echo esc_html($date); ?>
-                    </time>
-                </div>
-                
                 <h2 class="ygv-poll-card__title"><?php the_title(); ?></h2>
-                
+
+                <?php
+                $poll_desc = wp_strip_all_tags(get_post_field('post_content', $poll_id));
+                if ($poll_desc): ?>
+                    <p class="ygv-poll-card__desc"><?php echo esc_html(wp_trim_words($poll_desc, 28, '…')); ?></p>
+                <?php endif; ?>
+
                 <div class="ygv-poll-card__content">
                     <?php echo do_shortcode('[voting_poll id="' . $poll_id . '"]'); ?>
                 </div>

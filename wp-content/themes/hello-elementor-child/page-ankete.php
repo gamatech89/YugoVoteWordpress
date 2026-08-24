@@ -127,7 +127,6 @@ get_header();
                         while ($archive_query->have_posts()):
                             $archive_query->the_post();
                             $poll_id     = get_the_ID();
-                            $date        = get_the_date('d. M Y.');
                             $img_url     = get_the_post_thumbnail_url($poll_id, 'medium_large');
                             $total_votes = (int) get_post_meta($poll_id, '_cs_poll_total_votes', true);
                             include $card_template;
