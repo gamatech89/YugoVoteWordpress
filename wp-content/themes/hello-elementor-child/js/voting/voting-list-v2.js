@@ -73,9 +73,9 @@ class VotingListV2 {
       data: {
         action: "submit_vote",
         nonce: this.nonce,
-        list_id: this.listId,
-        item_id: itemId,
-        score: score,
+        voting_list_id: this.listId,
+        voting_item_id: itemId,
+        vote_value: score,
       },
       success: function (response) {
         if (response.success) {

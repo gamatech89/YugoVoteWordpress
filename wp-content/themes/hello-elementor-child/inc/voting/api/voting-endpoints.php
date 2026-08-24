@@ -221,7 +221,6 @@ function submit_vote() {
     $vote_value = $base_vote_value + $expert_bonus;
 
     $table = $wpdb->prefix . "voting_list_votes";
-    $where_user_or_ip = ($user_id > 0) ? ['user_id' => $user_id] : ['ip_address' => $ip_address];
 
     // Check if this user has a temporary bypass on vote restrictions.
     // Bypass users skip deduplication and get a unique fake IP per vote so
@@ -235,20 +234,30 @@ function submit_vote() {
     }
 
     if (!$bypass_restrictions) {
+        // Seed votes (ip_address 'bypass_...') must never be deleted by the
+        // normal dedup flow, even when they share the voter's user_id.
+        if ($user_id > 0) {
+            $who_sql = 'user_id = %d';
+            $who_val = $user_id;
+        } else {
+            $who_sql = 'ip_address = %s';
+            $who_val = $ip_address;
+        }
+
         // Step A: Remove any previous assignment of this specific base vote value
         // by this user/IP on this $voting_list_id, regardless of the item it was on.
         // Note: We match on base_vote_value since that's what the user selected (1-10)
-        $wpdb->delete($table, array_merge($where_user_or_ip, [
-            'voting_list_id'  => $voting_list_id,
-            'base_vote_value' => $base_vote_value
-        ]));
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM $table WHERE $who_sql AND voting_list_id = %d AND base_vote_value = %d AND ip_address NOT LIKE 'bypass\\_%%'",
+            $who_val, $voting_list_id, $base_vote_value
+        ));
 
         // Step B: Remove any other vote values this user/IP might have
         // previously assigned to the current $voting_item_id on this $voting_list_id.
-        $wpdb->delete($table, array_merge($where_user_or_ip, [
-            'voting_list_id' => $voting_list_id,
-            'voting_item_id' => $voting_item_id
-        ]));
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM $table WHERE $who_sql AND voting_list_id = %d AND voting_item_id = %d AND ip_address NOT LIKE 'bypass\\_%%'",
+            $who_val, $voting_list_id, $voting_item_id
+        ));
     }
 
     // In bypass mode each vote gets a unique fake IP so the DB unique key
@@ -257,7 +266,10 @@ function submit_vote() {
         ? sprintf('bypass_%d_%04d', time(), mt_rand(0, 9999))
         : $ip_address;
 
-    // Step C: Insert the new vote — always include both user_id and ip_address
+    // Step C: Insert the new vote — always include both user_id and ip_address.
+    // Seed votes (bypass mode) are stored with user_id NULL so they are never
+    // touched by the voter's own dedup/removal later; the unique 'bypass_' IP
+    // still identifies them and makes each count as a distinct voter.
     $insert_data = [
         'voting_list_id'  => $voting_list_id,
         'voting_item_id'  => $voting_item_id,
@@ -265,7 +277,7 @@ function submit_vote() {
         'vote_value'      => $vote_value,
         'expert_bonus'    => $expert_bonus,
         'ip_address'      => $effective_ip,
-        'user_id'         => $user_id > 0 ? $user_id : null,
+        'user_id'         => ($user_id > 0 && !$bypass_restrictions) ? $user_id : null,
         'created_at'      => current_time('mysql', 1)
     ];
 
@@ -405,29 +417,29 @@ function remove_vote() {
     }
 
     $table = $wpdb->prefix . "voting_list_votes";
-    
-    // Build where conditions
-    $where_conditions = [
-        'voting_list_id'  => $voting_list_id,
-        'voting_item_id'  => $voting_item_id,
-    ];
-    
+
+    // Build the delete query. Seed votes (ip_address 'bypass_...') are
+    // protected — they must never be removable through this endpoint.
+    $sql    = "DELETE FROM $table WHERE voting_list_id = %d AND voting_item_id = %d";
+    $params = [$voting_list_id, $voting_item_id];
+
     // Only add base_vote_value if provided (for backwards compatibility)
     if ($base_vote_value > 0) {
-        $where_conditions['base_vote_value'] = $base_vote_value;
+        $sql     .= " AND base_vote_value = %d";
+        $params[] = $base_vote_value;
     }
 
     if ($user_id > 0) {
-        $where_conditions['user_id'] = $user_id;
+        $sql     .= " AND user_id = %d";
+        $params[] = $user_id;
     } else {
-        $where_conditions['ip_address'] = $_SERVER['REMOTE_ADDR'];
+        $sql     .= " AND ip_address = %s";
+        $params[] = $_SERVER['REMOTE_ADDR'];
     }
 
-    // Debug: Construct SQL for logging if needed (PHP 7.4+ for arrow function)
-    // $sql_debug = "DELETE FROM $table WHERE " . implode(" AND ", array_map(fn($key, $val) => "$key = '" . esc_sql($val) . "'", array_keys($where_conditions), array_values($where_conditions)));
-    // error_log("Remove vote SQL attempt: " . $sql_debug);
-    
-    $deleted = $wpdb->delete($table, $where_conditions);
+    $sql .= " AND ip_address NOT LIKE 'bypass\\_%%'";
+
+    $deleted = $wpdb->query($wpdb->prepare($sql, ...$params));
     
     if ($deleted === false) {
         // This means there was a query error.
@@ -516,7 +528,9 @@ function get_user_votes() {
     $sql_where_user = '';
 
     if ($user_id > 0) {
-        $sql_where_user = " AND user_id = %d";
+        // Exclude seed votes ('bypass_' IPs) — they may share the admin's
+        // user_id but must never surface as the user's own active votes.
+        $sql_where_user = " AND user_id = %d AND ip_address NOT LIKE 'bypass\\_%%'";
         $params[] = $user_id;
     } else {
         $sql_where_user = " AND ip_address = %s";

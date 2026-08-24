@@ -42,11 +42,14 @@ $votes_table = $wpdb->prefix . 'voting_list_votes';
 $total_score = $wpdb->get_var($wpdb->prepare(
     "SELECT SUM(vote_value) FROM $votes_table WHERE voting_list_id = %d", $voting_list_id
 )) ?: 0;
+// Seed votes ('bypass_' IPs) each carry a unique fake IP — count them by IP
+// (one voter per seed row) even when they share an admin user_id, so the
+// displayed vote/voter counts stay consistent with the point totals.
 $total_votes = $wpdb->get_var($wpdb->prepare(
-    "SELECT COUNT(DISTINCT CONCAT(voting_item_id, '-', COALESCE(user_id, ip_address))) FROM $votes_table WHERE voting_list_id = %d", $voting_list_id
+    "SELECT COUNT(DISTINCT CONCAT(voting_item_id, '-', CASE WHEN ip_address LIKE 'bypass\\_%%' THEN ip_address ELSE COALESCE(user_id, ip_address) END)) FROM $votes_table WHERE voting_list_id = %d", $voting_list_id
 )) ?: 0;
 $unique_voters = $wpdb->get_var($wpdb->prepare(
-    "SELECT COUNT(DISTINCT COALESCE(user_id, ip_address)) FROM $votes_table WHERE voting_list_id = %d", $voting_list_id
+    "SELECT COUNT(DISTINCT CASE WHEN ip_address LIKE 'bypass\\_%%' THEN ip_address ELSE COALESCE(user_id, ip_address) END) FROM $votes_table WHERE voting_list_id = %d", $voting_list_id
 )) ?: 0;
 
 // Get category info
@@ -92,13 +95,17 @@ $user_ip = $_SERVER['REMOTE_ADDR'];
 
 $user_votes = [];
 if ($current_user_id) {
+    // base_vote_value (not vote_value) — buttons are 1-10 base values; vote_value
+    // includes the expert bonus and would highlight the wrong button.
+    // Seed votes ('bypass_' IPs) are excluded — they may share the admin's
+    // user_id but are not the user's own active votes.
     $user_votes_raw = $wpdb->get_results($wpdb->prepare(
-        "SELECT voting_item_id, vote_value FROM $votes_table WHERE voting_list_id = %d AND user_id = %d",
+        "SELECT voting_item_id, base_vote_value AS vote_value FROM $votes_table WHERE voting_list_id = %d AND user_id = %d AND ip_address NOT LIKE 'bypass\\_%%'",
         $voting_list_id, $current_user_id
     ), ARRAY_A);
 } else {
     $user_votes_raw = $wpdb->get_results($wpdb->prepare(
-        "SELECT voting_item_id, vote_value FROM $votes_table WHERE voting_list_id = %d AND ip_address = %s AND user_id IS NULL",
+        "SELECT voting_item_id, base_vote_value AS vote_value FROM $votes_table WHERE voting_list_id = %d AND ip_address = %s AND user_id IS NULL",
         $voting_list_id, $user_ip
     ), ARRAY_A);
 }
