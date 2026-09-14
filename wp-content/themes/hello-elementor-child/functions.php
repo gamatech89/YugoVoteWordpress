@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
-define('HELLO_ELEMENTOR_CHILD_VERSION', '2.0.3');
+define('HELLO_ELEMENTOR_CHILD_VERSION', '2.0.4');
 
 // **** LOAD THEME CONFIGURATION CONSTANTS ****
 if (file_exists(get_stylesheet_directory() . '/inc/config.php')) {

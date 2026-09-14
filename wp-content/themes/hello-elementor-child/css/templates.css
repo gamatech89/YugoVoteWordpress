@@ -3804,6 +3804,20 @@ button.ygv-quiz-card__btn:hover,
   height: 48px;
 }
 
+/* Logo je link ka početnoj (desktop maskota i mobilni logo) */
+.ygv-auth-logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.ygv-auth-logo-link:hover {
+  opacity: 0.85;
+}
+
 .ygv-auth-mobile-logo span {
   font-size: 24px;
   font-weight: 800;

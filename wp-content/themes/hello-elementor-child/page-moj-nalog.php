@@ -43,7 +43,7 @@ if ($level_config) {
 }
 
 // Enqueue styles
-wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], '1.0.0');
+wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], HELLO_ELEMENTOR_CHILD_VERSION);
 
 get_header();
 ?>

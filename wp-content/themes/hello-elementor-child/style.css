@@ -799,14 +799,20 @@ a {
     left: 0;
     width: 85%;
     max-width: 320px;
+    /* 100vh na mobilnim browserima uključuje prostor iza adresne trake,
+       pa se dno menija seče. bottom:0 + dvh prate vidljivi viewport. */
+    bottom: 0;
     height: 100vh;
+    height: 100dvh;
     background: #fff;
     z-index: 99999;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.77, 0.2, 0.05, 1);
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    padding: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 0 0 env(safe-area-inset-bottom, 0) 0;
   }
 
   .cs-mega-menu-nav.active {

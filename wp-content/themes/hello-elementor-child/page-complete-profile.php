@@ -59,7 +59,7 @@ $countries = [
 $current_step = isset($_GET['step']) ? intval($_GET['step']) : 1;
 $current_step = max(1, min(2, $current_step)); // Clamp between 1 and 2
 
-wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], '1.0.0');
+wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], HELLO_ELEMENTOR_CHILD_VERSION);
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>

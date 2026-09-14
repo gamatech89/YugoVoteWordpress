@@ -18,7 +18,7 @@ if (is_user_logged_in()) {
 }
 
 // Enqueue unified styles
-wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], '1.0.0');
+wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templates.css', [], HELLO_ELEMENTOR_CHILD_VERSION);
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -74,7 +74,7 @@ wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templat
     <div class="ygv-auth-branding">
         <div class="ygv-auth-branding__content">
             <div class="ygv-auth-branding__logo">
-                <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="YugoVote Mascot" class="ygv-auth-mascot">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="ygv-auth-logo-link" aria-label="Yu Go Vote - početna"><img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="YugoVote Mascot" class="ygv-auth-mascot"></a>
             </div>
             <h1 class="ygv-auth-branding__title">Yu Go Vote</h1>
             <p class="ygv-auth-branding__tagline">Pridruži se zajednici glasača!</p>
@@ -101,8 +101,8 @@ wp_enqueue_style('ygv-templates', get_stylesheet_directory_uri() . '/css/templat
             <div class="ygv-auth-form-card">
                 <!-- Mobile Logo -->
                 <div class="ygv-auth-mobile-logo">
-                    <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="Yu Go Vote" width="60">
-                    <span>Yu Go Vote</span>
+                    <a href="<?php echo esc_url(home_url('/')); ?>" class="ygv-auth-logo-link"><img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/mascot.svg'); ?>" alt="Yu Go Vote" width="60">
+                    <span>Yu Go Vote</span></a>
                 </div>
                 
                 <h2 class="ygv-auth-form-title">Kreiraj nalog</h2>
