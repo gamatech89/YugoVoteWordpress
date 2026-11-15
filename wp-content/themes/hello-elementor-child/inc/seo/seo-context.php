@@ -254,7 +254,7 @@ function ygv_seo_context(): array {
         'url'     => $url,
         'type'    => $type,
         'image'   => $image ?: ygv_seo_default_image(),
-        'noindex' => false,
+        'noindex' => ygv_seo_is_noindex_request(),
     ];
     return $ctx;
 }

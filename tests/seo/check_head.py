@@ -69,5 +69,41 @@ if 'head' in SECTIONS:
         c = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*>', b)
         ok(f'{name}: tačno jedan canonical', len(c) == 1, str(c))
 
+def robots_meta(body):
+    return ' '.join(re.findall(r'<meta\s+name=["\']robots["\'][^>]*>', body))
+
+if 'robots' in SECTIONS:
+    q = first_loc('wp-sitemap-posts-question-1.xml') or BASE + '/question/kako-se-zove-film-u-kome-putnici-autobusom-putuju-ka-beogradu-uz-razne-nezgode/'
+    noindex_urls = {
+        'pitanje': q,
+        'prijava': BASE + '/prijava/',
+        'registracija': BASE + '/registracija/',
+        'moj-nalog': BASE + '/moj-nalog/',
+        'test stranica': BASE + '/test/',
+        'hello world post': BASE + '/hello-world/',
+        'pretraga': BASE + '/?s=fudbal',
+    }
+    for name, url in noindex_urls.items():
+        st, b = get(url)
+        r = robots_meta(b)
+        ok(f'{name}: noindex', 'noindex' in r, f'{st} {r} {url}')
+        ok(f'{name}: follow (ne nofollow)', 'nofollow' not in r, r)
+    for name in ['home', 'lista', 'stavka', 'kviz', 'anketa', 'showdown', 'kategorija liste', 'arhiva kvizova']:
+        url = pages[name]
+        if not url:
+            ok(f'{name}: URL', False); continue
+        st, b = get(url)
+        ok(f'{name}: NIJE noindex', 'noindex' not in robots_meta(b), robots_meta(b))
+    st, idx = get(BASE + '/wp-sitemap.xml')
+    ok('sitemap index: 200', st == 200, str(st))
+    for frag in ['posts-question-', 'posts-quiz_levels-', 'posts-post-', 'users-', 'taxonomies-question_category-', 'taxonomies-category-']:
+        ok(f'sitemap index bez "{frag}"', frag not in idx)
+    for frag in ['posts-voting_list-', 'posts-voting_items-', 'posts-quiz-', 'posts-voting_poll-', 'posts-page-', 'taxonomies-voting_list_category-']:
+        ok(f'sitemap index ima "{frag}"', frag in idx)
+    st, pg = get(BASE + '/wp-sitemap-posts-page-1.xml')
+    for slug in ['/prijava/', '/registracija/', '/moj-nalog/', '/test/', '/pocetna-old/']:
+        ok(f'sitemap stranica bez {slug}', slug not in pg)
+    ok('sitemap stranica ima /kontakt/', '/kontakt/' in pg)
+
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)
