@@ -32,6 +32,9 @@ require_once get_stylesheet_directory() . '/inc/migrations/migrations-init.php';
 // --- LOADING GLOBAL HELPERS ---
 require_once get_stylesheet_directory() . '/inc/helpers/helpers-init.php';
 
+// --- LOADING SEO (naslovi, meta opisi, OG, noindex, sitemap) ---
+require_once get_stylesheet_directory() . '/inc/seo/seo-init.php';
+
 
 
 
