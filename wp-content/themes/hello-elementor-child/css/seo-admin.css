@@ -1,0 +1,17 @@
+/* SEO (Google) kutija — inc/seo/seo-admin.php */
+.ygv-seo-box label { display: block; margin-bottom: 4px; }
+.ygv-seo-box .ygv-seo-opt { color: #646970; font-weight: normal; }
+.ygv-seo-box .description { display: block; margin-top: 2px; }
+.ygv-seo-counter { float: right; font-size: 11px; color: #646970; }
+.ygv-seo-counter.is-over { color: #d63638; font-weight: 600; }
+.ygv-seo-preview {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #f6f7f7;
+    border-left: 3px solid #2271b1;
+}
+.ygv-seo-preview span { display: block; }
+.ygv-seo-preview-label { font-size: 11px; color: #646970; margin-bottom: 4px; }
+.ygv-seo-preview-title { color: #1a0dab; font-size: 14px; line-height: 1.3; }
+.ygv-seo-preview-desc { color: #4d5156; font-size: 12px; line-height: 1.4; margin-top: 2px; }
+.ygv-seo-term .ygv-seo-box { max-width: 640px; }

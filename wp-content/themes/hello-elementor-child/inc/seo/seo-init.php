@@ -22,3 +22,4 @@ require_once YGV_SEO_DIR . '/seo-static.php';
 require_once YGV_SEO_DIR . '/seo-context.php';
 require_once YGV_SEO_DIR . '/seo-head.php';
 require_once YGV_SEO_DIR . '/seo-robots.php';
+require_once YGV_SEO_DIR . '/seo-admin.php';
