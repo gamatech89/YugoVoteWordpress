@@ -53,7 +53,8 @@ function ygv_seo_list_top_names(int $list_id, int $n = 3): array {
                 continue;
             }
             $name = ygv_seo_clean(get_the_title($id));
-            if ($name !== '') {
+            // Različite stavke ponekad imaju isto ime — ne ponavljamo ga u opisu.
+            if ($name !== '' && !in_array($name, $names, true)) {
                 $names[] = $name;
             }
         }
