@@ -73,5 +73,6 @@ Otvori i klikni "Scrape Again":
 php tests/seo/run-tests.php
 bash tests/seo/check-head.sh http://yugovote.local:8080
 docker compose cp tests/seo/test-admin-save.php wordpress:/tmp/ && docker compose exec -T wordpress php /tmp/test-admin-save.php
+docker compose cp tests/seo/test-context.php wordpress:/tmp/ && docker compose exec -T wordpress php /tmp/test-context.php
 docker compose cp scripts/seo/import-meta.php wordpress:/tmp/ && docker compose cp tests/seo/test-import.php wordpress:/tmp/ && docker compose exec -T wordpress php /tmp/test-import.php
 ```
