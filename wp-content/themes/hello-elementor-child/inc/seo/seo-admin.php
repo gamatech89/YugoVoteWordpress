@@ -164,6 +164,12 @@ function ygv_seo_save_term($term_id): void {
         return;
     }
     ygv_seo_store('term', $term_id);
+
+    // LiteSpeed ne čisti keš na izmenu kategorije — bez ovoga promena se ne vidi do isteka keša.
+    $link = get_term_link($term_id);
+    if (!is_wp_error($link)) {
+        do_action('litespeed_purge_url', $link);
+    }
 }
 
 /* -------------------------------------------------------------------------

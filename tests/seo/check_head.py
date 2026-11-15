@@ -64,6 +64,11 @@ if 'head' in SECTIONS:
     st, b = get(BASE + '/kvizovi/?difficulty=hard')
     c = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*>', b)
     ok('arhiva sa parametrom: jedan canonical bez "?"', len(c) == 1 and '?' not in c[0], str(c))
+    st, b = get(BASE + '/kvizovi/page/2/')
+    c = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*>', b)
+    ok('arhiva strana 2: canonical na samu sebe', len(c) == 1 and '/kvizovi/page/2/' in c[0], str(c))
+    t2 = re.search(r'<title>(.*?)</title>', b, re.S)
+    ok('arhiva strana 2: naslov ima "strana 2"', bool(t2) and 'strana 2' in html.unescape(t2.group(1)), t2.group(1) if t2 else '')
     for name in ['lista', 'kviz']:
         st, b = get(pages[name])
         c = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*>', b)
@@ -82,6 +87,7 @@ if 'robots' in SECTIONS:
         'test stranica': BASE + '/test/',
         'hello world post': BASE + '/hello-world/',
         'pretraga': BASE + '/?s=fudbal',
+        'arhiva po datumu': BASE + '/2024/12/',
     }
     for name, url in noindex_urls.items():
         st, b = get(url)

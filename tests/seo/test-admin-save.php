@@ -61,10 +61,13 @@ t('post: prazan opis briše meta', metadata_exists('post', $pid, '_ygv_seo_desc'
 t('post: neštiklirano briše noindex', metadata_exists('post', $pid, '_ygv_seo_noindex'), false);
 
 // --- termini
+$GLOBALS['ygv_purged'] = [];
+add_action('litespeed_purge_url', function ($u) { $GLOBALS['ygv_purged'][] = $u; });
 $_POST = ['ygv_seo_nonce' => wp_create_nonce('ygv_seo_save'), 'ygv_seo_title' => 'Term naslov', 'ygv_seo_desc' => 'Term opis', 'ygv_seo_noindex' => '1'];
 ygv_seo_save_term($tid);
 t('term: naslov', get_term_meta($tid, '_ygv_seo_title', true), 'Term naslov');
 t('term: noindex', get_term_meta($tid, '_ygv_seo_noindex', true), '1');
+t('term: LiteSpeed purge za URL kategorije', in_array(get_term_link($tid), $GLOBALS['ygv_purged'], true), true);
 $_POST = ['ygv_seo_nonce' => 'los', 'ygv_seo_title' => 'X'];
 ygv_seo_save_term($tid);
 t('term: loš nonce ne menja', get_term_meta($tid, '_ygv_seo_title', true), 'Term naslov');

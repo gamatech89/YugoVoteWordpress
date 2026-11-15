@@ -85,7 +85,8 @@ function ygv_seo_auto_title_post(WP_Post $p): string {
 }
 
 function ygv_seo_auto_desc_post(WP_Post $p): string {
-    $content = ygv_seo_clean((string) $p->post_content);
+    // Sadržaj zaštićen lozinkom ne sme da procuri u opis.
+    $content = post_password_required($p) ? '' : ygv_seo_clean((string) $p->post_content);
     $title   = ygv_seo_clean(get_the_title($p));
 
     switch ($p->post_type) {
@@ -98,7 +99,8 @@ function ygv_seo_auto_desc_post(WP_Post $p): string {
                 return ygv_seo_truncate($desc);
             }
             $n = (int) get_post_meta($p->ID, '_num_questions', true);
-            return ygv_seo_truncate('Kviz: ' . $title . '.' . ($n > 0 ? " {$n} pitanja." : '') . ' Proveri koliko znaš.');
+            $base = stripos($title, 'kviz') === false ? 'Kviz: ' . $title : $title;
+            return ygv_seo_truncate(ygv_seo_sentence($base) . ($n > 0 ? " {$n} pitanja." : '') . ' Proveri koliko znaš.');
 
         case 'voting_poll':
             $answers = get_post_meta($p->ID, '_cs_poll_answers', true);
@@ -108,7 +110,7 @@ function ygv_seo_auto_desc_post(WP_Post $p): string {
                     $texts[] = ygv_seo_clean(is_array($a) ? (string) ($a['text'] ?? '') : (string) $a);
                 }
             }
-            $q    = $content !== '' ? $content : $title;
+            $q    = ygv_seo_sentence($content !== '' ? $content : $title);
             $opts = ygv_seo_join_names($texts);
             return ygv_seo_truncate($q . ($opts !== '' ? ' ' . $opts . ' ili nešto treće? Glasaj u anketi.' : ' Glasaj u anketi.'));
 
@@ -148,7 +150,15 @@ function ygv_seo_auto_desc_term(WP_Term $t): string {
     if ($desc !== '') {
         return ygv_seo_truncate($desc);
     }
-    return ygv_seo_truncate(ygv_seo_clean($t->name) . ': liste i kvizovi na YugoVote. Glasaj i reci svoje.');
+    $name = ygv_seo_clean($t->name);
+    switch ($t->taxonomy) {
+        case 'voting_list_category':
+            return ygv_seo_truncate($name . ': rang liste na YugoVote. Glasaj i reci svoje.');
+        case 'quiz_category':
+            return ygv_seo_truncate($name . ': kvizovi na YugoVote. Proveri koliko znaš.');
+        default:
+            return ygv_seo_truncate($name . ' na YugoVote rang listama. Pogledaj gde su se našli i glasaj.');
+    }
 }
 
 /* -------------------------------------------------------------------------
@@ -246,6 +256,14 @@ function ygv_seo_context(): array {
         $u     = get_queried_object();
         $title = $u instanceof WP_User ? ygv_seo_clean($u->display_name) : '';
         $desc  = $copy['home']['desc'];
+    }
+
+    // Arhive sa straničenjem: svaka strana ima svoj canonical i naslov.
+    $paged = (int) get_query_var('paged');
+    if ($paged > 1 && $url !== '' && (is_tax() || is_category() || is_tag() || is_post_type_archive())) {
+        global $wp_rewrite;
+        $url   = trailingslashit($url) . user_trailingslashit($wp_rewrite->pagination_base . '/' . $paged, 'paged');
+        $title = trim($title) . ', strana ' . $paged;
     }
 
     $title = trim($title);

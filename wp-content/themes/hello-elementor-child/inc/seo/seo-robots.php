@@ -50,11 +50,14 @@ function ygv_seo_is_noindex_term(WP_Term $t): bool {
  * Da li je trenutni zahtev noindex.
  */
 function ygv_seo_is_noindex_request(): bool {
-    if (is_search() || is_404() || is_author()) {
+    if (is_search() || is_404() || is_author() || is_date()) {
         return true;
     }
     if (is_front_page()) {
         return false;
+    }
+    if (is_home()) {
+        return true; // blog indeks — sajt nema blog, tu su samo test postovi
     }
     if (is_singular()) {
         $p = get_queried_object();
@@ -106,45 +109,57 @@ add_filter('wp_sitemaps_taxonomies', function (array $taxonomies) {
     return $taxonomies;
 });
 
-add_filter('wp_sitemaps_posts_query_args', function (array $args, string $post_type) {
-    $meta_query = isset($args['meta_query']) && is_array($args['meta_query']) ? $args['meta_query'] : [];
-    $meta_query[] = [
-        'relation' => 'OR',
-        ['key' => '_ygv_seo_noindex', 'compare' => 'NOT EXISTS'],
-        ['key' => '_ygv_seo_noindex', 'value' => '1', 'compare' => '!='],
-    ];
-    if ($post_type === 'voting_list') {
-        $meta_query[] = [
-            'relation' => 'OR',
-            ['key' => '_is_tournament_match', 'compare' => 'NOT EXISTS'],
-            ['key' => '_is_tournament_match', 'value' => '1', 'compare' => '!='],
-        ];
+/**
+ * ID-jevi postova koji ne idu u sitemap: ručno sakriveni i turnirske liste.
+ * Jedan upit po indeksu meta_key, umesto meta_query JOIN-ova na velikim tipovima. Memo po zahtevu.
+ */
+function ygv_seo_sitemap_excluded_post_ids(): array {
+    static $ids = null;
+    if ($ids === null) {
+        global $wpdb;
+        $ids = array_map('intval', $wpdb->get_col(
+            "SELECT DISTINCT post_id FROM {$wpdb->postmeta}
+             WHERE meta_key IN ('_ygv_seo_noindex', '_is_tournament_match') AND meta_value = '1'"
+        ));
     }
-    $args['meta_query'] = $meta_query;
+    return $ids;
+}
+
+function ygv_seo_sitemap_excluded_term_ids(): array {
+    static $ids = null;
+    if ($ids === null) {
+        global $wpdb;
+        $ids = array_map('intval', $wpdb->get_col(
+            "SELECT DISTINCT term_id FROM {$wpdb->termmeta} WHERE meta_key = '_ygv_seo_noindex' AND meta_value = '1'"
+        ));
+    }
+    return $ids;
+}
+
+add_filter('wp_sitemaps_posts_query_args', function (array $args, string $post_type) {
+    $exclude = ygv_seo_sitemap_excluded_post_ids();
 
     if ($post_type === 'page') {
-        $exclude = get_posts([
+        $exclude = array_merge($exclude, get_posts([
             'post_type'      => 'page',
             'post_name__in'  => ygv_seo_noindex_page_slugs(),
             'post_status'    => 'any',
             'fields'         => 'ids',
             'posts_per_page' => -1,
             'no_found_rows'  => true,
-        ]);
-        if ($exclude) {
-            $args['post__not_in'] = array_merge($args['post__not_in'] ?? [], $exclude);
-        }
+        ]));
+    }
+    if ($exclude) {
+        $args['post__not_in'] = array_values(array_unique(array_merge($args['post__not_in'] ?? [], $exclude)));
     }
     return $args;
 }, 10, 2);
 
 add_filter('wp_sitemaps_taxonomies_query_args', function (array $args) {
-    $meta_query = isset($args['meta_query']) && is_array($args['meta_query']) ? $args['meta_query'] : [];
-    $meta_query[] = [
-        'relation' => 'OR',
-        ['key' => '_ygv_seo_noindex', 'compare' => 'NOT EXISTS'],
-        ['key' => '_ygv_seo_noindex', 'value' => '1', 'compare' => '!='],
-    ];
-    $args['meta_query'] = $meta_query;
+    $exclude = ygv_seo_sitemap_excluded_term_ids();
+    if ($exclude) {
+        $current         = isset($args['exclude']) ? wp_parse_id_list($args['exclude']) : [];
+        $args['exclude'] = array_values(array_unique(array_merge($current, $exclude)));
+    }
     return $args;
 });

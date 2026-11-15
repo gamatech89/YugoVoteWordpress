@@ -39,6 +39,17 @@ function ygv_seo_truncate(string $text, int $max = 155): string {
 }
 
 /**
+ * Zatvara rečenicu: skida viseću interpunkciju (, ; : –) i dodaje tačku ako nema . ! ? …
+ */
+function ygv_seo_sentence(string $text): string {
+    $text = preg_replace('/[\s,;:–\-]+$/u', '', trim($text));
+    if ($text === '') {
+        return '';
+    }
+    return preg_match('/[.!?…]$/u', $text) ? $text : $text . '.';
+}
+
+/**
  * ['A','B','C'] → "A, B i C".
  */
 function ygv_seo_join_names(array $names): string {
@@ -79,11 +90,7 @@ function ygv_seo_list_desc(string $intro, array $names, int $max = 155): string 
                 return $out;
             }
         } else {
-            $full = $intro;
-            if (!preg_match('/[.!?…]$/u', $full)) {
-                $full .= '.';
-            }
-            $out = $full . ' ' . $suffix;
+            $out = ygv_seo_sentence($intro) . ' ' . $suffix;
             if (mb_strlen($out) <= $max) {
                 return $out;
             }

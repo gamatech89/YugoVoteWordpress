@@ -46,5 +46,15 @@ t('list_desc: bez " ." i ",."', (bool) preg_match('/ \.|,\./u', $r), false);
 $r = ygv_seo_list_desc('Neki crnogorski fudbaleri kao da nisu iz Crne Gore. Osvajali su sve.', ['Savićević', 'Mijatović']);
 t('list_desc: kratak uvod ceo + imena', $r, 'Neki crnogorski fudbaleri kao da nisu iz Crne Gore. Osvajali su sve. Savićević i Mijatović. Glasaj!');
 
+
+// sentence (završna interpunkcija za automatske opise)
+t('sentence: dodaje tačku', ygv_seo_sentence('Euroliga poredak'), 'Euroliga poredak.');
+t('sentence: skida dvotačku', ygv_seo_sentence('Najbolji fudbaleri su:'), 'Najbolji fudbaleri su.');
+t('sentence: skida zarez i crtu', ygv_seo_sentence('Ovo je to, –'), 'Ovo je to.');
+t('sentence: ostavlja upitnik', ygv_seo_sentence('Čiji si ti?'), 'Čiji si ti?');
+t('sentence: ostavlja …', ygv_seo_sentence('I tako dalje…'), 'I tako dalje…');
+t('sentence: prazno', ygv_seo_sentence('  '), '');
+t('list_desc: uvod sa dvotačkom bez ":."', ygv_seo_list_desc('Najbolji fudbaleri su:', ['A', 'B']), 'Najbolji fudbaleri su. A i B. Glasaj!');
+
 echo $fails ? "\n$fails FAIL\n" : "\nSVE PASS\n";
 exit($fails ? 1 : 0);
