@@ -1,6 +1,14 @@
 <?php
 // Integracioni test SEO kutije. Pokreće se u WP kontejneru:
 //   docker compose cp tests/seo/test-admin-save.php wordpress:/tmp/ && docker compose exec -T wordpress php /tmp/test-admin-save.php
+$GLOBALS['ygv_test_done'] = false;
+register_shutdown_function(function () {
+    if (empty($GLOBALS['ygv_test_done'])) {
+        $e = error_get_last();
+        echo "FAIL  test se nije završio: " . ($e['message'] ?? 'nepoznato') . "\n";
+    }
+});
+define('WP_DISABLE_FATAL_ERROR_HANDLER', true);
 require '/var/www/html/wp-load.php';
 require_once ABSPATH . 'wp-admin/includes/template.php';
 
@@ -81,5 +89,6 @@ t('render term: polja', strpos($html, 'name="ygv_seo_title"') !== false && strpo
 
 $clean();
 $_POST = [];
+$GLOBALS['ygv_test_done'] = true;
 echo $fails ? "\n$fails FAIL\n" : "\nSVE PASS\n";
 exit($fails ? 1 : 0);
