@@ -24,8 +24,31 @@
 
             this.showdownId = parseInt($page.data("showdown-id"));
 
+            // Gost se prepoznaje po kolačiću (ne po IP-u); mora postojati pre prvog AJAX poziva
+            this.ensureGuestToken();
+
             // Always check via AJAX to bypass LiteSpeed cache and get real has_played state
             this.checkStatusAndInit($page);
+        },
+
+        /**
+         * Kolačić yuv_sd_guest: 32 hex znaka, godinu dana. Server po njemu zna da je gost već glasao
+         * i posle prijave prebacuje te glasove na nalog.
+         */
+        ensureGuestToken: function () {
+            const m = document.cookie.match(/(?:^|;\s*)yuv_sd_guest=([a-f0-9]{32})(?:;|$)/);
+            if (m) return m[1];
+            let token = "";
+            if (window.crypto && window.crypto.getRandomValues) {
+                const bytes = new Uint8Array(16);
+                window.crypto.getRandomValues(bytes);
+                token = Array.from(bytes, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+            } else {
+                for (let i = 0; i < 32; i++) token += Math.floor(Math.random() * 16).toString(16);
+            }
+            const secure = window.location.protocol === "https:" ? "; Secure" : "";
+            document.cookie = "yuv_sd_guest=" + token + "; path=/; max-age=31536000; SameSite=Lax" + secure;
+            return token;
         },
 
         checkStatusAndInit: function ($page) {
@@ -60,11 +83,8 @@
         },
 
         startArena: function ($page) {
-            const hasPlayedServer = $page.data("has-played") === 1 || $page.data("has-played") === "1";
-            if (hasPlayedServer) {
-                // If even the server knows we played, and AJAX didn't catch it (rare), 
-                // we might want to hide, but usually we just start the arena if AJAX said OK.
-            }
+            // Arena je sakrivena dok AJAX ne kaže da korisnik nije glasao
+            $page.removeClass("is-checking");
 
             try {
                 this.items = JSON.parse($page.attr("data-items"));
@@ -250,6 +270,12 @@
                                 response.data.leaderboard,
                                 response.data.total_players
                             );
+                        } else if (response.data && response.data.leaderboard) {
+                            // Već glasao (npr. u drugom tabu) — stvarni poredak, isti kao za sve
+                            self.renderLeaderboard(
+                                response.data.leaderboard,
+                                response.data.total_players
+                            );
                         } else {
                             self.renderLocalLeaderboard();
                         }
@@ -269,6 +295,7 @@
         showResults: function ($results, html) {
             // Wrap in inner container
             $results.html('<div class="sd-results-inner">' + html + '</div>');
+            $(".sd-page").removeClass("is-checking");
 
             // Hide the arena page completely after fade-out completes
             setTimeout(function () {

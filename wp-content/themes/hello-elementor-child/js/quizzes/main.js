@@ -1,10 +1,10 @@
 async function api(url, opts = {}) {
+  const headers = { "Content-Type": "application/json" };
+  // Gost nema nonce (keširana stranica) — bez zaglavlja REST ga tretira kao gosta umesto 403.
+  if (quizSettings.nonce) headers["X-WP-Nonce"] = quizSettings.nonce;
   const res = await fetch(url, {
     method: opts.method || "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-WP-Nonce": quizSettings.nonce,
-    },
+    headers,
     credentials: "same-origin",
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });

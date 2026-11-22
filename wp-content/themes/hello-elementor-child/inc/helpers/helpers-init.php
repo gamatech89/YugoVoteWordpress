@@ -34,6 +34,11 @@ if (file_exists($base . 'utilities.php')) {
     require_once $base . 'utilities.php';
 }
 
+// Nonce za javne (gost) akcije + stranice sa formama van keša
+if (file_exists($base . 'public-nonce.php')) {
+    require_once $base . 'public-nonce.php';
+}
+
 // Live search AJAX handler
 if (file_exists($base . 'live-search.php')) {
     require_once $base . 'live-search.php';

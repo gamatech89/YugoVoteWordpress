@@ -56,9 +56,12 @@ class YUV_Showdown_Manager
     }
 
     /**
-     * Check if user has already played a showdown
+     * Check if user has already played a showdown.
+     * Prijavljen: po user_id. Gost: po oznaci iz kolačića (guest_token), ne po IP-u —
+     * IP deli cela porodica/mobilna mreža, a menja se na mobilnom.
+     * $ip_address se više ne koristi za proveru (ostaje zbog kompatibilnosti poziva).
      */
-    public function has_user_played($showdown_id, $user_id = 0, $ip_address = '')
+    public function has_user_played($showdown_id, $user_id = 0, $ip_address = '', $guest_token = '')
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yuv_showdown_sessions';
@@ -71,10 +74,14 @@ class YUV_Showdown_Manager
             ));
         }
 
+        if ($guest_token === '') {
+            return false;
+        }
+
         return (bool)$wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM $table WHERE showdown_id = %d AND user_id IS NULL AND ip_address = %s LIMIT 1",
+            "SELECT id FROM $table WHERE showdown_id = %d AND user_id IS NULL AND guest_token = %s LIMIT 1",
             $showdown_id,
-            $ip_address
+            $guest_token
         ));
     }
 
@@ -124,14 +131,19 @@ class YUV_Showdown_Manager
      * @param string $winner_name Name of the winning item
      * @return array
      */
-    public function save_session($showdown_id, $user_id, $ip_address, $results, $winner_name)
+    public function save_session($showdown_id, $user_id, $ip_address, $results, $winner_name, $guest_token = '')
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yuv_showdown_sessions';
 
+        // Gost bez oznake ne može da se zaštiti od duplog glasa
+        if ($user_id <= 0 && $guest_token === '') {
+            return ['success' => false, 'message' => 'Uključi kolačiće da bi tvoj glas bio sačuvan'];
+        }
+
         // Prevent duplicate sessions
-        if ($this->has_user_played($showdown_id, $user_id, $ip_address)) {
-            return ['success' => false, 'message' => 'Već ste odigrali ovaj Showdown'];
+        if ($this->has_user_played($showdown_id, $user_id, $ip_address, $guest_token)) {
+            return ['success' => false, 'already_played' => true, 'message' => 'Već ste odigrali ovaj Showdown'];
         }
 
         // Find winner item index from items meta
@@ -148,10 +160,11 @@ class YUV_Showdown_Manager
             'showdown_id' => $showdown_id,
             'user_id' => $user_id > 0 ? $user_id : null,
             'ip_address' => $ip_address,
+            'guest_token' => $user_id > 0 ? '' : $guest_token,
             'results_json' => wp_json_encode($results),
             'winner_item_id' => $winner_item_id,
             'created_at' => current_time('mysql'),
-        ], ['%d', '%d', '%s', '%s', '%d', '%s']);
+        ], ['%d', '%d', '%s', '%s', '%s', '%d', '%s']);
 
         if ($inserted === false) {
             return ['success' => false, 'message' => 'Greška pri čuvanju rezultata'];
@@ -307,7 +320,7 @@ class YUV_Showdown_Manager
     /**
      * Get user's previous session results for a showdown
      */
-    public function get_user_session($showdown_id, $user_id = 0, $ip_address = '')
+    public function get_user_session($showdown_id, $user_id = 0, $ip_address = '', $guest_token = '')
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yuv_showdown_sessions';
@@ -319,12 +332,15 @@ class YUV_Showdown_Manager
                 $user_id
             ));
         }
-        else {
+        elseif ($guest_token !== '') {
             $row = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM $table WHERE showdown_id = %d AND user_id IS NULL AND ip_address = %s LIMIT 1",
+                "SELECT * FROM $table WHERE showdown_id = %d AND user_id IS NULL AND guest_token = %s LIMIT 1",
                 $showdown_id,
-                $ip_address
+                $guest_token
             ));
+        }
+        else {
+            $row = null;
         }
 
         if (!$row)
@@ -336,5 +352,43 @@ class YUV_Showdown_Manager
             'winner_item' => $row->winner_item_id,
             'created_at' => $row->created_at,
         ];
+    }
+
+    /**
+     * Posle prijave: glasovi koje je posetilac dao kao gost (ista oznaka iz kolačića) prelaze na nalog.
+     * Ako je nalog već glasao u tom dvoboju, glas gosta ostaje anoniman (ne briše se).
+     *
+     * @return int Broj prebačenih glasova.
+     */
+    public function claim_guest_sessions($user_id, $guest_token)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yuv_showdown_sessions';
+
+        $user_id = (int) $user_id;
+        if ($user_id <= 0 || $guest_token === '') {
+            return 0;
+        }
+
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT id, showdown_id FROM $table WHERE user_id IS NULL AND guest_token = %s",
+            $guest_token
+        ));
+
+        $claimed = 0;
+        foreach ($rows as $row) {
+            if ($this->has_user_played((int) $row->showdown_id, $user_id)) {
+                continue;
+            }
+            $claimed += (int) $wpdb->update(
+                $table,
+                ['user_id' => $user_id, 'guest_token' => ''],
+                ['id' => (int) $row->id],
+                ['%d', '%s'],
+                ['%d']
+            );
+        }
+
+        return $claimed;
     }
 }

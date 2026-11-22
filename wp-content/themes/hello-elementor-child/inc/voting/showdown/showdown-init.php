@@ -18,6 +18,9 @@ require_once $showdown_path . 'cpts/cpt-showdown.php';
 // Load manager class
 require_once $showdown_path . 'classes/class-showdown-manager.php';
 
+// Guest token (cookie) + claim guest votes on login
+require_once $showdown_path . 'showdown-guest.php';
+
 // Load meta boxes
 require_once $showdown_path . 'meta/showdown-meta.php';
 
@@ -48,18 +51,20 @@ function yuv_enqueue_showdown_assets()
         '3.5.0'
     );
 
+    // Verzija = vreme izmene fajla: posle svakog deploy-a pregledač uzima novu verziju
+    // (staticki '2.0.0' je ostavljao stari JS koji je prikazivao procente).
     wp_enqueue_style(
         'yuv-showdown',
         get_stylesheet_directory_uri() . '/css/showdown.css',
     ['yuv-showdown-fonts', 'yuv-remixicon'],
-        '2.0.0'
+        (string) filemtime(get_stylesheet_directory() . '/css/showdown.css')
     );
 
     wp_enqueue_script(
         'yuv-showdown',
         get_stylesheet_directory_uri() . '/js/showdown.js',
     ['jquery'],
-        '2.0.0',
+        (string) filemtime(get_stylesheet_directory() . '/js/showdown.js'),
         true
     );
 

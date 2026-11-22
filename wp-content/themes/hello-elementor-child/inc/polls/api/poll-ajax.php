@@ -13,7 +13,9 @@ function cs_has_user_voted_poll($poll_id) {
 
 // AJAX
 function cs_handle_poll_vote_ajax() {
-    check_ajax_referer('cs_poll_vote_nonce', 'nonce');
+    if (!ygv_public_nonce_ok('cs_poll_vote_nonce')) {
+        wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osveži stranicu.'], 403);
+    }
 
     $poll_id = intval($_POST['poll_id']);
     $answer_idx = intval($_POST['answer_index']);
@@ -73,7 +75,9 @@ add_action('wp_ajax_nopriv_cs_vote_poll', 'cs_handle_poll_vote_ajax');
 
 // Load more polls for infinite scroll
 function cs_load_more_polls_ajax() {
-    check_ajax_referer('cs_load_more_polls', 'nonce');
+    if (!ygv_public_nonce_ok('cs_load_more_polls')) {
+        wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osveži stranicu.'], 403);
+    }
 
     $page     = max(1, intval($_POST['page'] ?? 1));
     $per_page = 9;

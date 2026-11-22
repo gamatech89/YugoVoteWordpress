@@ -19,7 +19,7 @@ function enqueue_quizzes_assets() {
         'quizzes-js',
         get_stylesheet_directory_uri() . '/js/quizzes/main.js',
         [],
-        defined('HELLO_ELEMENTOR_CHILD_VERSION') ? HELLO_ELEMENTOR_CHILD_VERSION : '1.0.0',
+        (string) filemtime(get_stylesheet_directory() . '/js/quizzes/main.js'), // nova verzija posle svake izmene
         true
     );
 
@@ -44,7 +44,8 @@ function enqueue_quizzes_assets() {
     wp_localize_script('quizzes-js', 'quizSettings', [
         'apiUrl'      => esc_url_raw( rest_url('yugovote/v1') ),
         'soundPath'   => get_stylesheet_directory_uri() . '/assets/sounds/',
-        'nonce'       => wp_create_nonce('wp_rest'),
+        // Samo za prijavljene: gost iz keša bi slao zastareli nonce i REST bi vratio 403 "Cookie check failed".
+        'nonce'       => is_user_logged_in() ? wp_create_nonce('wp_rest') : '',
         'loginUrl'    => wp_login_url( get_permalink() ),
         'registerUrl' => wp_registration_url(),
     ]);

@@ -1600,3 +1600,8 @@
   font-size: 0.9rem;
   color: var(--sd-text-muted);
 }
+
+/* Arena čeka AJAX proveru (da li je posetilac već glasao) — bez treptanja arene pre rezultata */
+.sd-page.is-checking {
+  visibility: hidden;
+}

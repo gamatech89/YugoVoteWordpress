@@ -13,7 +13,8 @@ add_action('wp_ajax_yugo_ajax_login', 'yugo_ajax_login_handler');
 
 function yugo_ajax_login_handler() {
     // Verify nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yugo_login_nonce')) {
+    // Gost iz keša šalje zastareli nonce; core wp-login.php ni nema nonce za prijavu.
+    if (!ygv_public_nonce_ok('yugo_login_nonce')) {
         wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osvežite stranicu i pokušajte ponovo.']);
         exit;
     }

@@ -186,8 +186,10 @@ add_action("wp_ajax_get_voting_item_details", "get_voting_item_details");
  * @action wp_ajax_nopriv_submit_vote (for guest users)
  */
 function submit_vote() {
-    // 1. Verify the nonce
-    check_ajax_referer('voting_list_actions_nonce', 'nonce'); 
+    // 1. Verify the nonce (gost: preskače se, vidi inc/helpers/public-nonce.php)
+    if (!ygv_public_nonce_ok('voting_list_actions_nonce')) {
+        wp_send_json_error('Sigurnosna provera nije uspela. Osveži stranicu.', 403);
+    }
 
     global $wpdb;
     $user_id = get_current_user_id(); // 0 if guest
@@ -400,8 +402,10 @@ add_action("wp_ajax_nopriv_submit_vote", "submit_vote");
  * @action wp_ajax_nopriv_remove_vote (for guest users)
  */
 function remove_vote() {
-    // 1. Verify the nonce
-    check_ajax_referer('voting_list_actions_nonce', 'nonce'); 
+    // 1. Verify the nonce (gost: preskače se, vidi inc/helpers/public-nonce.php)
+    if (!ygv_public_nonce_ok('voting_list_actions_nonce')) {
+        wp_send_json_error('Sigurnosna provera nije uspela. Osveži stranicu.', 403);
+    }
 
     global $wpdb;
     $user_id = get_current_user_id();
@@ -623,7 +627,7 @@ add_action("wp_ajax_nopriv_get_voting_list_totals", "get_voting_list_totals");
 function cs_search_voting_lists() {
     // Provera Nonce-a (sigurnost) - koristimo postojeći voting nonce
     // Ako tvoj JS šalje 'nonce' ključ, ovo je ok.
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'voting_list_actions_nonce')) {
+    if (!ygv_public_nonce_ok('voting_list_actions_nonce')) {
         wp_send_json_error('Security check failed.');
         return;
     }

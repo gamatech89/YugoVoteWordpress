@@ -14,7 +14,9 @@ add_action('wp_ajax_nopriv_yuv_showdown_get_items', 'yuv_showdown_get_items_ajax
 
 function yuv_showdown_get_items_ajax()
 {
-    check_ajax_referer('yuv_showdown_nonce', 'nonce');
+    if (!ygv_public_nonce_ok('yuv_showdown_nonce')) {
+        wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osveži stranicu.'], 403);
+    }
 
     $showdown_id = intval($_POST['showdown_id'] ?? 0);
     if (!$showdown_id) {
@@ -30,7 +32,8 @@ function yuv_showdown_get_items_ajax()
 
     $user_id = get_current_user_id();
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $has_played = $manager->has_user_played($showdown_id, $user_id, $ip);
+    $token = yuv_showdown_guest_token();
+    $has_played = $manager->has_user_played($showdown_id, $user_id, $ip, $token);
 
     $response = [
         'items' => $items,
@@ -39,7 +42,7 @@ function yuv_showdown_get_items_ajax()
 
     // If already played, include their session + leaderboard
     if ($has_played) {
-        $response['session'] = $manager->get_user_session($showdown_id, $user_id, $ip);
+        $response['session'] = $manager->get_user_session($showdown_id, $user_id, $ip, $token);
         $response['leaderboard'] = $manager->get_leaderboard($showdown_id);
         $response['total_players'] = $manager->get_session_count($showdown_id);
     }
@@ -55,7 +58,9 @@ add_action('wp_ajax_nopriv_yuv_showdown_save_session', 'yuv_showdown_save_sessio
 
 function yuv_showdown_save_session_ajax()
 {
-    check_ajax_referer('yuv_showdown_nonce', 'nonce');
+    if (!ygv_public_nonce_ok('yuv_showdown_nonce')) {
+        wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osveži stranicu.'], 403);
+    }
 
     $showdown_id = intval($_POST['showdown_id'] ?? 0);
     $results_raw = $_POST['results'] ?? '';
@@ -81,10 +86,16 @@ function yuv_showdown_save_session_ajax()
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
     $manager = new YUV_Showdown_Manager();
-    $result = $manager->save_session($showdown_id, $user_id, $ip, $results, $winner);
+    $result = $manager->save_session($showdown_id, $user_id, $ip, $results, $winner, yuv_showdown_guest_token());
 
     if (!$result['success']) {
-        wp_send_json_error(['message' => $result['message']]);
+        $error = ['message' => $result['message']];
+        // Već glasao (npr. drugi tab): pokaži stvarni poredak umesto "ličnog"
+        if (!empty($result['already_played'])) {
+            $error['leaderboard'] = $manager->get_leaderboard($showdown_id);
+            $error['total_players'] = $manager->get_session_count($showdown_id);
+        }
+        wp_send_json_error($error);
     }
 
     // Return leaderboard after saving
@@ -107,7 +118,9 @@ add_action('wp_ajax_nopriv_yuv_showdown_get_leaderboard', 'yuv_showdown_get_lead
 
 function yuv_showdown_get_leaderboard_ajax()
 {
-    check_ajax_referer('yuv_showdown_nonce', 'nonce');
+    if (!ygv_public_nonce_ok('yuv_showdown_nonce')) {
+        wp_send_json_error(['message' => 'Sigurnosna provera nije uspela. Osveži stranicu.'], 403);
+    }
 
     $showdown_id = intval($_POST['showdown_id'] ?? 0);
     if (!$showdown_id) {

@@ -44,20 +44,16 @@ function yuv_showdown_shortcode($atts) {
         return '<div class="showdown-wrap"><div class="sd-empty"><div class="sd-empty__icon"><i class="ri-error-warning-line"></i></div><h3 class="sd-empty__title">Nedovoljno učesnika</h3><p class="sd-empty__desc">Dvoboj nema dovoljno učesnika za početak.</p></div></div>';
     }
 
-    $user_id = get_current_user_id();
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $has_played = $manager->has_user_played($showdown_id, $user_id, $ip);
-    $leaderboard = $has_played ? $manager->get_leaderboard($showdown_id) : [];
-    $total_players = $manager->get_session_count($showdown_id);
+    // Lično stanje (da li je glasao, poredak) NE ide u HTML: LiteSpeed kešira stranicu za sve goste.
+    // js/showdown.js ga pita AJAX-om i crta rezultate isto za goste i prijavljene.
 
     ob_start();
     ?>
-    <div class="sd-page"
+    <div class="sd-page is-checking"
          id="yuv-showdown-arena"
          data-showdown-id="<?php echo esc_attr($showdown_id); ?>"
          data-showdown-url="<?php echo esc_url(get_permalink($showdown_id)); ?>"
          data-status="<?php echo esc_attr($status); ?>"
-         data-has-played="<?php echo $has_played ? '1' : '0'; ?>"
          data-items='<?php echo esc_attr(wp_json_encode($items)); ?>'
          >
 
@@ -134,67 +130,8 @@ function yuv_showdown_shortcode($atts) {
 
     </div><!-- /.sd-page -->
 
-    <!-- Results Screen (fixed overlay, light theme, matching mockup) -->
-    <div id="sd-results" class="sd-results-screen <?php echo $has_played ? 'sd-results-screen--visible' : ''; ?>">
-
-            <?php if ($has_played): ?>
-                <!-- Results Header -->
-                <header class="showdown-header sd-results-header">
-                    <div class="showdown-badge">
-                        <i class="ri-sword-line"></i>
-                        Može biti samo jedan
-                    </div>
-                    <h2 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h2>
-                </header>
-
-                <?php if (!empty($leaderboard)): ?>
-                    <!-- Podium (top 3) -->
-                    <section class="sd-podium">
-                        <?php 
-                        $podium_order = ['silver' => 1, 'gold' => 0, 'bronze' => 2];
-                        foreach ($podium_order as $class => $idx):
-                            if (!isset($leaderboard[$idx])) continue;
-                            $entry = $leaderboard[$idx];
-                        ?>
-                            <div class="sd-podium__item sd-podium__item--<?php echo $class; ?>">
-                                <div class="sd-podium__avatar-wrap">
-                                    <?php if ($class === 'gold'): ?>
-                                        <span class="sd-podium__crown">👑</span>
-                                    <?php endif; ?>
-                                    <span class="sd-podium__medal"><?php echo $idx + 1; ?></span>
-                                    <?php if (!empty($entry['image'])): ?>
-                                        <img class="sd-podium__avatar" src="<?php echo esc_url($entry['image']); ?>" alt="<?php echo esc_attr($entry['name']); ?>">
-                                    <?php endif; ?>
-                                </div>
-                                <h3 class="sd-podium__name"><?php echo esc_html($entry['name']); ?></h3>
-                                <p class="sd-podium__wins">
-                                    Pobede: <strong><?php 
-                                        $win_rate = $entry['sessions'] > 0 ? round(($entry['wins'] / $entry['sessions']) * 100) : 0;
-                                        echo $win_rate; 
-                                    ?>%</strong>
-                                </p>
-                            </div>
-                        <?php endforeach; ?>
-                    </section>
-
-                    <?php $is_own_page = (get_the_ID() == $showdown_id); ?>
-
-                    <?php if (!$is_own_page): ?>
-                        <!-- Redirect button — shown on homepage or any other page -->
-                        <section class="sd-ranked">
-                            <div class="sd-ranked__expand">
-                                <a href="<?php echo esc_url(get_permalink($showdown_id)); ?>" class="sd-btn--cta">
-                                    <i class="ri-bar-chart-2-line"></i>
-                                    Pogledaj kompletan poredak
-                                </a>
-                            </div>
-                        </section>
-                    <?php endif; ?>
-
-
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
+    <!-- Results Screen: puni ga js/showdown.js (renderLeaderboard) posle AJAX provere -->
+    <div id="sd-results" class="sd-results-screen"></div>
     <?php
     return ob_get_clean();
 }
@@ -215,7 +152,6 @@ function yuv_showdown_archive_shortcode($atts) {
     }
 
     $user_id = get_current_user_id();
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
     ob_start();
     ?>
@@ -232,7 +168,8 @@ function yuv_showdown_archive_shortcode($atts) {
         <!-- Grid -->
         <div class="sd-archive-grid">
             <?php foreach ($archive as $item): ?>
-                <?php $voted = $manager->has_user_played($item['id'], $user_id, $ip); ?>
+                <?php // Bedž samo za prijavljene: stranica gosta je u javnom kešu i bila bi ista za sve goste
+                $voted = $user_id > 0 && $manager->has_user_played($item['id'], $user_id); ?>
                 <article class="sd-archive-card<?php echo $voted ? ' sd-archive-card--voted' : ''; ?>">
                     <div class="sd-archive-card__top">
                         <span class="sd-archive-card__date"><?php echo esc_html($item['date']); ?></span>
@@ -301,9 +238,9 @@ function yuv_showdown_widget_shortcode($atts) {
     $items = $manager->get_items($showdown_id);
     $total_players = $manager->get_session_count($showdown_id);
     
+    // Gost: neutralno (stranica je u javnom kešu). Prijavljen: stvarno stanje.
     $user_id = get_current_user_id();
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $has_played = $manager->has_user_played($showdown_id, $user_id, $ip);
+    $has_played = $user_id > 0 && $manager->has_user_played($showdown_id, $user_id);
 
     ob_start();
     ?>

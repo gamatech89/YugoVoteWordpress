@@ -6,7 +6,7 @@
 if (!defined('ABSPATH')) exit;
 
 function ygv_archive_filter_ajax() {
-    if (!check_ajax_referer('ygv_archive_filter', 'nonce', false)) {
+    if (!ygv_public_nonce_ok('ygv_archive_filter')) {
         wp_send_json_error(['message' => 'Invalid nonce'], 403);
     }
 
