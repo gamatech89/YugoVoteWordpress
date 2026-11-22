@@ -41,12 +41,15 @@ expect_success "ankete: učitaj još sa starim ključem"       -d "action=cs_loa
 expect_success "kvizovi: filter arhive sa starim ključem"   -d "action=ygv_archive_filter&nonce=$BAD&cat=&diff=0&paged=1"
 expect_success "liste: pretraga sa starim ključem"          -d "action=cs_search_voting_lists&nonce=$BAD&term=film"
 
-# Prijava: sa starim ključem ne sme da padne na "Sigurnosna provera" (pogrešna lozinka je OK)
-out=$(curl -s -A "$UA" -X POST "$AJAX" -d "action=yugo_ajax_login&nonce=$BAD&username=nepostojeci_korisnik_xyz&password=pogresna")
-case "$out" in
-  *Sigurnosna*) fail "prijava: stari ključ ne blokira prijavu" "odgovor: ${out:0:160}" ;;
-  *) pass "prijava: stari ključ ne blokira prijavu" ;;
-esac
+# Dvoboj: server postavlja kolačić gosta (Safari briše kolačiće iz JS-a posle 7 dana)
+if [ -n "$SID" ]; then
+  H=$(curl -s -D - -o /dev/null -A "$UA" -X POST "$AJAX" -d "action=yuv_showdown_get_items&nonce=$BAD&showdown_id=$SID")
+  if printf '%s' "$H" | grep -qi '^set-cookie: yuv_sd_guest=[a-f0-9]\{32\}'; then
+    pass "dvoboj: server postavlja kolačić gosta"
+  else
+    fail "dvoboj: server postavlja kolačić gosta" "nema Set-Cookie: yuv_sd_guest"
+  fi
+fi
 
 # Kviz: gost ne sme dobiti REST nonce u keširanoj stranici (inače 403 "Cookie check failed" posle 24h)
 QS=$(curl -s -A "$UA" "$BASE/kvizovi/" | grep -o 'var quizSettings = {[^}]*}')
@@ -56,14 +59,16 @@ case "$QS" in
   *) fail "kviz: gost nema REST nonce u stranici" "$(printf '%s' "$QS" | grep -o '"nonce":"[^"]*"')" ;;
 esac
 
-# Dvoboj: keširana stranica ne sme nositi tuđe rezultate
+# Dvoboj: keširana stranica ne sme nositi tuđe rezultate — arena čeka JS proveru
 SD_ONE=$(printf '%s' "$SD_PAGE" | grep -o 'href="[^"]*/showdown/[a-z0-9-]*/"' | grep -v '/feed/' | head -1 | cut -d'"' -f2)
-if [ -n "$SD_ONE" ]; then
+if [ -z "$SD_ONE" ]; then
+  fail "dvoboj: pronađen link ka dvoboju" "nema linka na /showdown/"
+else
   P=$(curl -s -A "$UA" "$SD_ONE")
-  if printf '%s' "$P" | grep -q 'sd-results-screen--visible'; then
-    fail "dvoboj: HTML bez rezultata (crta ih JS posle provere)" "$SD_ONE ima sd-results-screen--visible"
+  if printf '%s' "$P" | grep -q 'class="sd-page is-checking"' && ! printf '%s' "$P" | grep -q 'data-has-played\|sd-results-screen--visible'; then
+    pass "dvoboj: HTML bez ličnog stanja, arena čeka proveru"
   else
-    pass "dvoboj: HTML bez rezultata (crta ih JS posle provere)"
+    fail "dvoboj: HTML bez ličnog stanja, arena čeka proveru" "$SD_ONE"
   fi
 fi
 

@@ -242,7 +242,8 @@ function submit_vote() {
             $who_sql = 'user_id = %d';
             $who_val = $user_id;
         } else {
-            $who_sql = 'ip_address = %s';
+            // Gost: samo glasovi gostiju sa ovog IP-a — ne glasovi prijavljenih na istoj mreži
+            $who_sql = 'user_id IS NULL AND ip_address = %s';
             $who_val = $ip_address;
         }
 
@@ -437,7 +438,8 @@ function remove_vote() {
         $sql     .= " AND user_id = %d";
         $params[] = $user_id;
     } else {
-        $sql     .= " AND ip_address = %s";
+        // Gost: samo glasovi gostiju sa ovog IP-a — ne glasovi prijavljenih na istoj mreži
+        $sql     .= " AND user_id IS NULL AND ip_address = %s";
         $params[] = $_SERVER['REMOTE_ADDR'];
     }
 

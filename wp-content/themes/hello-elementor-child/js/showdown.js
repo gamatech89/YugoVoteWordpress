@@ -57,6 +57,7 @@
             $.ajax({
                 url: yuvShowdown.ajaxurl,
                 method: "POST",
+                timeout: 8000, // zaglavljen zahtev → greška → arena se ipak prikaže
                 data: {
                     action: "yuv_showdown_get_items",
                     nonce: yuvShowdown.nonce,
@@ -295,6 +296,9 @@
         showResults: function ($results, html) {
             // Wrap in inner container
             $results.html('<div class="sd-results-inner">' + html + '</div>');
+            // Povratnik (arena još sakrivena): odmah ukloni arenu, bez bljeska prazne arene
+            const $checking = $(".sd-page.is-checking");
+            if ($checking.length) $checking.css("display", "none");
             $(".sd-page").removeClass("is-checking");
 
             // Hide the arena page completely after fade-out completes
@@ -344,7 +348,8 @@
 
             // Full list on own page, redirect button elsewhere
             const showdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            const normalize = function (u) { return u.replace(/\/+$/, ''); };
+            // Bez ?fbclid/utm i #… — posetioci sa Instagrama dolaze sa parametrima
+            const normalize = function (u) { try { const x = new URL(u, window.location.origin); return (x.origin + x.pathname).replace(/\/+$/, ''); } catch (e) { return String(u).replace(/[?#].*$/, '').replace(/\/+$/, ''); } };
             const isOwnPage = showdownUrl && normalize(window.location.href) === normalize(showdownUrl);
 
             if (isOwnPage && leaderboard.length > 3) {
@@ -413,7 +418,7 @@
 
             // Full list on own page, redirect button elsewhere
             const localShowdownUrl = $(".sd-page#yuv-showdown-arena").data("showdown-url");
-            const normalizeLocal = function (u) { return u.replace(/\/+$/, ''); };
+            const normalizeLocal = function (u) { try { const x = new URL(u, window.location.origin); return (x.origin + x.pathname).replace(/\/+$/, ''); } catch (e) { return String(u).replace(/[?#].*$/, '').replace(/\/+$/, ''); } };
             const isOwnPageLocal = localShowdownUrl && normalizeLocal(window.location.href) === normalizeLocal(localShowdownUrl);
 
             if (isOwnPageLocal && ranked.length > 3) {

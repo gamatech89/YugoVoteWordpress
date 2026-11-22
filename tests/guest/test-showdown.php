@@ -42,15 +42,17 @@ $resB  = $names($sdB);
 $tok1 = bin2hex(random_bytes(16));
 $tok2 = bin2hex(random_bytes(16));
 $uid  = 0;
+$extraTokens = [];
 
 // Čišćenje i kad test pukne (fatal preskače finally).
-$cleanup = function () use (&$uid, $table, $tok1, $tok2) {
+$cleanup = function () use (&$uid, &$extraTokens, $table, $tok1, $tok2) {
     global $wpdb;
     static $done = false;
     if ($done) { return; }
     $done = true;
     $wpdb->suppress_errors(true);
-    $wpdb->query("DELETE FROM $table WHERE ip_address = '203.0.113.7'");
+    $wpdb->query("DELETE FROM $table WHERE ip_address IN ('203.0.113.7', '203.0.113.8')");
+    foreach ($extraTokens as $tk) { $wpdb->query($wpdb->prepare("DELETE FROM $table WHERE guest_token=%s", $tk)); }
     $wpdb->query($wpdb->prepare("DELETE FROM $table WHERE guest_token IN (%s,%s)", $tok1, $tok2));
     if ($uid) {
         $wpdb->query($wpdb->prepare("DELETE FROM $table WHERE user_id=%d", $uid));
@@ -60,9 +62,19 @@ $cleanup = function () use (&$uid, $table, $tok1, $tok2) {
 register_shutdown_function($cleanup);
 
 try {
-    // --- šema
+    // --- šema: nadogradnja v1 → v2 na postojećoj tabeli
+    $wpdb->suppress_errors(true);
+    $wpdb->query("ALTER TABLE $table DROP INDEX showdown_guest");
+    $wpdb->query("ALTER TABLE $table DROP INDEX guest_showdown");
+    $wpdb->query("ALTER TABLE $table DROP COLUMN guest_token");
+    $wpdb->suppress_errors(false);
+    update_option('yuv_showdown_db_version', 1);
+    yuv_showdown_create_tables();
     $cols = $wpdb->get_col("SHOW COLUMNS FROM $table");
-    t('tabela ima kolonu guest_token', in_array('guest_token', $cols, true), true);
+    t('nadogradnja: tabela dobija kolonu guest_token', in_array('guest_token', $cols, true), true);
+    t('nadogradnja: verzija šeme 2', (int) get_option('yuv_showdown_db_version'), 2);
+    $idx = $wpdb->get_results("SHOW INDEX FROM $table WHERE Key_name = 'guest_showdown'");
+    t('indeks (guest_token, showdown_id) za proveru i prebacivanje', $idx ? $idx[0]->Column_name : null, 'guest_token');
 
     // --- gost po kolačiću, ne po IP-u
     $r = $m->save_session($sdA->ID, 0, '203.0.113.7', $resA, end($resA), $tok1);
@@ -79,10 +91,13 @@ try {
 
     // nalog je već glasao u dvoboju B kao prijavljen; gost (token1) glasao u B pre toga
     $m->save_session($sdB->ID, 0, '203.0.113.7', $resB, end($resB), $tok1);
-    $m->save_session($sdB->ID, $uid, '203.0.113.7', $resB, $resB[0], '');
+    $revB = array_reverse($resB);
+    $r = $m->save_session($sdB->ID, $uid, '203.0.113.7', $revB, end($revB), '');
+    t('nalog glasa u dvoboju B (ispravan poredak)', $r['success'] ?? null, true);
 
     $_COOKIE['yuv_sd_guest'] = $tok1;
-    do_action('set_logged_in_cookie', 'x', time() + 3600, time() + 3600, $uid, 'logged_in', 'tok');
+    add_filter('send_auth_cookies', '__return_false'); // pravi put prijave, bez slanja zaglavlja
+    wp_set_auth_cookie($uid);
     unset($_COOKIE['yuv_sd_guest']);
 
     t('posle prijave: nalog vidi svoj glas iz dvoboja A', $m->has_user_played($sdA->ID, $uid), true);
@@ -90,6 +105,27 @@ try {
     t('dvoboj B: nalog je već glasao → glas gosta ostaje anoniman (ne briše se)', $guestB, 1);
     $userB = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table WHERE showdown_id=%d AND user_id=%d", $sdB->ID, $uid));
     t('dvoboj B: nalog i dalje ima tačno jedan glas', $userB, 1);
+
+    // --- poredak mora biti pravi: svi učesnici tačno jednom, pobednik poslednji
+    $tok3 = bin2hex(random_bytes(16));
+    $extraTokens[] = $tok3;
+    $r = $m->save_session($sdA->ID, 0, '203.0.113.8', [end($resA)], end($resA), $tok3);
+    t('odbija poredak sa jednim imenom (nabijanje pobeda)', $r['success'] ?? null, false);
+    $bad = $resA; $winner = $bad[0];
+    $r = $m->save_session($sdA->ID, 0, '203.0.113.8', $bad, $winner, $tok3);
+    t('odbija kad pobednik nije poslednji', $r['success'] ?? null, false);
+    $r = $m->save_session($sdA->ID, 0, '203.0.113.8', array_merge($resA, ['Izmišljen']), 'Izmišljen', $tok3);
+    t('odbija nepoznato ime', $r['success'] ?? null, false);
+
+    // --- gornja granica po IP-u za goste (skripta sa nasumičnim kolačićima)
+    $ok = 0;
+    for ($i = 0; $i < YUV_SHOWDOWN_GUEST_IP_CAP + 2; $i++) {
+        $tk = bin2hex(random_bytes(16));
+        $extraTokens[] = $tk;
+        $r = $m->save_session($sdA->ID, 0, '203.0.113.8', $resA, end($resA), $tk);
+        if (!empty($r['success'])) { $ok++; }
+    }
+    t('najviše ' . YUV_SHOWDOWN_GUEST_IP_CAP . ' glasova gostiju po IP-u dnevno', $ok, YUV_SHOWDOWN_GUEST_IP_CAP);
 
     // --- loš token se ignoriše
     t('neispravan token se odbacuje', yuv_showdown_guest_token("abc'; DROP"), '');

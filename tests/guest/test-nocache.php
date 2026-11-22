@@ -33,7 +33,7 @@ function ygv_test_query_page(string $slug): bool {
 
 t('funkcija postoji', function_exists('ygv_nocache_form_pages'), true);
 
-foreach (['prijava', 'registracija', 'zaboravljena-lozinka', 'kompletiranje-naloga'] as $slug) {
+foreach (['prijava', 'registracija', 'zaboravljena-lozinka', 'kompletiranje-naloga', 'kontakt'] as $slug) {
     if (!ygv_test_query_page($slug)) { echo "SKIP  $slug (nema stranice lokalno)\n"; continue; }
     $nocache = 0;
     if (function_exists('ygv_nocache_form_pages')) { ygv_nocache_form_pages(); }

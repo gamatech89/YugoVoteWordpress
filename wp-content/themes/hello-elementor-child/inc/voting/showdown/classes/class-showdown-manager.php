@@ -7,6 +7,12 @@
 if (!defined('ABSPATH'))
     exit;
 
+// Najviše glasova gostiju sa jednog IP-a po dvoboju u 24h (skripta sa nasumičnim kolačićima).
+// Dovoljno za porodicu/kancelariju na istoj mreži; prijavljeni nisu ograničeni ovim.
+if (!defined('YUV_SHOWDOWN_GUEST_IP_CAP')) {
+    define('YUV_SHOWDOWN_GUEST_IP_CAP', 10);
+}
+
 class YUV_Showdown_Manager
 {
 
@@ -141,13 +147,23 @@ class YUV_Showdown_Manager
             return ['success' => false, 'message' => 'Uključi kolačiće da bi tvoj glas bio sačuvan'];
         }
 
+        // Poredak mora biti pravi: svaki učesnik tačno jednom, pobednik poslednji
+        $items = $this->get_items($showdown_id);
+        if (!$this->is_valid_result($items, $results, $winner_name)) {
+            return ['success' => false, 'message' => 'Nevažeći rezultati'];
+        }
+
         // Prevent duplicate sessions
         if ($this->has_user_played($showdown_id, $user_id, $ip_address, $guest_token)) {
             return ['success' => false, 'already_played' => true, 'message' => 'Već ste odigrali ovaj Showdown'];
         }
 
+        // Gornja granica za goste sa jednog IP-a
+        if ($user_id <= 0 && $this->guest_sessions_from_ip_today($showdown_id, $ip_address) >= YUV_SHOWDOWN_GUEST_IP_CAP) {
+            return ['success' => false, 'message' => 'Sa ove mreže je danas glasano previše puta. Prijavi se da bi tvoj glas bio sačuvan.'];
+        }
+
         // Find winner item index from items meta
-        $items = $this->get_items($showdown_id);
         $winner_item_id = 0;
         foreach ($items as $idx => $item) {
             if ($item['name'] === $winner_name) {
@@ -171,6 +187,41 @@ class YUV_Showdown_Manager
         }
 
         return ['success' => true, 'session_id' => $wpdb->insert_id];
+    }
+
+    /**
+     * Rezultat je ispravan ako sadrži svako ime učesnika tačno jednom i pobednik je poslednji.
+     */
+    private function is_valid_result(array $items, $results, $winner_name)
+    {
+        if (!is_array($results) || !is_string($winner_name) || $winner_name === '') {
+            return false;
+        }
+        $names = array_column($items, 'name');
+        if (count($results) !== count($names) || end($results) !== $winner_name) {
+            return false;
+        }
+        $given = array_map('strval', $results);
+        sort($given);
+        sort($names);
+        return $given === $names;
+    }
+
+    /**
+     * Broj glasova gostiju sa ovog IP-a za dvoboj u poslednja 24h.
+     */
+    private function guest_sessions_from_ip_today($showdown_id, $ip_address)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yuv_showdown_sessions';
+        $since = (new DateTime('now', wp_timezone()))->modify('-1 day')->format('Y-m-d H:i:s');
+
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table WHERE showdown_id = %d AND user_id IS NULL AND ip_address = %s AND created_at > %s",
+            $showdown_id,
+            $ip_address,
+            $since
+        ));
     }
 
     /**

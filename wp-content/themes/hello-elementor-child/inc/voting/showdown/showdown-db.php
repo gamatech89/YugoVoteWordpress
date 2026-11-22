@@ -31,12 +31,17 @@ function yuv_showdown_create_tables()
         KEY user_id (user_id),
         KEY showdown_user (showdown_id, user_id),
         KEY showdown_ip (showdown_id, ip_address),
-        KEY showdown_guest (showdown_id, guest_token)
+        KEY guest_showdown (guest_token, showdown_id)
     ) $charset_collate;";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
-    update_option('yuv_showdown_db_version', YUV_SHOWDOWN_DB_VERSION, true); // autoload: bez upita po zahtevu
+
+    // Verziju podižemo tek kad kolona stvarno postoji (npr. bez ALTER prava pokušaće ponovo sledeći put)
+    $has_column = (bool) $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'guest_token'");
+    if ($has_column) {
+        update_option('yuv_showdown_db_version', YUV_SHOWDOWN_DB_VERSION, true); // autoload: bez upita po zahtevu
+    }
 }
 
 // Run on theme switch / activation

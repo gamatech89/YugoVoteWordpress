@@ -35,7 +35,7 @@ function ygv_public_nonce_ok(string $action, ?string $nonce = null, string $fiel
  * Stranice sa formama koje nose nonce (prijava, registracija, nalog) ne idu u javni keš.
  */
 function ygv_nocache_form_pages(): void {
-    $slugs = ['prijava', 'registracija', 'zaboravljena-lozinka', 'kompletiranje-naloga', 'moj-nalog', 'uredi-profil'];
+    $slugs = ['prijava', 'registracija', 'zaboravljena-lozinka', 'kompletiranje-naloga', 'moj-nalog', 'uredi-profil', 'kontakt'];
     if (is_page($slugs)) {
         do_action('litespeed_control_set_nocache', 'YugoVote: forma sa nonce-om');
     }

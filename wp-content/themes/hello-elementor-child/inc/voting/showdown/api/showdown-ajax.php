@@ -32,7 +32,7 @@ function yuv_showdown_get_items_ajax()
 
     $user_id = get_current_user_id();
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $token = yuv_showdown_guest_token();
+    $token = yuv_showdown_ensure_guest_cookie();
     $has_played = $manager->has_user_played($showdown_id, $user_id, $ip, $token);
 
     $response = [
@@ -64,9 +64,8 @@ function yuv_showdown_save_session_ajax()
 
     $showdown_id = intval($_POST['showdown_id'] ?? 0);
     $results_raw = $_POST['results'] ?? '';
-    $winner = sanitize_text_field($_POST['winner'] ?? '');
 
-    if (!$showdown_id || empty($results_raw) || empty($winner)) {
+    if (!$showdown_id || empty($results_raw)) {
         wp_send_json_error(['message' => 'Nedostaju podaci']);
     }
 
@@ -81,6 +80,10 @@ function yuv_showdown_save_session_ajax()
     if (!is_array($results) || empty($results)) {
         wp_send_json_error(['message' => 'Nevažeći rezultati']);
     }
+
+    // Pobednik = poslednji u poretku (poredak je izvor istine; poslato 'winner' polje je sa kosim
+    // crtama iz $_POST i ne bi se poklopilo sa imenima koja imaju apostrof/navodnike)
+    $winner = (string) end($results);
 
     $user_id = get_current_user_id();
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
