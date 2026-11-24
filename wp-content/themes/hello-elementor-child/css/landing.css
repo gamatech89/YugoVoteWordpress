@@ -1,0 +1,405 @@
+/**
+ * Stranice kviza i ankete — izgled B („kartica, kao anketa“).
+ * Vrednosti iz mockup-a .superpowers/brainstorm/2455-1795001903/content/kviz-stranica-v2.html (opcija B).
+ */
+
+.ygv-landing {
+  --ygv-l-ink: #1e293b;
+  --ygv-l-muted: #64748b;
+  --ygv-l-navy: #2d3a8c;
+  --ygv-l-coral: #fe6555;
+  --ygv-l-bg: #f8fafc;
+  background: var(--ygv-l-bg);
+  color: #0f172a;
+  font-family: Inter, var(--primary-font, sans-serif);
+  overflow-x: clip;
+}
+
+.ygv-landing *,
+.ygv-landing *::before,
+.ygv-landing *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- zaglavlje (indigo traka) ---------- */
+.ygv-landing-hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 30px 42px 150px;
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 70%, #3730a3 100%);
+}
+
+.ygv-landing-hero::before {
+  content: "";
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.1;
+  top: -220px;
+  right: -60px;
+  pointer-events: none;
+}
+
+.ygv-landing-hero__in {
+  position: relative;
+  z-index: 2;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ygv-landing-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  min-width: 0;
+}
+
+.ygv-landing-crumbs a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ygv-landing-crumbs a:hover {
+  color: #fff;
+}
+
+.ygv-landing-crumbs__sep {
+  opacity: 0.6;
+}
+
+.ygv-landing-crumbs__current {
+  color: #fff;
+  font-weight: 600;
+}
+
+.ygv-landing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  background: var(--ygv-l-coral);
+  border: 1px solid var(--ygv-l-coral);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 100px;
+}
+
+/* ---------- kartica ---------- */
+.ygv-landing-wrap {
+  position: relative;
+  z-index: 4;
+  max-width: calc(1120px + 84px);
+  margin: -122px auto 0;
+  padding: 0 42px;
+}
+
+.ygv-landing-card {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: #fff;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(30, 41, 99, 0.14);
+}
+
+.ygv-landing-card__media {
+  position: relative;
+  padding: 26px;
+  background: linear-gradient(135deg, #5468d4 0%, #6b7fe3 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ygv-landing-card__media::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.08;
+  bottom: -120px;
+  left: -60px;
+  pointer-events: none;
+}
+
+.ygv-landing-card__img {
+  position: relative;
+  z-index: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  box-shadow: 0 14px 30px rgba(17, 24, 80, 0.3);
+  background: #1e2a5e;
+}
+
+.ygv-landing-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ygv-landing-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ygv-landing-card__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.ygv-landing-card__body {
+  padding: 40px 44px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.ygv-landing-card__title {
+  font-family: "Jockey One", var(--primary-font, sans-serif);
+  font-weight: 400;
+  font-size: 50px;
+  line-height: 1.02;
+  color: var(--ygv-l-ink);
+  margin: 0 0 14px;
+  overflow-wrap: anywhere;
+}
+
+.ygv-landing-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 14.5px;
+  color: #475569;
+  margin-bottom: 18px;
+}
+
+.ygv-landing-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ygv-landing-card__meta svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.ygv-landing-card__diff {
+  font-weight: 600;
+}
+
+.ygv-landing-card__desc {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #334155;
+  margin: 0 0 26px;
+}
+
+.ygv-landing-card__desc p {
+  margin: 0 0 12px;
+}
+
+.ygv-landing-card__desc p:last-child {
+  margin-bottom: 0;
+}
+
+/* Dugme: nadjačava opšti .ygv-quiz-start-btn iz templates.css */
+.ygv-landing-cta.ygv-quiz-start-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  font: 700 17px Inter, var(--primary-font, sans-serif);
+  color: #fff;
+  border-radius: 12px;
+  padding: 17px 36px;
+  background: var(--ygv-l-navy);
+  box-shadow: 0 10px 22px rgba(45, 58, 140, 0.25);
+  cursor: pointer;
+}
+
+.ygv-landing-cta.ygv-quiz-start-btn:hover,
+.ygv-landing-cta.ygv-quiz-start-btn:focus-visible {
+  background: #1e2a6e;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(45, 58, 140, 0.32);
+}
+
+.ygv-landing-cta svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ygv-landing-note {
+  font-size: 13px;
+  margin: 12px 0 0;
+  color: var(--ygv-l-muted);
+  text-align: center;
+}
+
+/* Anketa: pitanje u widgetu ponavlja H1 */
+.ygv-landing-card__poll .ygv-poll__question {
+  display: none;
+}
+
+/* ---------- još kvizova / još anketa ---------- */
+.ygv-landing-more {
+  padding: 64px 42px 72px;
+  background: var(--ygv-l-bg);
+}
+
+.ygv-landing-more__in {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.ygv-landing-more__title {
+  font-family: "Jockey One", var(--primary-font, sans-serif);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.1;
+  color: var(--ygv-l-ink);
+  margin: 0 0 26px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ygv-landing-more__title svg {
+  width: 26px;
+  height: 26px;
+  color: var(--ygv-l-navy);
+  flex: none;
+}
+
+.ygv-landing-more__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.ygv-landing-more__grid > * {
+  min-width: 0;
+}
+
+/* ---------- telefon ---------- */
+@media (max-width: 767px) {
+  .ygv-landing-hero {
+    padding: 16px 16px 92px;
+  }
+
+  .ygv-landing-hero__in {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ygv-landing-crumbs {
+    font-size: 12px;
+  }
+
+  .ygv-landing-wrap {
+    margin-top: -74px;
+    padding: 0 12px;
+  }
+
+  .ygv-landing-card {
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+
+  .ygv-landing-card__media {
+    padding: 12px;
+  }
+
+  .ygv-landing-card__img {
+    border-radius: 12px;
+  }
+
+  .ygv-landing-card__body {
+    padding: 20px 18px 22px;
+  }
+
+  .ygv-landing-card__title {
+    font-size: 34px;
+    margin-bottom: 10px;
+  }
+
+  .ygv-landing-card__meta {
+    font-size: 13px;
+    gap: 6px 14px;
+    margin-bottom: 12px;
+  }
+
+  .ygv-landing-card__desc {
+    font-size: 15px;
+    margin-bottom: 18px;
+  }
+
+  .ygv-landing-more {
+    padding: 40px 16px 48px;
+  }
+
+  .ygv-landing-more__title {
+    font-size: 27px;
+  }
+
+  /* red kartica koji se prevlači */
+  .ygv-landing-more__grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 14px;
+    scroll-snap-type: x mandatory;
+    margin: 0 -16px;
+    padding: 0 16px 6px;
+    scrollbar-width: none;
+  }
+
+  .ygv-landing-more__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ygv-landing-more__grid > * {
+    flex: 0 0 76%;
+    scroll-snap-align: start;
+  }
+}

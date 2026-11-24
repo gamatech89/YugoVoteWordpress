@@ -86,6 +86,72 @@ t('boja težine: tesko', ygv_quiz_difficulty_color('Tesko'), '#ef4444');
 t('boja težine: nepoznata', ygv_quiz_difficulty_color('xyz'), '#6366f1');
 t('napredak: gost', ygv_quiz_progress(0, $Q1), ['best_percent' => 0, 'attempts' => 0]);
 
+// ---------- stranica kviza ----------
+// Iscrtava šablon kao da je otvorena stranica $id; upozorenja iz novih fajlova idu u $GLOBALS['ygv_warnings'].
+function ygv_test_render_singular(int $id, string $tpl): string {
+    global $wp_query, $wp_the_query, $post;
+    $GLOBALS['ygv_warnings'] = [];
+    $new_files = '#/(single-quiz|single-voting_poll|quiz-landing|poll-landing|quiz-card|seo-schema|seo-h1)\.php$#';
+    set_error_handler(function ($no, $msg, $file, $line) use ($new_files) {
+        if (preg_match($new_files, $file)) { $GLOBALS['ygv_warnings'][] = basename($file) . ":$line $msg"; }
+        return true;
+    }, E_WARNING | E_NOTICE | E_DEPRECATED | E_USER_WARNING | E_USER_NOTICE);
+    $wp_query = $wp_the_query = new WP_Query(['p' => $id, 'post_type' => get_post_type($id)]);
+    $post = get_post($id);
+    setup_postdata($post);
+    ob_start();
+    include get_stylesheet_directory() . '/' . $tpl;
+    $html = ob_get_clean();
+    restore_error_handler();
+    wp_reset_postdata();
+    return $html;
+}
+
+t('cta gost zaključan', ygv_quiz_cta_state(0, false, 0), 'locked');
+t('cta gost otvoren', ygv_quiz_cta_state(0, true, 0), 'start');
+t('cta prijavljen odigrao', ygv_quiz_cta_state(5, false, 2), 'replay');
+t('cta prijavljen nije igrao', ygv_quiz_cta_state(5, false, 0), 'start');
+update_post_meta($Q1, '_quiz_description', 'Opis iz polja.');
+t('opis iz _quiz_description', ygv_quiz_landing_data($Q1, 0)['description'], 'Opis iz polja.');
+$wpdb->update($wpdb->posts, ['post_excerpt' => 'Izvod.'], ['ID' => $Q2]); clean_post_cache($Q2);
+t('opis: izvod kad nema polja', ygv_quiz_landing_data($Q2, 0)['description'], 'Izvod.');
+$wpdb->update($wpdb->posts, ['post_excerpt' => ''], ['ID' => $Q2]); clean_post_cache($Q2);
+$d = ygv_quiz_landing_data($Q2, 0);
+t('podrazumevano', [$d['questions'], $d['seconds'], $d['xp'], $d['difficulty'], $d['category'], $d['description']], [10, 10, 20, '', null, '']);
+t('kviz sa kategorijom: termin', ygv_quiz_landing_data($Q1, 0)['category'] instanceof WP_Term, true);
+
+// preporuke: Q3 je u K, Q4 i Q5 nisu; datumi u budućnosti da budu najnoviji na sajtu
+$Q3 = mk_post('quiz', 'Q3'); wp_set_object_terms($Q3, [$K], 'quiz_category');
+$Q4 = mk_post('quiz', 'Q4');
+$Q5 = mk_post('quiz', 'Q5');
+foreach ([$Q3 => '2030-01-04', $Q4 => '2030-01-02', $Q5 => '2030-01-03'] as $id => $date) {
+    $wpdb->update($wpdb->posts, ['post_date' => "$date 10:00:00", 'post_date_gmt' => "$date 09:00:00"], ['ID' => $id]);
+    clean_post_cache($id);
+}
+t('preporuke: prvo iz kategorije, pa dopuna, bez trenutnog i duplikata', ygv_quiz_related_ids($Q1), [$Q3, $Q5, $Q4]);
+t('preporuke: granica', count(ygv_quiz_related_ids($Q1, 2)), 2);
+
+$html = ygv_test_render_singular($Q2, 'single-quiz.php');
+t('stranica bez slike/kategorije/težine: bez upozorenja', $GLOBALS['ygv_warnings'], []);
+t('stranica: tačno jedan h1', substr_count($html, '<h1'), 1);
+t('gost: nema "Igraj ponovo"', strpos($html, 'Igraj ponovo'), false);
+t('gost: dugme za prozor', strpos($html, 'ygv-quiz-start-btn') !== false && strpos($html, 'data-quiz-id="' . $Q2 . '"') !== false, true);
+preg_match('#<button type="button" class="ygv-landing-cta[^>]*>.*?</button>#s', $html, $btn);
+t('zaključan za gosta: poruka za prijavu, bez napomene', [strpos($btn[0] ?? '', 'data-locked="true"') !== false, strpos($btn[0] ?? '', 'Prijavi se da igraš') !== false, strpos($html, 'Igraš odmah, bez registracije')], [true, true, false]);
+t('još kvizova', strpos($html, 'Još kvizova') !== false && substr_count($html, 'class="ygv-quiz-card ') === 3, true);
+
+update_post_meta($Q1, '_allow_guest_play', '1');
+$html = ygv_test_render_singular($Q1, 'single-quiz.php');
+t('otvoren za goste: napomena', strpos($html, 'Igraš odmah, bez registracije') !== false, true);
+preg_match('#<button type="button" class="ygv-landing-cta[^>]*>.*?</button>#s', $html, $btn);
+t('otvoren za goste: Započni kviz, bez zaključavanja', strpos($btn[0] ?? '', 'Započni kviz') !== false && strpos($btn[0] ?? '', 'data-locked') === false, true);
+t('h1 escapovan jednom', strpos($html, '>Kviz &quot;A&amp;B&quot; &lt;/script&gt;</h1>') !== false, true);
+t('opis na stranici', strpos($html, 'Opis iz polja.') !== false, true);
+// get_header() učitava header.php samo jednom po procesu, pa JSON-LD za Q1 tražimo direktno (upit je i dalje Q1)
+$ld = json_decode(ygv_schema_json(ygv_schema_graph()), true);
+t('JSON-LD na stranici kviza', array_column($ld['@graph'][0]['itemListElement'] ?? [], 'name'), ['Kvizovi', 'K', 'Kviz "A&B" </script>']);
+t('vidljiva putanja: kategorija vodi na filtriranu arhivu', strpos($html, 'href="' . esc_url(ygv_quiz_category_url(get_term($K))) . '"') !== false, true);
+
 $GLOBALS['ygv_test_done'] = true;
 echo $fails === 0 ? "SVE PASS\n" : "PALO: $fails\n";
 exit($fails === 0 ? 0 : 1);

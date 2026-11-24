@@ -192,6 +192,11 @@ if 'landing' in SECTIONS:
     title_link = 'class="ygv-quiz-card__title-link" href="%s/quiz/' % BASE
     ok('arhiva kvizova: naslov kartice je link ka kvizu', title_link in page('arhiva kvizova')[1])
     ok('početna (slajder): naslov kartice je link ka kvizu', title_link in page('home')[1])
+    st, b = page('kviz')
+    pid = re.search(r'\bpostid-(\d+)\b', b)
+    ok('kviz: dugme otvara prozor za ovaj kviz', bool(pid) and re.search(r'class="ygv-landing-cta ygv-quiz-start-btn"\s+data-quiz-id="%s"' % (pid.group(1) if pid else 'x'), b) is not None, pid.group(1) if pid else 'nema postid')
+    ok('kviz: putanja se vidi', bool(crumbs(b, 'ygv-landing-crumbs')), str(crumbs(b, 'ygv-landing-crumbs')))
+    ok('kviz: još kvizova', 'ygv-landing-more__grid' in b and 'class="ygv-quiz-card ' in b.split('ygv-landing-more__grid', 1)[-1])
 
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)
