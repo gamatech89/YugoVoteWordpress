@@ -2,7 +2,7 @@
 import re, sys, urllib.request, urllib.error, html
 
 BASE = sys.argv[1].rstrip('/')
-SECTIONS = (sys.argv[3] if len(sys.argv) > 3 and sys.argv[2] == '--sections' else 'head,robots').split(',')
+SECTIONS = (sys.argv[3] if len(sys.argv) > 3 and sys.argv[2] == '--sections' else 'head,robots,h1,schema,landing').split(',')
 UA = {'User-Agent': 'Mozilla/5.0 (compatible; ygv-seo-check)'}
 fails = 0
 
@@ -30,6 +30,24 @@ def first_loc(sitemap):
 def metas(body, attr, key):
     return re.findall(r'<meta\s+[^>]*%s=["\']%s["\'][^>]*>' % (attr, re.escape(key)), body)
 
+def clean(fragment):
+    s = re.sub(r'<img\b[^>]*\balt=(["\'])(.*?)\1[^>]*>', lambda m: ' ' + m.group(2) + ' ', fragment, flags=re.S)
+    s = re.sub(r'<(svg|script|style)\b.*?</\1>', ' ', s, flags=re.S)
+    s = re.sub(r'<[^>]+>', ' ', s)
+    return re.sub(r'\s+', ' ', html.unescape(s)).strip()
+
+def h1s(body):
+    """Tekst svakog <h1> (slika u H1 se računa kroz alt)."""
+    return [clean(x) for x in re.findall(r'<h1\b[^>]*>(.*?)</h1>', body, re.S)]
+
+def crumbs(body, cls):
+    """Vidljiva putanja: tekst linkova i spanova u <nav class="cls">, bez separatora."""
+    m = re.search(r'<nav\b[^>]*class=["\'][^"\']*\b%s\b[^"\']*["\'][^>]*>(.*?)</nav>' % re.escape(cls), body, re.S)
+    if not m:
+        return None
+    parts = [clean(x[1]) for x in re.findall(r'<(a|span)\b[^>]*>(.*?)</\1>', m.group(1), re.S)]
+    return [x for x in parts if x not in ('', '›')]
+
 def content(tag):
     m = re.search(r'content=(["\'])(.*?)\1', tag, re.S)
     return html.unescape(m.group(2)) if m else ''
@@ -44,7 +62,16 @@ pages = {
     'kategorija liste': first_loc('wp-sitemap-taxonomies-voting_list_category-1.xml'),
     'arhiva kvizova': BASE + '/kvizovi/',
     'arhiva lista': BASE + '/liste/',
+    'kategorija kvizova': first_loc('wp-sitemap-taxonomies-quiz_category-1.xml'),
+    'kategorija stavki': first_loc('wp-sitemap-taxonomies-voting_item_category-1.xml'),
+    'vip arhiva': BASE + '/vip-osobe/',
+    'dvoboji': BASE + '/showdown/',
 }
+_cache = {}
+def page(name):
+    if name not in _cache:
+        _cache[name] = get(pages[name]) if pages.get(name) else (0, '')
+    return _cache[name]
 
 if 'head' in SECTIONS:
     for name, url in pages.items():
@@ -110,6 +137,17 @@ if 'robots' in SECTIONS:
     for slug in ['/prijava/', '/registracija/', '/moj-nalog/', '/test/', '/pocetna-old/']:
         ok(f'sitemap stranica bez {slug}', slug not in pg)
     ok('sitemap stranica ima /kontakt/', '/kontakt/' in pg)
+
+if 'h1' in SECTIONS:
+    for name in pages:
+        st, b = page(name)
+        h = h1s(b)
+        ok(f'{name}: tačno jedan H1 koji nije prazan', len(h) == 1 and h[0] != '', f'{h} {pages[name]}')
+    expect = {'home': 'YugoVote', 'arhiva lista': 'Sve rang liste za glasanje',
+              'vip arhiva': 'VIP liste poznatih ličnosti', 'dvoboji': '1 na 1',
+              'arhiva kvizova': 'Pokaži šta znaš'}
+    for name, want in expect.items():
+        ok(f'{name}: H1 = {want}', h1s(page(name)[1]) == [want], str(h1s(page(name)[1])))
 
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)

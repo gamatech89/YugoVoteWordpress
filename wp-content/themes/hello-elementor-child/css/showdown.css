@@ -237,6 +237,8 @@
 }
 
 .showdown-title {
+  margin-top: .83em; /* iste margine kao ranije h2, i kad je h1 na stranici dvoboja */
+  margin-bottom: .83em;
   font-family: var(--sd-font-heading);
   font-size: 40px;
   font-weight: 400;

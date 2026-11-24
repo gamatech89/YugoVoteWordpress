@@ -210,7 +210,9 @@ $categories = get_terms([
     <div class="ygv-header__main">
         <div class="ygv-header__main-inner">
             <div class="ygv-header__frame">
-                <!-- Logo -->
+                <!-- Logo (na početnoj je logo H1 stranice) -->
+                <?php $ygv_logo_h1 = is_front_page(); ?>
+                <?php if ($ygv_logo_h1): ?><h1 class="ygv-header__logo-h1"><?php endif; ?>
                 <a href="<?php echo home_url('/'); ?>" class="ygv-header__logo">
                     <div class="ygv-header__mascot">
                         <?php 
@@ -230,6 +232,7 @@ $categories = get_terms([
                     </div>
                     <img width="196" height="28" src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" class="ygv-header__logo-img attachment-full size-full wp-image-80" alt="YugoVote">
                 </a>
+                <?php if ($ygv_logo_h1): ?></h1><?php endif; ?>
                 
                 <!-- Mega Menu (shortcode) -->
                 <div class="ygv-header__menu">

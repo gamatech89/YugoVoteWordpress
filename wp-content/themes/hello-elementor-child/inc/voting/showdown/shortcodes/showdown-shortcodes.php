@@ -63,7 +63,8 @@ function yuv_showdown_shortcode($atts) {
                 <i class="ri-sword-line"></i>
                 Može biti samo jedan
             </div>
-            <h2 class="showdown-title"><?php echo esc_html($showdown->post_title); ?></h2>
+            <?php $sd_title_tag = is_singular('yuv_showdown') ? 'h1' : 'h2'; // H1 samo na stranici dvoboja (shortcode je i na početnoj i na /showdown/) ?>
+            <<?php echo $sd_title_tag; ?> class="showdown-title"><?php echo esc_html($showdown->post_title); ?></<?php echo $sd_title_tag; ?>>
             <?php if ($showdown->post_content): ?>
                 <p class="showdown-subtitle"><?php echo esc_html(wp_trim_words($showdown->post_content, 25)); ?></p>
             <?php else: ?>
