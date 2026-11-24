@@ -323,14 +323,16 @@
 
 /* ---------- telefon ---------- */
 @media (max-width: 767px) {
+  /* Telefon: dugme mora da stane u vidljivi deo ekrana (Safari/Chrome ~390×664), pa su zaglavlje,
+     preklapanje i slika niži, a opis kviza ide ispod dugmeta. */
   .ygv-landing-hero {
-    padding: 16px 16px 92px;
+    padding: 14px 16px 60px;
   }
 
   .ygv-landing-hero__in {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
   }
 
   .ygv-landing-crumbs {
@@ -338,7 +340,7 @@
   }
 
   .ygv-landing-wrap {
-    margin-top: -74px;
+    margin-top: -44px;
     padding: 0 12px;
   }
 
@@ -348,20 +350,39 @@
   }
 
   .ygv-landing-card__media {
-    padding: 12px;
+    padding: 10px;
   }
 
   .ygv-landing-card__img {
     border-radius: 12px;
+    aspect-ratio: 2 / 1;
   }
 
   .ygv-landing-card__body {
-    padding: 20px 18px 22px;
+    padding: 18px 18px 22px;
+  }
+
+  .ygv-landing--quiz .ygv-landing-cta {
+    order: 1;
+  }
+
+  .ygv-landing--quiz .ygv-landing-note {
+    order: 2;
+  }
+
+  .ygv-landing--quiz .ygv-landing-card__desc {
+    order: 3;
+    margin: 16px 0 0;
   }
 
   .ygv-landing-card__title {
-    font-size: 34px;
+    font-size: 32px;
     margin-bottom: 10px;
+  }
+
+  /* Plutajuća anketa (fixed, dole desno) bi prekrila glavno dugme kviza */
+  .single-quiz .ygv-fab-poll {
+    display: none;
   }
 
   .ygv-landing-card__meta {
@@ -372,7 +393,7 @@
 
   .ygv-landing-card__desc {
     font-size: 15px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .ygv-landing-more {
