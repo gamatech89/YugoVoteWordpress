@@ -33,16 +33,7 @@ function ygv_quiz_landing_data(int $quiz_id, int $user_id): array {
         $description = trim((string) get_post_field('post_excerpt', $quiz_id));
     }
 
-    $difficulty = '';
-    $diff_slug  = '';
-    $level_id   = (int) get_post_meta($quiz_id, '_quiz_difficulty', true);
-    if ($level_id) {
-        $level = get_post($level_id);
-        if ($level) {
-            $difficulty = $level->post_title;
-            $diff_slug  = $level->post_name;
-        }
-    }
+    $difficulty = ygv_quiz_difficulty($quiz_id);
 
     $terms    = get_the_terms($quiz_id, 'quiz_category');
     $category = ($terms && !is_wp_error($terms)) ? $terms[0] : null;
@@ -53,15 +44,14 @@ function ygv_quiz_landing_data(int $quiz_id, int $user_id): array {
     $progress      = ygv_quiz_progress($user_id, $quiz_id);
 
     return [
-        'title'            => get_the_title($quiz_id),
         'description'      => $description,
         'category'         => $category,
         'category_color'   => $cat_color,
         'questions'        => (int) (get_post_meta($quiz_id, '_num_questions', true) ?: 10),
         'seconds'          => (int) (get_post_meta($quiz_id, '_time_per_question', true) ?: 10),
         'xp'               => (int) (get_post_meta($quiz_id, '_quiz_xp_value', true) ?: 20),
-        'difficulty'       => $difficulty,
-        'difficulty_color' => ygv_quiz_difficulty_color($diff_slug),
+        'difficulty'       => $difficulty['name'],
+        'difficulty_color' => ygv_quiz_difficulty_color($difficulty['slug']),
         'guest_allowed'    => $guest_allowed,
         'cta_state'        => ygv_quiz_cta_state($user_id, $guest_allowed, $progress['attempts']),
     ];
@@ -98,6 +88,13 @@ function ygv_quiz_related_ids(int $quiz_id, int $limit = 3): array {
         ]));
     }
     return array_values(array_map('intval', array_unique($ids)));
+}
+
+/**
+ * Naslov za H1 stranice kviza/ankete: razmaci sabijeni kao u putanji i JSON-LD-u.
+ */
+function ygv_landing_title(int $post_id): string {
+    return trim((string) preg_replace('/\s+/u', ' ', get_the_title($post_id)));
 }
 
 /**

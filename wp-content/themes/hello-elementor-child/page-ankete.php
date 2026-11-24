@@ -42,11 +42,8 @@ get_header();
                     <span class="ygv-page-hero__stat-label">Anketa</span>
                 </div>
                 <?php if (get_current_user_id()):
-                    global $wpdb;
-                    $voted = $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(DISTINCT poll_id) FROM {$wpdb->prefix}cs_poll_votes WHERE user_id = %d",
-                        get_current_user_id()
-                    ));
+                    // Glasovi prijavljenih se čuvaju u user meta (vidi cs_has_user_voted_poll), ne u tabeli.
+                    $voted = count(array_unique(array_map('intval', (array) (get_user_meta(get_current_user_id(), '_cs_voted_polls', true) ?: []))));
                     ?>
                     <div class="ygv-page-hero__stat">
                         <span class="ygv-page-hero__stat-value"><?php echo intval($voted); ?></span>

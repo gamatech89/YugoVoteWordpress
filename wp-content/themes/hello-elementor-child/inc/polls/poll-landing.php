@@ -8,6 +8,16 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Kartica ankete (inc/polls/templates/poll-card.php) u svom opsegu, da njene promenljive
+ * ($poll_id, $img_url, $total_votes) ne prepišu promenljive šablona koji je poziva.
+ */
+function ygv_render_poll_card(int $poll_id): void {
+    $img_url     = get_the_post_thumbnail_url($poll_id, 'medium_large');
+    $total_votes = (int) get_post_meta($poll_id, '_cs_poll_total_votes', true);
+    include get_stylesheet_directory() . '/inc/polls/templates/poll-card.php';
+}
+
+/**
  * „Još anketa“: najnovije objavljene ankete bez trenutne i bez zaključanih
  * (u zaključanoj nema glasanja, a i isključila bi javni keš stranice).
  *

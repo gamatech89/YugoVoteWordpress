@@ -66,19 +66,9 @@ function ygv_live_search_handler() {
                 $thumbnail = get_the_post_thumbnail_url($post_id, 'thumbnail');
             }
             
-            // Get items count
+            // Broj stavki se u rezultatima ne prikazuje (raniji upit je išao na tabelu koje nema).
             $items_count = 0;
-            if (function_exists('ygv_get_list_items_count')) {
-                $items_count = ygv_get_list_items_count($post_id);
-            } else {
-                // Fallback - count items in voting_items
-                global $wpdb;
-                $items_count = $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(*) FROM {$wpdb->prefix}voting_items WHERE list_id = %d",
-                    $post_id
-                ));
-            }
-            
+
             $results[] = [
                 'id' => $post_id,
                 'title' => get_the_title(),
@@ -105,7 +95,7 @@ function ygv_live_search_handler() {
     
     if ($items_query->have_posts()) {
         global $wpdb;
-        $relations_table = $wpdb->prefix . 'voting_list_items';
+        $relations_table = $wpdb->prefix . 'voting_list_item_relations';
         
         while ($items_query->have_posts()) {
             $items_query->the_post();

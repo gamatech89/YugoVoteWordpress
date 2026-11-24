@@ -23,6 +23,16 @@ function ygv_quiz_difficulty_color(string $slug): string {
 }
 
 /**
+ * Težina kviza iz _quiz_difficulty (post quiz_levels); prazno kad nije postavljena.
+ *
+ * @return array{name:string, slug:string}
+ */
+function ygv_quiz_difficulty(int $quiz_id): array {
+    $level = get_post((int) get_post_meta($quiz_id, '_quiz_difficulty', true));
+    return $level ? ['name' => $level->post_title, 'slug' => $level->post_name] : ['name' => '', 'slug' => ''];
+}
+
+/**
  * Najbolji rezultat i broj pokušaja prijavljenog korisnika (gost: nule).
  *
  * @return array{best_percent:int, attempts:int}
@@ -47,14 +57,9 @@ function ygv_quiz_progress(int $user_id, int $quiz_id): array {
  */
 function ygv_render_quiz_card(int $quiz_id, int $user_id): void {
     $num_questions      = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
-    $quiz_difficulty_id = get_post_meta($quiz_id, '_quiz_difficulty', true);
-    $quiz_difficulty    = '';
-    $diff_slug          = 'beginner';
-    if ($quiz_difficulty_id) {
-        $dp = get_post($quiz_difficulty_id);
-        if ($dp) { $quiz_difficulty = $dp->post_title; $diff_slug = $dp->post_name; }
-    }
-    $diff_color = ygv_quiz_difficulty_color($diff_slug);
+    $difficulty         = ygv_quiz_difficulty($quiz_id);
+    $quiz_difficulty    = $difficulty['name'];
+    $diff_color         = ygv_quiz_difficulty_color($difficulty['slug']);
 
     $terms     = get_the_terms($quiz_id, 'quiz_category');
     $cat_name  = 'GENERAL';

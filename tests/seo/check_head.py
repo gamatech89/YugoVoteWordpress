@@ -165,6 +165,8 @@ if 'h1' in SECTIONS:
               'arhiva kvizova': 'Pokaži šta znaš'}
     for name, want in expect.items():
         ok(f'{name}: H1 = {want}', h1s(page(name)[1]) == [want], str(h1s(page(name)[1])))
+    home_h1 = re.findall(r'<h1\b[^>]*>(.*?)</h1>', page('home')[1], re.S)
+    ok('home: H1 bez <div> (samo fraze)', bool(home_h1) and '<div' not in home_h1[0], 'div u H1')
 
 if 'schema' in SECTIONS:
     for name in pages:
@@ -201,6 +203,13 @@ if 'landing' in SECTIONS:
     pid = re.search(r'\bpostid-(\d+)\b', b)
     ok('anketa: forma za glasanje ove ankete', bool(pid) and re.search(r'class="ygv-poll [^"]*"\s+data-poll-id="%s"' % (pid.group(1) if pid else 'x'), b) is not None, pid.group(1) if pid else 'nema postid')
     ok('anketa: putanja se vidi', bool(crumbs(b, 'ygv-landing-crumbs')), str(crumbs(b, 'ygv-landing-crumbs')))
+    # fetchpriority dodaje Elementor (izlazni bafer) ili WP; dupli atribut je neispravan HTML
+    for name in ('kviz', 'anketa'):
+        m = re.search(r'class="ygv-landing-card__img">\s*(<img\b[^>]*>)', page(name)[1])
+        if m:
+            ok(f'{name}: slika nema dupli fetchpriority', m.group(1).count('fetchpriority=') <= 1, m.group(1)[:160])
+        else:
+            print(f'SKIP  {name}: stranica nema sliku ({pages[name]})')
 
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)

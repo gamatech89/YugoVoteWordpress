@@ -263,7 +263,9 @@
   box-shadow: 0 14px 26px rgba(45, 58, 140, 0.32);
 }
 
-.ygv-landing-cta svg {
+/* jače od .ygv-quiz-start-btn .ygv-icon (16 px) iz templates.css */
+.ygv-landing-cta.ygv-quiz-start-btn svg,
+.ygv-landing-cta.ygv-quiz-start-btn .ygv-icon {
   width: 18px;
   height: 18px;
 }

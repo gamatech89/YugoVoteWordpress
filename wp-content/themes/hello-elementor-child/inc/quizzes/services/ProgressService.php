@@ -6,6 +6,9 @@ if (!defined('ABSPATH')) {
 }
 
 class ProgressService {
+    /** Povećaj kad se promeni šema ispod — tada se dbDelta pokreće još jednom. */
+    const DB_VERSION = '1';
+
     protected string $t_quiz;
     protected string $t_cat;
     protected string $t_over;
@@ -19,7 +22,14 @@ class ProgressService {
         $this->maybe_install_tables();
     }
 
+    /**
+     * Pravi tabele jednom po verziji šeme, ne na svakom zahtevu (dbDelta = nekoliko DESCRIBE/ALTER upita,
+     * a na produkciji je svaki put upisivao grešku „Multiple primary key“ u debug.log).
+     */
     protected function maybe_install_tables(): void {
+        if (get_option('ygv_progress_db_version') === self::DB_VERSION) {
+            return;
+        }
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         global $wpdb;
 
@@ -56,6 +66,7 @@ class ProgressService {
         dbDelta($sql_quiz);
         dbDelta($sql_cat);
         dbDelta($sql_over);
+        update_option('ygv_progress_db_version', self::DB_VERSION, true);
     }
 
     public function get_thresholds($scope = 'category'): array {

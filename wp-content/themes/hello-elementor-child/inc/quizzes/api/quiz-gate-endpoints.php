@@ -12,9 +12,6 @@ function ygv_req_int(WP_REST_Request $r, string $key, int $default = 0): int {
 }
 
 add_action('rest_api_init', function () {
-    // Debug log so you know this file actually ran
-    if (defined('WP_DEBUG') && WP_DEBUG) error_log('YGV: registering quiz gate endpoints');
-
     // POST /yugovote/v1/quiz/{id}/start
 register_rest_route('yugovote/v1', '/quiz/(?P<id>\d+)/start', [
     'methods'  => 'POST',

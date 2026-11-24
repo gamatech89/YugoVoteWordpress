@@ -14,7 +14,7 @@ get_header();
 while (have_posts()):
     the_post();
     $poll_id = get_the_ID();
-    $title   = get_the_title($poll_id);
+    $title   = ygv_landing_title($poll_id);
     $content = trim((string) get_post_field('post_content', $poll_id));
     ?>
     <main id="content" class="site-main ygv-landing ygv-landing--poll">
@@ -26,7 +26,8 @@ while (have_posts()):
                 <div class="ygv-landing-card__media">
                     <div class="ygv-landing-card__img">
                         <?php if (has_post_thumbnail($poll_id)): ?>
-                            <?php echo get_the_post_thumbnail($poll_id, 'large', ['alt' => esc_attr(wp_strip_all_tags($title)), 'loading' => 'eager', 'fetchpriority' => 'high']); ?>
+                            <?php // fetchpriority dodaje WP (lokalno) ili Elementor (produkcija); naš bi bio duplikat ?>
+                            <?php echo get_the_post_thumbnail($poll_id, 'large', ['alt' => esc_attr(wp_strip_all_tags($title)), 'loading' => 'eager']); ?>
                         <?php else: ?>
                             <div class="ygv-landing-card__placeholder">
                                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -56,15 +57,7 @@ while (have_posts()):
                 <div class="ygv-landing-more__in">
                     <h2 class="ygv-landing-more__title"><?php ygv_icon_e('bar-chart', 26); ?>Još anketa</h2>
                     <div class="ygv-landing-more__grid ygv-landing-more__grid--polls">
-                        <?php
-                        $card_template = get_stylesheet_directory() . '/inc/polls/templates/poll-card.php';
-                        foreach ($related as $rid) {
-                            $poll_id     = $rid; // promenljive koje poll-card.php očekuje
-                            $img_url     = get_the_post_thumbnail_url($rid, 'medium_large');
-                            $total_votes = (int) get_post_meta($rid, '_cs_poll_total_votes', true);
-                            include $card_template;
-                        }
-                        ?>
+                        <?php foreach ($related as $rid) { ygv_render_poll_card($rid); } ?>
                     </div>
                 </div>
             </section>

@@ -2,8 +2,6 @@
 if (!defined('ABSPATH')) exit;
 
 add_action('rest_api_init', function () {
-    if (defined('WP_DEBUG') && WP_DEBUG) error_log('YGV: registering user state endpoint');
-
     register_rest_route('yugovote/v1', '/user/state', [
         'methods'  => 'GET',
         'permission_callback' => function(){ return is_user_logged_in(); },

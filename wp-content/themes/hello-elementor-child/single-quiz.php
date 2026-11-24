@@ -17,7 +17,7 @@ while (have_posts()):
     $quiz_id = get_the_ID();
     $user_id = get_current_user_id();
     $d       = ygv_quiz_landing_data($quiz_id, $user_id);
-    $title   = get_the_title($quiz_id);
+    $title   = ygv_landing_title($quiz_id);
     $cta     = [
         'locked' => ['icon' => 'lock', 'label' => 'Prijavi se da igraš'],
         'replay' => ['icon' => 'refresh', 'label' => 'Igraj ponovo'],
@@ -33,7 +33,8 @@ while (have_posts()):
                 <div class="ygv-landing-card__media">
                     <div class="ygv-landing-card__img">
                         <?php if (has_post_thumbnail($quiz_id)): ?>
-                            <?php echo get_the_post_thumbnail($quiz_id, 'large', ['alt' => esc_attr(wp_strip_all_tags($title)), 'loading' => 'eager', 'fetchpriority' => 'high']); ?>
+                            <?php // fetchpriority dodaje WP (lokalno) ili Elementor (produkcija); naš bi bio duplikat ?>
+                            <?php echo get_the_post_thumbnail($quiz_id, 'large', ['alt' => esc_attr(wp_strip_all_tags($title)), 'loading' => 'eager']); ?>
                         <?php else: ?>
                             <div class="ygv-landing-card__placeholder"
                                 style="background:linear-gradient(135deg,<?php echo esc_attr($d['category_color']); ?> 0%,#1e2a5e 100%);">

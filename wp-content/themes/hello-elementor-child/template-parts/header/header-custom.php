@@ -214,7 +214,7 @@ $categories = get_terms([
                 <?php $ygv_logo_h1 = is_front_page(); ?>
                 <?php if ($ygv_logo_h1): ?><h1 class="ygv-header__logo-h1"><?php endif; ?>
                 <a href="<?php echo home_url('/'); ?>" class="ygv-header__logo">
-                    <div class="ygv-header__mascot">
+                    <span class="ygv-header__mascot">
                         <?php 
                         $svg_path = get_stylesheet_directory() . '/assets/images/king-head.svg';
                         if (file_exists($svg_path)) {
@@ -229,7 +229,7 @@ $categories = get_terms([
                             }
                         }
                         ?>
-                    </div>
+                    </span>
                     <img width="196" height="28" src="https://yugovote.com/wp-content/uploads/2024/12/Logo.png" class="ygv-header__logo-img attachment-full size-full wp-image-80" alt="YugoVote">
                 </a>
                 <?php if ($ygv_logo_h1): ?></h1><?php endif; ?>
