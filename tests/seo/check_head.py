@@ -1,5 +1,5 @@
 """Integracioni test SEO <head> izlaza.  python3 -I tests/seo/check_head.py BASE_URL [--sections head,robots]"""
-import re, sys, urllib.request, urllib.error, html
+import re, sys, json, urllib.request, urllib.error, html
 
 BASE = sys.argv[1].rstrip('/')
 SECTIONS = (sys.argv[3] if len(sys.argv) > 3 and sys.argv[2] == '--sections' else 'head,robots,h1,schema,landing').split(',')
@@ -47,6 +47,23 @@ def crumbs(body, cls):
         return None
     parts = [clean(x[1]) for x in re.findall(r'<(a|span)\b[^>]*>(.*?)</\1>', m.group(1), re.S)]
     return [x for x in parts if x not in ('', '›')]
+
+def lds(body):
+    """Svi JSON-LD blokovi; None na mestu bloka koji nije ispravan JSON."""
+    out = []
+    for raw in re.findall(r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', body, re.S):
+        try:
+            out.append(json.loads(raw))
+        except ValueError:
+            out.append(None)
+    return out
+
+def ld_breadcrumbs(body):
+    for block in lds(body):
+        for node in (block or {}).get('@graph', []):
+            if node.get('@type') == 'BreadcrumbList':
+                return node.get('itemListElement', [])
+    return None
 
 def content(tag):
     m = re.search(r'content=(["\'])(.*?)\1', tag, re.S)
@@ -148,6 +165,28 @@ if 'h1' in SECTIONS:
               'arhiva kvizova': 'Pokaži šta znaš'}
     for name, want in expect.items():
         ok(f'{name}: H1 = {want}', h1s(page(name)[1]) == [want], str(h1s(page(name)[1])))
+
+if 'schema' in SECTIONS:
+    for name in pages:
+        st, b = page(name)
+        blocks = lds(b)
+        ok(f'{name}: JSON-LD je ispravan JSON', None not in blocks, pages[name])
+        if name == 'home':
+            types = {n.get('@type') for blk in blocks if blk for n in blk.get('@graph', [])}
+            ok('home: tačno jedan JSON-LD blok', len(blocks) == 1, str(len(blocks)))
+            ok('home: WebSite + Organization', types == {'WebSite', 'Organization'}, str(types))
+        elif name in ('lista', 'kategorija liste', 'kviz', 'anketa'):
+            items = ld_breadcrumbs(b) or []
+            names = [i.get('name') for i in items]
+            ok(f'{name}: BreadcrumbList', len(items) >= 2, str(names))
+            ok(f'{name}: pozicije 1..n', [i.get('position') for i in items] == list(range(1, len(items) + 1)), str(items))
+            ok(f'{name}: sve adrese apsolutne na sajtu', all(str(i.get('item', '')).startswith(BASE) for i in items), str([i.get('item') for i in items]))
+            og = metas(b, 'property', 'og:url')
+            ok(f'{name}: poslednja stavka = og:url', bool(items) and bool(og) and items[-1].get('item') == content(og[0]), f"{items[-1].get('item') if items else None} vs {content(og[0]) if og else None}")
+            cls = {'lista': 'vlp-breadcrumb', 'kategorija liste': 'ygv-cat-hero__breadcrumb', 'kviz': 'ygv-landing-crumbs', 'anketa': 'ygv-landing-crumbs'}[name]
+            ok(f'{name}: JSON-LD putanja = vidljiva', names == crumbs(b, cls), f'{names} vs {crumbs(b, cls)}')
+        else:
+            ok(f'{name}: bez JSON-LD', blocks == [], str(len(blocks)))
 
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)

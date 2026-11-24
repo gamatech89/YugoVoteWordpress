@@ -24,3 +24,4 @@ require_once YGV_SEO_DIR . '/seo-head.php';
 require_once YGV_SEO_DIR . '/seo-robots.php';
 require_once YGV_SEO_DIR . '/seo-admin.php';
 require_once YGV_SEO_DIR . '/seo-h1.php';
+require_once YGV_SEO_DIR . '/seo-schema.php';
