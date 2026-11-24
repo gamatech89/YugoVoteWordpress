@@ -674,6 +674,18 @@ document.addEventListener("click", (e) => {
   }
 });
 
+// Naslov kartice je pravi link ka stranici kviza (za Google i za otvaranje u novom tabu),
+// ali običan klik i dalje odmah otvara kviz u prozoru — kao klik na dugme iste kartice.
+document.addEventListener("click", (e) => {
+  const link = e.target.closest(".ygv-quiz-card__title-link");
+  if (!link) return;
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+  const btn = link.closest(".ygv-quiz-card")?.querySelector(".ygv-quiz-start-btn");
+  if (!btn) return;
+  e.preventDefault();
+  btn.click();
+});
+
 function ygvShowLoginModal() {
   let modal = document.getElementById("ygv-login-modal");
 

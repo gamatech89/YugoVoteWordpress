@@ -188,5 +188,10 @@ if 'schema' in SECTIONS:
         else:
             ok(f'{name}: bez JSON-LD', blocks == [], str(len(blocks)))
 
+if 'landing' in SECTIONS:
+    title_link = 'class="ygv-quiz-card__title-link" href="%s/quiz/' % BASE
+    ok('arhiva kvizova: naslov kartice je link ka kvizu', title_link in page('arhiva kvizova')[1])
+    ok('početna (slajder): naslov kartice je link ka kvizu', title_link in page('home')[1])
+
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)

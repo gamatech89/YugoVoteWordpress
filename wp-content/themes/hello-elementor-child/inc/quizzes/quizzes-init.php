@@ -18,6 +18,7 @@ require_once $quizzes_inc_path . 'cpts/cpt-quiz-level.php';
 require_once $quizzes_inc_path . 'cpts/cpt-questions.php';
 require_once $quizzes_inc_path . 'cpts/taxonomy-question-category.php';
 require_once $quizzes_inc_path . 'cpts/taxonomy-quiz-category.php';
+require_once $quizzes_inc_path . 'quiz-card.php'; // kartica kviza (filter, slajder, preporuke)
 
 // --- Meta Boxes ---
 if (class_exists('HelloElementorChild\\Quizzes\\Meta\\QuizMetaBox')) {

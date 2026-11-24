@@ -308,7 +308,7 @@ get_header();
                             </div>
 
                             <div class="ygv-quiz-card__body">
-                                <h3 class="ygv-quiz-card__title"><?php the_title(); ?></h3>
+                                <h3 class="ygv-quiz-card__title"><a class="ygv-quiz-card__title-link" href="<?php echo esc_url(get_permalink()); ?>"><?php echo esc_html(get_the_title()); ?></a></h3>
 
                                 <div class="ygv-quiz-card__meta">
                                     <span class="ygv-quiz-card__meta-item">

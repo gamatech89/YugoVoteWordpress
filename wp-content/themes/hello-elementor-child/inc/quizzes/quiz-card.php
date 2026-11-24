@@ -1,0 +1,159 @@
+<?php
+/**
+ * Kartica kviza — jedna za AJAX filter arhive, slajder na početnoj i „Još kvizova“ na stranici kviza.
+ *
+ * HTML je isti kao ranija kopija iz quiz-archive-ajax.php (proverava tests/seo/snapshot-cards.php),
+ * plus naslov kao link ka stranici kviza. Običan klik na naslov otvara prozor (js/quizzes/main.js).
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * Boja težine po slug-u nivoa (quiz_levels).
+ */
+function ygv_quiz_difficulty_color(string $slug): string {
+    $colors = [
+        'beginner'     => '#10b981', 'easy'   => '#10b981', 'lako'    => '#10b981',
+        'intermediate' => '#f59e0b', 'medium' => '#f59e0b', 'srednje' => '#f59e0b',
+        'expert'       => '#ef4444', 'hard'   => '#ef4444', 'tesko'   => '#ef4444', 'teško' => '#ef4444',
+    ];
+    return $colors[strtolower($slug)] ?? '#6366f1';
+}
+
+/**
+ * Najbolji rezultat i broj pokušaja prijavljenog korisnika (gost: nule).
+ *
+ * @return array{best_percent:int, attempts:int}
+ */
+function ygv_quiz_progress(int $user_id, int $quiz_id): array {
+    if ($user_id <= 0) {
+        return ['best_percent' => 0, 'attempts' => 0];
+    }
+    global $wpdb;
+    $row = $wpdb->get_row($wpdb->prepare(
+        "SELECT best_percent, attempts FROM {$wpdb->prefix}ygv_user_quiz_progress WHERE user_id=%d AND quiz_id=%d",
+        $user_id, $quiz_id
+    ));
+    return [
+        'best_percent' => $row ? (int) $row->best_percent : 0,
+        'attempts'     => $row ? (int) $row->attempts : 0,
+    ];
+}
+
+/**
+ * Ispisuje <article class="ygv-quiz-card">.
+ */
+function ygv_render_quiz_card(int $quiz_id, int $user_id): void {
+    $num_questions      = get_post_meta($quiz_id, '_num_questions', true) ?: 10;
+    $quiz_difficulty_id = get_post_meta($quiz_id, '_quiz_difficulty', true);
+    $quiz_difficulty    = '';
+    $diff_slug          = 'beginner';
+    if ($quiz_difficulty_id) {
+        $dp = get_post($quiz_difficulty_id);
+        if ($dp) { $quiz_difficulty = $dp->post_title; $diff_slug = $dp->post_name; }
+    }
+    $diff_color = ygv_quiz_difficulty_color($diff_slug);
+
+    $terms     = get_the_terms($quiz_id, 'quiz_category');
+    $cat_name  = 'GENERAL';
+    $cat_color = '#6366f1';
+    if ($terms && !is_wp_error($terms)) {
+        $cat_name  = strtoupper($terms[0]->name);
+        $cat_color = function_exists('ygv_get_quiz_category_color')
+            ? ygv_get_quiz_category_color($quiz_id) : '#6366f1';
+    }
+
+    $progress     = ygv_quiz_progress($user_id, $quiz_id);
+    $best_percent = $progress['best_percent'];
+    $attempts     = $progress['attempts'];
+    $is_completed = $attempts > 0;
+    $is_locked    = !$user_id && get_post_meta($quiz_id, '_allow_guest_play', true) !== '1';
+
+    if ($is_locked) {
+        $status_badge = '🔒 Prijavi se';      $status_class = 'ygv-status-locked';
+    } elseif ($is_completed && $best_percent >= 80) {
+        $status_badge = '✓ Odličan rezultat'; $status_class = 'ygv-status-excellent';
+    } elseif ($is_completed) {
+        $status_badge = '✓ Odigrano';         $status_class = 'ygv-status-played';
+    } else {
+        $status_badge = '☆ Nije igrano';      $status_class = 'ygv-status-new';
+    }
+    ?>
+    <article class="ygv-quiz-card <?php echo $is_locked ? 'ygv-quiz-card--locked' : ''; ?>"
+        style="--card-color: <?php echo esc_attr($cat_color); ?>;">
+        <div class="ygv-quiz-card__image">
+            <?php if (has_post_thumbnail($quiz_id)): ?>
+                <?php echo get_the_post_thumbnail($quiz_id, 'medium_large'); ?>
+            <?php else: ?>
+                <div class="ygv-quiz-card__placeholder"
+                    style="background:linear-gradient(135deg,<?php echo esc_attr($cat_color); ?> 0%,#1e2a5e 100%);">
+                    <?php ygv_icon_e('brain', 48); ?>
+                </div>
+            <?php endif; ?>
+            <span class="ygv-quiz-card__category" style="background:<?php echo esc_attr($cat_color); ?>;">
+                <?php echo esc_html($cat_name); ?>
+            </span>
+            <span class="ygv-quiz-card__status <?php echo esc_attr($status_class); ?>">
+                <?php echo esc_html($status_badge); ?>
+            </span>
+            <?php if ($is_locked): ?>
+                <div class="ygv-quiz-card__lock-overlay">
+                    <?php ygv_icon_e('lock', 28); ?>
+                </div>
+            <?php elseif ($is_completed): ?>
+                <div class="ygv-quiz-card__overlay">
+                    <div class="ygv-quiz-card__checkmark"><?php ygv_icon_e('check', 32); ?></div>
+                    <span class="ygv-quiz-card__percent"><?php echo $best_percent; ?>%</span>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="ygv-quiz-card__body">
+            <h3 class="ygv-quiz-card__title"><a class="ygv-quiz-card__title-link" href="<?php echo esc_url(get_permalink($quiz_id)); ?>"><?php echo esc_html(get_the_title($quiz_id)); ?></a></h3>
+            <div class="ygv-quiz-card__meta">
+                <span class="ygv-quiz-card__meta-item">
+                    <?php ygv_icon_e('file-list', 14); ?> <?php echo $num_questions; ?> pitanja
+                </span>
+                <?php if ($quiz_difficulty): ?>
+                    <span class="ygv-quiz-card__meta-item ygv-quiz-card__difficulty"
+                        style="color:<?php echo esc_attr($diff_color); ?>;">
+                        <?php ygv_icon_e('star', 14); ?> <?php echo esc_html($quiz_difficulty); ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+            <?php if ($is_locked): ?>
+                <div class="ygv-quiz-card__new-badge">
+                    <?php ygv_icon_e('lock', 14); ?> Registracija potrebna
+                </div>
+            <?php elseif ($is_completed): ?>
+                <div class="ygv-quiz-card__result">
+                    <span class="ygv-quiz-card__score-badge"
+                        style="color:<?php echo $best_percent >= 80 ? '#10b981' : ($best_percent >= 50 ? '#f59e0b' : '#ef4444'); ?>;">
+                        <?php echo $best_percent; ?>% <small>NAJBOLJI REZULTAT</small>
+                    </span>
+                    <span class="ygv-quiz-card__attempts">
+                        <?php ygv_icon_e('refresh', 12); ?> <?php echo $attempts; ?>x pokušaja
+                    </span>
+                </div>
+            <?php else: ?>
+                <div class="ygv-quiz-card__new-badge">
+                    <?php ygv_icon_e('sparkles', 14); ?> Novi kviz za tebe!
+                </div>
+            <?php endif; ?>
+            <button type="button"
+                class="ygv-quiz-card__btn ygv-quiz-start-btn <?php echo $is_locked ? 'ygv-quiz-btn--locked' : ''; ?>"
+                data-quiz-id="<?php echo $quiz_id; ?>"
+                <?php echo $is_locked ? 'data-locked="true"' : ''; ?>>
+                <?php if ($is_locked): ?>
+                    <?php ygv_icon_e('lock', 16); ?>
+                    <span>Prijavi se da igraš</span>
+                <?php else: ?>
+                    <?php ygv_icon_e($is_completed ? 'refresh' : 'play', 16); ?>
+                    <span><?php echo $is_completed ? 'Igraj Ponovo' : 'Započni Kviz'; ?></span>
+                <?php endif; ?>
+            </button>
+        </div>
+    </article>
+    <?php
+}

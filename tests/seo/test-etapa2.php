@@ -77,6 +77,15 @@ t('JSON: BreadcrumbList', $d['@graph'][0]['@type'] ?? null, 'BreadcrumbList');
 t('pozicije od 1', array_column($d['@graph'][0]['itemListElement'], 'position'), [1, 2, 3]);
 t('ListItem tip', array_unique(array_column($d['@graph'][0]['itemListElement'], '@type')), ['ListItem']);
 
+// ---------- kartica kviza (partial) ----------
+ob_start(); ygv_render_quiz_card($Q1, 0); $h = ob_get_clean();
+t('kartica: naslov je link ka kvizu', (bool) preg_match('#<h3 class="ygv-quiz-card__title"><a class="ygv-quiz-card__title-link" href="' . preg_quote(get_permalink($Q1), '#') . '">#', $h), true);
+t('kartica: dugme otvara prozor', strpos($h, 'data-quiz-id="' . $Q1 . '"') !== false, true);
+t('kartica: naslov escapovan jednom', strpos($h, 'Kviz &quot;A&amp;B&quot; &lt;/script&gt;') !== false, true);
+t('boja težine: tesko', ygv_quiz_difficulty_color('Tesko'), '#ef4444');
+t('boja težine: nepoznata', ygv_quiz_difficulty_color('xyz'), '#6366f1');
+t('napredak: gost', ygv_quiz_progress(0, $Q1), ['best_percent' => 0, 'attempts' => 0]);
+
 $GLOBALS['ygv_test_done'] = true;
 echo $fails === 0 ? "SVE PASS\n" : "PALO: $fails\n";
 exit($fails === 0 ? 0 : 1);
