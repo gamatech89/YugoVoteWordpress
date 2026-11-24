@@ -20,6 +20,17 @@ function t(string $name, $got, $want): void {
 }
 
 // ---------- privremeni podaci (brišu se na kraju, i posle fatalne greške) ----------
+// Pravljenje kategorije lista pokreće generator boja, koji prepisuje css/category-colors.css iz LOKALNE
+// baze — taj fajl bi onda otišao na produkciju sa deploy-em. Generator gasimo, a fajl čuvamo i vraćamo.
+remove_action('created_voting_list_category', 'regenerate_category_color_css');
+remove_action('edited_voting_list_category', 'regenerate_category_color_css');
+$ygv_colors_css = get_stylesheet_directory() . '/css/category-colors.css';
+$ygv_colors_before = (string) @file_get_contents($ygv_colors_css);
+register_shutdown_function(function () use ($ygv_colors_css, $ygv_colors_before) {
+    if ($ygv_colors_before !== '' && (string) @file_get_contents($ygv_colors_css) !== $ygv_colors_before) {
+        file_put_contents($ygv_colors_css, $ygv_colors_before);
+    }
+});
 $made = ['posts' => [], 'terms' => []];
 register_shutdown_function(function () use (&$made) {
     foreach ($made['posts'] as $id) { wp_delete_post($id, true); }
