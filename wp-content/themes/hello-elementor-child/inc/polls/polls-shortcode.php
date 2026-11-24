@@ -85,6 +85,7 @@ function cs_poll_shortcode($atts) {
     $total = (int) get_post_meta($poll_id, '_cs_poll_total_votes', true);
     
     $has_voted = function_exists('cs_has_user_voted_poll') ? cs_has_user_voted_poll($poll_id) : isset($_COOKIE['cs_poll_' . $poll_id]);
+    $guest_voted = $has_voted && !is_user_logged_in(); // pre nego što zaključavanje forsira prikaz rezultata
 
     // Force results if the poll is locked
     $is_locked = get_post_meta($poll_id, '_cs_poll_locked', true);
@@ -92,8 +93,9 @@ function cs_poll_shortcode($atts) {
         $has_voted = true;
     }
 
-    // Tell LiteSpeed not to serve public cache to users who already voted via cookie
-    if ($has_voted && !is_user_logged_in()) {
+    // Tell LiteSpeed not to serve public cache to users who already voted via cookie.
+    // Zaključana anketa svima prikazuje iste rezultate, pa za nju javni keš ostaje.
+    if ($guest_voted) {
         do_action('litespeed_control_set_private', 'user_voted_poll_' . $poll_id);
     }
 

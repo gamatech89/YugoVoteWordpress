@@ -152,6 +152,39 @@ $ld = json_decode(ygv_schema_json(ygv_schema_graph()), true);
 t('JSON-LD na stranici kviza', array_column($ld['@graph'][0]['itemListElement'] ?? [], 'name'), ['Kvizovi', 'K', 'Kviz "A&B" </script>']);
 t('vidljiva putanja: kategorija vodi na filtriranu arhivu', strpos($html, 'href="' . esc_url(ygv_quiz_category_url(get_term($K))) . '"') !== false, true);
 
+// ---------- stranica ankete + keš ankete ----------
+$A1 = mk_post('voting_poll', 'A1', ['post_content' => 'Opis ankete A1.']);
+$A2 = mk_post('voting_poll', 'A2');
+$A3 = mk_post('voting_poll', 'A3');
+$A4 = mk_post('voting_poll', 'A4');
+foreach ([$A1 => '2030-02-04', $A2 => '2030-02-03', $A3 => '2030-02-02', $A4 => '2030-02-01'] as $id => $date) {
+    $wpdb->update($wpdb->posts, ['post_date' => "$date 10:00:00", 'post_date_gmt' => "$date 09:00:00"], ['ID' => $id]);
+    clean_post_cache($id);
+    update_post_meta($id, '_cs_poll_answers', [['text' => 'Da', 'votes' => 0], ['text' => 'Ne', 'votes' => 0]]);
+}
+update_post_meta($A2, '_cs_poll_locked', '1');
+t('još anketa: bez trenutne i zaključanih', array_slice(ygv_poll_related_ids($A1, 3), 0, 2), [$A3, $A4]);
+t('još anketa: granica', count(ygv_poll_related_ids($A1, 2)), 2);
+
+$priv = 0;
+add_action('litespeed_control_set_private', function () use (&$priv) { $priv++; });
+wp_set_current_user(0);
+unset($_COOKIE['cs_poll_' . $A2]);
+do_shortcode('[voting_poll id="' . $A2 . '"]');
+t('zaključana anketa, gost nije glasao: bez privatnog keša', $priv, 0);
+$_COOKIE['cs_poll_' . $A3] = '1';
+do_shortcode('[voting_poll id="' . $A3 . '"]');
+t('gost je glasao: privatni keš', $priv, 1);
+unset($_COOKIE['cs_poll_' . $A3]);
+
+$html = ygv_test_render_singular($A1, 'single-voting_poll.php');
+t('anketa: bez upozorenja', $GLOBALS['ygv_warnings'], []);
+t('anketa: jedan h1', substr_count($html, '<h1'), 1);
+t('anketa: forma za glasanje', (bool) preg_match('#class="ygv-poll [^"]*"\s+data-poll-id="' . $A1 . '"#', $html), true);
+t('anketa: opis', strpos($html, 'Opis ankete A1.') !== false, true);
+t('anketa: još anketa (bez zaključane)', strpos($html, 'Još anketa') !== false && strpos($html, 'data-poll-id="' . $A2 . '"') === false && strpos($html, 'data-poll-id="' . $A3 . '"') !== false, true);
+t('anketa: putanja', strpos($html, 'class="ygv-landing-crumbs"') !== false && strpos($html, '>Ankete</a>') !== false, true);
+
 $GLOBALS['ygv_test_done'] = true;
 echo $fails === 0 ? "SVE PASS\n" : "PALO: $fails\n";
 exit($fails === 0 ? 0 : 1);

@@ -197,6 +197,10 @@ if 'landing' in SECTIONS:
     ok('kviz: dugme otvara prozor za ovaj kviz', bool(pid) and re.search(r'class="ygv-landing-cta ygv-quiz-start-btn"\s+data-quiz-id="%s"' % (pid.group(1) if pid else 'x'), b) is not None, pid.group(1) if pid else 'nema postid')
     ok('kviz: putanja se vidi', bool(crumbs(b, 'ygv-landing-crumbs')), str(crumbs(b, 'ygv-landing-crumbs')))
     ok('kviz: još kvizova', 'ygv-landing-more__grid' in b and 'class="ygv-quiz-card ' in b.split('ygv-landing-more__grid', 1)[-1])
+    st, b = page('anketa')
+    pid = re.search(r'\bpostid-(\d+)\b', b)
+    ok('anketa: forma za glasanje ove ankete', bool(pid) and re.search(r'class="ygv-poll [^"]*"\s+data-poll-id="%s"' % (pid.group(1) if pid else 'x'), b) is not None, pid.group(1) if pid else 'nema postid')
+    ok('anketa: putanja se vidi', bool(crumbs(b, 'ygv-landing-crumbs')), str(crumbs(b, 'ygv-landing-crumbs')))
 
 print(f'\n{fails} FAIL' if fails else '\nSVE PASS')
 sys.exit(1 if fails else 0)
