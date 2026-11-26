@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
-define('HELLO_ELEMENTOR_CHILD_VERSION', '2.0.5'); // 2.0.5: SEO etapa 2 (templates.css, landing)
+define('HELLO_ELEMENTOR_CHILD_VERSION', '2.0.6'); // 2.0.6: TikTok i YouTube na Kontakt stranici
 
 // **** LOAD THEME CONFIGURATION CONSTANTS ****
 if (file_exists(get_stylesheet_directory() . '/inc/config.php')) {

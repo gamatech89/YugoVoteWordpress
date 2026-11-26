@@ -3821,6 +3821,16 @@ a {
   color: #1565c0;
 }
 
+.ygv-kontakt-info__icon--tt {
+  background: #eceef2;
+  color: #111827;
+}
+
+.ygv-kontakt-info__icon--yt {
+  background: #fde8e8;
+  color: #cc0000;
+}
+
 .ygv-kontakt-info__item span {
   display: block;
   font-size: 11px;

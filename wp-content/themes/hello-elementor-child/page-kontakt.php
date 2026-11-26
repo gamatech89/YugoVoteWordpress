@@ -83,6 +83,31 @@ get_header();
                                 <a href="https://www.facebook.com/yugovote/" target="_blank" rel="noopener">YugoVote</a>
                             </div>
                         </div>
+
+                        <div class="ygv-kontakt-info__item">
+                            <div class="ygv-kontakt-info__icon ygv-kontakt-info__icon--tt">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 7.917v4.034a9.948 9.948 0 0 1-5-1.951v4.5a6.5 6.5 0 1 1-8-6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span>TikTok</span>
+                                <a href="https://www.tiktok.com/@yugovote" target="_blank" rel="noopener">@yugovote</a>
+                            </div>
+                        </div>
+
+                        <div class="ygv-kontakt-info__item">
+                            <div class="ygv-kontakt-info__icon ygv-kontakt-info__icon--yt">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+                                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span>YouTube</span>
+                                <a href="https://www.youtube.com/@YugoVote" target="_blank" rel="noopener">@YugoVote</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </aside>

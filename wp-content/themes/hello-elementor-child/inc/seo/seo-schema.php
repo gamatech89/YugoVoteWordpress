@@ -143,6 +143,8 @@ function ygv_schema_graph(): array {
                 'sameAs' => [
                     'https://www.facebook.com/profile.php?id=61591842951679',
                     'https://www.instagram.com/yugovote/',
+                    'https://www.tiktok.com/@yugovote',
+                    'https://www.youtube.com/@YugoVote',
                 ],
             ],
         ];

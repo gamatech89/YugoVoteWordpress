@@ -181,6 +181,11 @@ if 'schema' in SECTIONS:
             ok('home: Organization sameAs ima Instagram @yugovote', 'https://www.instagram.com/yugovote/' in org.get('sameAs', []), str(org.get('sameAs')))
             ok('home: futer vodi na Instagram @yugovote', 'instagram.com/yugovote/' in b, 'nema linka')
             ok('home: nigde stari nalog @yugo_vote', 'yugo_vote' not in b, 'stari nalog još postoji')
+            kontakt = get(BASE + '/kontakt/')[1]
+            for mreza, url in (('TikTok', 'https://www.tiktok.com/@yugovote'), ('YouTube', 'https://www.youtube.com/@YugoVote')):
+                ok(f'home: Organization sameAs ima {mreza}', url in org.get('sameAs', []), str(org.get('sameAs')))
+                ok(f'home: futer ima {mreza} ikonicu', f'href="{url}"' in b and f'elementor-social-icon-{mreza.lower()}' in b, 'nema ikonice')
+                ok(f'kontakt: {mreza} link', f'href="{url}"' in kontakt, 'nema linka')
         elif name in ('lista', 'kategorija liste', 'kviz', 'anketa'):
             items = ld_breadcrumbs(b) or []
             names = [i.get('name') for i in items]
