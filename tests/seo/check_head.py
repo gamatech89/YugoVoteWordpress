@@ -177,6 +177,10 @@ if 'schema' in SECTIONS:
             types = {n.get('@type') for blk in blocks if blk for n in blk.get('@graph', [])}
             ok('home: tačno jedan JSON-LD blok', len(blocks) == 1, str(len(blocks)))
             ok('home: WebSite + Organization', types == {'WebSite', 'Organization'}, str(types))
+            org = next((n for blk in blocks if blk for n in blk.get('@graph', []) if n.get('@type') == 'Organization'), {})
+            ok('home: Organization sameAs ima Instagram @yugovote', 'https://www.instagram.com/yugovote/' in org.get('sameAs', []), str(org.get('sameAs')))
+            ok('home: futer vodi na Instagram @yugovote', 'instagram.com/yugovote/' in b, 'nema linka')
+            ok('home: nigde stari nalog @yugo_vote', 'yugo_vote' not in b, 'stari nalog još postoji')
         elif name in ('lista', 'kategorija liste', 'kviz', 'anketa'):
             items = ld_breadcrumbs(b) or []
             names = [i.get('name') for i in items]

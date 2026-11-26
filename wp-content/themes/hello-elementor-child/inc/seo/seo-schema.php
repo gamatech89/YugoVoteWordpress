@@ -142,7 +142,7 @@ function ygv_schema_graph(): array {
                 ],
                 'sameAs' => [
                     'https://www.facebook.com/profile.php?id=61591842951679',
-                    'https://www.instagram.com/yugo_vote/',
+                    'https://www.instagram.com/yugovote/',
                 ],
             ],
         ];
